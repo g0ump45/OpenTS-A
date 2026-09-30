@@ -34,3 +34,25 @@ a mission, or Options > Game Controls > About OpenTS-A from the main menu.
 Donations do not alter gameplay or unlock content. The GitHub funding button
 is configured in .github/FUNDING.yml. GitHub Sponsors requires enrollment by
 the account owner.
+
+## Release APK
+
+Build the unsigned release variant with Gradle 8.5:
+
+```powershell
+gradle.bat -p android --no-daemon assembleRelease
+```
+
+Sign android/app/build/outputs/apk/release/app-release-unsigned.apk with
+Android SDK Build Tools apksigner and a privately stored release keystore.
+Pass passwords through protected environment variables, not command arguments.
+Verify the result with apksigner verify --verbose --print-certs before publishing.
+Keep the keystore and its password backed up privately; future updates must use
+the same signing key. Never put either in the repository or release assets.
+
+V1 uses versionName 1.0.0 and versionCode 2. It uses a different certificate from
+the earlier debug APKs, so installing over those is not supported. Export saves
+and game files before uninstalling a debug build.
+
+Android native compilation enables Clang MS extensions in every configuration,
+including the RelWithDebInfo configuration used by the APK release variant.
