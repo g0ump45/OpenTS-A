@@ -4,11 +4,15 @@ An Android port of [OpenTS](https://github.com/OpenTS-Developers/OpenTS), mainta
 
 This port adds Modern Touch controls, phone menus, game-file importing, pinch zoom, campaign audio support and Android LAN multiplayer work. Development continues: sidebar video playback and minimap alignment need further device testing and refinement. More updates will follow, and more projects by GEARS0FUMP45 may come soon.
 
+The V1 download has been corrected to **1.0.1 (code 4)** for the startup
+library mismatch and post-cutscene smoke crash. Re-download the APK if the
+original V1 installation closes. The corrected build has been confirmed working on the phone.
+
 ## Install
 
 1. Use **Android 8.0 or newer on a 64-bit ARM device**. Install the OpenTS-A APK and allow installation from your file manager when Android asks. Download [V1 - Welcome Back Commander](https://github.com/g0ump45/OpenTS-A/releases/tag/v1.0.0).
-2. Supply your own Tiberian Sun files, plus expansion files for Firestorm. Keep movie and speech archives for videos and spoken objectives. Game assets are not included here.
-3. Put the game files in a ZIP. Open the app: when files are missing, the importer opens automatically. Choose the ZIP, finish importing, then start the game.
+2. Download **OpenTS-A-GameFiles.zip** from the [Releases page](https://github.com/g0ump45/OpenTS-A/releases/tag/v1.0.0). It includes the game files, movies and restored mission audio.
+3. Keep the ZIP compressed and leave at least 5 GiB free during import. Open the app: when game files are missing, the importer opens automatically. Tap **Choose installation ZIP**, select **OpenTS-A-GameFiles.zip**, wait for completion, tap **Close game**, then reopen OpenTS-A.
 4. Open **Options > Game Controls > Touch Controls > Controls Guide** for help. Back up saves before replacing test builds.
 
 See [game-file requirements](docs/ANDROID-GAME-FILES.md) and [Android build instructions](docs/ANDROID-BUILD.md).
