@@ -425,7 +425,7 @@ void ParticleSystemClass::Smoke_AI(void)
 {
 	int i;
 
-	if (Source->As_ObjectClass() != NULL && Source->What_Am_I() != RTTI_BUILDING) {
+	if (Source != NULL && Source->As_ObjectClass() != NULL && Source->What_Am_I() != RTTI_BUILDING) {
 		Set_Coord(Source->Center_Coord() + CoordOffset);
 	}
 
@@ -492,7 +492,7 @@ void ParticleSystemClass::Smoke_AI(void)
 	}
 
 	if (!IsMarkedForDeletion && IsActive && (Frame % (int)SpawnFrames) == 0) {
-		FootClass *foot = Source->As_FootClass();
+		FootClass *foot = Source != NULL ? Source->As_FootClass() : NULL;
 		if (foot == NULL || foot->CurrentTube < 0) {
 			int xrand = Scen->RandomNumber();
 			int yrand = Scen->RandomNumber();

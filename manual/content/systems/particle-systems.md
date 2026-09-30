@@ -220,3 +220,8 @@ Nothing rebuilds it. The one build happens as the scenario is set up, and the bl
 :::
 
 Of the ten `Default…System` names the rules carry, [`DefaultFirestormExplosionSystem`](/keys/defaultfirestormexplosionsystem/) is the only one that reaches a system that is ever built; the [`DefaultSparkSystem`](/keys/defaultsparksystem/) page covers the other nine as a group. [`HalfDamageSmokeLocation1`](/keys/halfdamagesmokelocation1/) and its two companions stand on the same footing beside [`DamageSmokeOffset`](/keys/damagesmokeoffset/).
+
+Smoke systems can exist without a source object. They keep their current
+position and continue updating particles; following a source and checking its
+tunnel state only apply when that source exists. A detached system still obeys
+its existing deletion state.

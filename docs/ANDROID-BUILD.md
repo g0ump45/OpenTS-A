@@ -56,3 +56,9 @@ and game files before uninstalling a debug build.
 
 Android native compilation enables Clang MS extensions in every configuration,
 including the RelWithDebInfo configuration used by the APK release variant.
+
+The corrected V1 APK uses versionName 1.0.1 and versionCode 4 with the original
+release signing key. All Android configurations package the engine as
+libGameD.so, matching the NativeActivity manifest. The original release APK
+used a different native library filename and could not start. The hotfix also
+checks for a missing source object before updating smoke effects.
