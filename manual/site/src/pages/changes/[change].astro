@@ -1,0 +1,82 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import Feedback from '../../components/Feedback.astro';
+import { UI } from '../../i18n/en.mjs';
+import {
+	entityHref,
+	entityLabel,
+	releaseByVersion,
+} from '../../lib/data';
+import { effectLabels } from '../../lib/lifecycle';
+import { withBase } from '../../lib/paths';
+
+export async function getStaticPaths() {
+	return (await getCollection('changes')).map((entry) => ({
+		params: { change: entry.id },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const release = releaseByVersion(entry.data.release);
+const categoryLabels = UI.changeCategories;
+const pageHeadings = [
+	...headings,
+	...(entry.data.breaking ? [{ depth: 2, slug: 'migration', text: 'Migration' }] : []),
+	...(entry.data.targets.length > 0 ? [{ depth: 2, slug: 'affected-entities', text: 'Affected entities' }] : []),
+];
+---
+
+<StarlightPage frontmatter={{ title: entry.data.title, description: `${categoryLabels[entry.data.category]} OpenTS change for ${entry.data.release}: ${entry.data.title}` }} headings={pageHeadings}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.changes, href: '/changes/' },
+		{
+			label: `${entry.data.release}${release?.status === 'development' ? ' (in development)' : ''}`,
+			href: `/changes/${entry.data.release}/`,
+		},
+	]} />
+	<div class="ots-badges">
+		<span class="ots-badge ots-badge-change">{categoryLabels[entry.data.category]}</span>
+		<span class="ots-badge ots-badge-release">
+			{release?.status === 'released' ? 'Released in' : 'Planned for'} {entry.data.release}
+		</span>
+		{entry.data.breaking && <span class="ots-badge ots-badge-breaking">Breaking</span>}
+	</div>
+	<Content />
+	{entry.data.breaking && (
+		<section class="ots-breaking-migration" aria-labelledby="migration">
+			<h2 id="migration">Migration</h2>
+			<div class="ots-aside ots-aside-warn">
+				<div class="ots-aside-title">Existing content must be updated</div>
+				<ol>{entry.data.migration.map((step) => <li>{step}</li>)}</ol>
+				<p><a href={withBase(`/changes/${entry.data.release}/`)}>View all upgrade steps for {entry.data.release}</a></p>
+			</div>
+		</section>
+	)}
+	{entry.data.targets.length > 0 && (
+		<section class="ots-change-targets">
+			<h2 id="affected-entities">Affected entities</h2>
+			<ul>
+				{entry.data.targets.map((target) => {
+					const href = entityHref(target);
+					return (
+						<li>
+							<span class={`ots-badge ots-badge-${target.effect === 'removed' ? 'removed' : target.effect === 'deprecated' ? 'deprecated' : 'change'}`}>
+								{effectLabels[target.effect]}
+							</span>
+							{href
+								? <a href={withBase(href)}><code>{entityLabel(target)}</code></a>
+								: <code>{entityLabel(target)}</code>}
+						</li>
+					);
+				})}
+			</ul>
+		</section>
+	)}
+	{release?.date && <p class="ots-credit">Release date: <time datetime={release.date}>{release.date}</time></p>}
+	{entry.data.credit.length > 0 && <p class="ots-credit">Credit: {entry.data.credit.join(', ')}</p>}
+	<Feedback title={entry.data.title} path={`/changes/${entry.id}/`} />
+</StarlightPage>

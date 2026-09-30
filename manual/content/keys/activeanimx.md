@@ -1,0 +1,12 @@
+---
+key: ActiveAnimX
+summary: How far right of the structure's drawing point the first active slot's animation sits, in screen pixels.
+see_also: ["ActiveAnim", "ActiveAnimY"]
+when_omitted:
+  kind: value
+  value: "0"
+---
+
+The horizontal half of the first slot's offset. It carries the [`ActiveAnim`](/keys/activeanim/) animation right across the screen from the point the structure is drawn at, and a negative figure moves it left of that point instead. The offset pins the animation to a point on the artwork rather than to a cell, so it holds wherever the structure stands.
+
+[Placement and draw order](/systems/building-animations/#placement-and-draw-order) covers how the offset differs from the two draw-order biases, and [Where each setting is read from](/systems/building-animations/#where-each-setting-is-read-from) covers when the two figures are read.

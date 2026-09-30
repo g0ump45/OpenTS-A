@@ -1,0 +1,58 @@
+---
+import ScriptingDetail from '../../../components/ScriptingDetail.astro';
+import TombstoneDetail from '../../../components/TombstoneDetail.astro';
+import {
+	entityHref,
+	scriptingRouteAliases,
+	tombstones,
+	triggersByKind,
+	type LifecycleEntityType,
+	type TombstoneRecord,
+	type TriggerRecord,
+} from '../../../lib/data';
+import { requireRouteTail, withBase } from '../../../lib/paths';
+
+export function getStaticPaths() {
+	const kinds = {
+		actions: 'action',
+		events: 'event',
+		missions: 'mission',
+	} as const;
+	return Object.entries(kinds).flatMap(([kind, type]) => {
+		const active = triggersByKind(kind).map((record) => ({
+			params: { kind, id: record.route_id },
+			props: { page: 'active' as const, record },
+		}));
+		const removed = tombstones()
+			.filter((record) => record.type === type)
+			.map((record) => ({
+				params: { kind, id: requireRouteTail(record.route, `${type} tombstone ${record.id}`) },
+				props: { page: 'removed' as const, record },
+			}));
+		const aliases = scriptingRouteAliases(kind).map((alias) => {
+			const reference = { type: type as Extract<LifecycleEntityType, 'action' | 'event' | 'mission'>, id: alias.target_id };
+			const destination = entityHref(reference);
+			if (!destination) throw new Error(`Alias ${kind}/${alias.route_id} has no target`);
+			return {
+				params: { kind, id: alias.route_id },
+				props: { page: 'alias' as const, destination },
+			};
+		});
+		return [...active, ...removed, ...aliases];
+	});
+}
+
+type Props =
+	| { page: 'active'; record: TriggerRecord }
+	| { page: 'removed'; record: TombstoneRecord }
+	| { page: 'alias'; destination: string };
+const props = Astro.props as Props;
+const aliasDestination = props.page === 'alias' ? withBase(props.destination) : undefined;
+if (aliasDestination) return Astro.redirect(aliasDestination, 301);
+---
+
+{props.page === 'active'
+	? <ScriptingDetail record={props.record} />
+	: props.page === 'removed'
+		? <TombstoneDetail record={props.record} />
+		: null}

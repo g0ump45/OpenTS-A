@@ -1,0 +1,66 @@
+---
+import type { EnumValueRecord } from '../lib/data';
+import { UI } from '../i18n/en.mjs';
+
+interface Props { values: EnumValueRecord[] }
+const { values } = Astro.props;
+---
+
+<div class="ots-reference ots-filter-table ots-enum-table" data-enum-table>
+	<div class="ots-reference-controls">
+		<label>
+			<span>{UI.enums.filter}</span>
+			<input type="search" data-filter placeholder={UI.enums.placeholder} autocomplete="off" />
+		</label>
+		<p class="ots-result-count" aria-live="polite"><strong data-visible-count>{values.length}</strong> {UI.enums.of} {values.length}</p>
+	</div>
+	<div class="ots-tablewrap">
+		<table>
+			<thead><tr>{UI.enums.headings.map((heading) => <th>{heading}</th>)}</tr></thead>
+			<tbody>
+				{values.map((value) => (
+					<tr data-row data-search={`${value.input} ${value.meaning} ${value.constant} ${value.value} ${value.note ?? ''}`.toLowerCase()}>
+						<td data-label={UI.enums.headings[0]}><code>{value.input}</code></td>
+						<td data-label={UI.enums.headings[1]}>{value.meaning}{value.note && <small>{value.note}</small>}</td>
+						<td data-label={UI.enums.headings[2]}><code>{value.constant}</code></td>
+						<td data-label={UI.enums.headings[3]} class="num"><code>{value.value}</code></td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+	<p class="ots-empty" data-empty hidden>{UI.enums.noMatches}</p>
+</div>
+
+<script>
+	function initializeEnumTables() {
+		for (const root of document.querySelectorAll('[data-enum-table]')) {
+			if (root.hasAttribute('data-ready')) continue;
+			root.setAttribute('data-ready', '');
+			const input = root.querySelector('[data-filter]');
+			const rows = [...root.querySelectorAll('[data-row]')];
+			const count = root.querySelector('[data-visible-count]');
+			const empty = root.querySelector('[data-empty]');
+			const params = new URLSearchParams(location.search);
+			if (input instanceof HTMLInputElement) input.value = params.get('q') ?? '';
+			const apply = () => {
+				const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+				let visible = 0;
+				for (const row of rows) {
+					const show = !query || row.getAttribute('data-search')?.includes(query);
+					row.toggleAttribute('hidden', !show);
+					if (show) visible++;
+				}
+				if (count) count.textContent = String(visible);
+				if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+				const next = new URLSearchParams(location.search);
+				query ? next.set('q', query) : next.delete('q');
+				history.replaceState(null, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
+			};
+			input?.addEventListener('input', apply);
+			apply();
+		}
+	}
+	document.addEventListener('astro:page-load', initializeEnumTables);
+	initializeEnumTables();
+</script>

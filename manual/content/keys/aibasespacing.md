@@ -1,0 +1,12 @@
+---
+key: AIBaseSpacing
+summary: Cells of clearance kept around a building when base ground is reserved and computer placements are searched.
+see_also: ["system:ai-base-building"]
+when_omitted:
+  kind: value
+  value: "1"
+---
+
+Every building that is not a vehicle reserves its footprint grown by this many cells on each side as ground occupied by its owner, and the computer's [placement search](/systems/ai-base-building/#choosing-a-spot) grows a candidate footprint by the same margin before testing it. The reservation is kept for every house, but each house's search consults its own reservations only.
+
+The margin constrains the first placement attempt only; the second attempt drops it and places against the bare footprint.

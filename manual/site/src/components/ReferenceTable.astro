@@ -1,0 +1,164 @@
+---
+import { UI } from '../i18n/en.mjs';
+import type { EffectState, WhenOmittedDisplay } from '../lib/data';
+
+interface Row {
+	key: string;
+	href: string;
+	summary?: string;
+	value?: string;
+	whenOmitted?: WhenOmittedDisplay;
+	facet?: string;
+	context?: string;
+	searchContext?: string;
+	viaImage?: boolean;
+	/* A row that stands for one scope is 'used' or 'none'; a row that stands
+	   for a whole key is 'partial' when only some of its scopes are inert. */
+	effect?: EffectState;
+}
+
+interface Props {
+	rows: Row[];
+	searchLabel?: string;
+	facetLabel?: string;
+	showImageFilter?: boolean;
+}
+
+const {
+	rows,
+	searchLabel = UI.reference.filterKeys,
+	facetLabel,
+	showImageFilter = false,
+} = Astro.props;
+const facets: string[] = Array.from(
+	new Set<string>((rows as Row[]).flatMap((row) => row.facet ? [row.facet] : [])),
+).sort();
+const effectState = (row: Row): EffectState => row.effect ?? 'used';
+const showEffectFilter = (rows as Row[]).some((row) => effectState(row) !== 'used');
+---
+
+<div class="ots-reference ots-filter-table" data-reference-table>
+	<div class="ots-reference-controls">
+		<label>
+			<span>{searchLabel}</span>
+			<input type="search" data-filter placeholder={UI.reference.placeholder} autocomplete="off" />
+		</label>
+		{facetLabel && facets.length > 1 && (
+			<label>
+				<span>{facetLabel}</span>
+				<select data-facet>
+					<option value="">{UI.reference.all}</option>
+					{facets.map((facet) => <option value={facet}>{facet}</option>)}
+				</select>
+			</label>
+		)}
+		{showEffectFilter && (
+			<label>
+				<span>{UI.noEffect.filterLabel}</span>
+				<select data-effect>
+					<option value="">{UI.reference.all}</option>
+					<option value="used">{UI.noEffect.filterUsed}</option>
+					<option value="none">{UI.noEffect.filterNone}</option>
+				</select>
+			</label>
+		)}
+		{showImageFilter && (
+			<label class="ots-checkbox"><input type="checkbox" data-image-only /> {UI.reference.imageOnly}</label>
+		)}
+		<p class="ots-result-count" aria-live="polite"><strong data-visible-count>{rows.length}</strong> {UI.reference.of} {rows.length}</p>
+	</div>
+	<div class="ots-tablewrap">
+		<table>
+			<thead><tr>{UI.reference.headings.map((heading) => <th>{heading}</th>)}{showImageFilter && <th>{UI.reference.imageSelected}</th>}</tr></thead>
+			<tbody>
+				{rows.map((row) => (
+					<tr
+						data-row
+						data-search={`${row.key} ${row.summary ?? ''} ${row.value ?? ''} ${row.whenOmitted?.text ?? ''} ${row.context ?? ''} ${row.searchContext ?? ''}`.toLowerCase()}
+						data-facet-value={row.facet ?? ''}
+						data-via-image={row.viaImage ? 'yes' : 'no'}
+						data-effect-value={effectState(row)}
+					>
+						<td data-label={UI.reference.headings[0]}>
+							<span class="ots-reference-key">
+								<a href={row.href}><code>{row.key}</code></a>
+								{effectState(row) !== 'used' && (
+									<span class="ots-badge ots-badge-noeffect">
+										{effectState(row) === 'partial' ? UI.noEffect.badgePartial : UI.noEffect.badge}
+									</span>
+								)}
+								{row.context && <small>{row.context}</small>}
+							</span>
+						</td>
+						<td data-label={UI.reference.headings[1]}>{row.summary ?? ''}</td>
+						<td data-label={UI.reference.headings[2]}>{row.value ?? ''}</td>
+						<td data-label={UI.reference.headings[3]}>
+							{row.whenOmitted?.code
+								? <code>{row.whenOmitted.text}</code>
+								: <span class="ots-unknown">{row.whenOmitted?.text ?? UI.omission.notDocumented}</span>}
+						</td>
+						{showImageFilter && <td data-label={UI.reference.imageSelected}>{row.viaImage ? UI.reference.yes : UI.reference.no}</td>}
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+	<p class="ots-empty" data-empty hidden>{UI.reference.noMatches}</p>
+</div>
+
+<script>
+	import { cleanParam } from '../lib/filter-params.mjs';
+
+	function initializeReferenceTables() {
+		for (const root of document.querySelectorAll('[data-reference-table]')) {
+			if (root.hasAttribute('data-ready')) continue;
+			root.setAttribute('data-ready', '');
+			const input = root.querySelector('[data-filter]');
+			const facet = root.querySelector('[data-facet]');
+			const effect = root.querySelector('[data-effect]');
+			const imageOnly = root.querySelector('[data-image-only]');
+			const rows = [...root.querySelectorAll('[data-row]')];
+			const count = root.querySelector('[data-visible-count]');
+			const empty = root.querySelector('[data-empty]');
+			const params = new URLSearchParams(location.search);
+			if (input instanceof HTMLInputElement) input.value = params.get('q') ?? '';
+			if (facet instanceof HTMLSelectElement) facet.value = cleanParam(params, 'type');
+			if (effect instanceof HTMLSelectElement) effect.value = cleanParam(params, 'effect');
+			if (imageOnly instanceof HTMLInputElement) imageOnly.checked = cleanParam(params, 'image') === 'yes';
+
+			const apply = () => {
+				const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+				const selected = facet instanceof HTMLSelectElement ? facet.value : '';
+				const runtime = effect instanceof HTMLSelectElement ? effect.value : '';
+				const image = imageOnly instanceof HTMLInputElement && imageOnly.checked;
+				let visible = 0;
+				for (const row of rows) {
+					/* A partly inert key belongs to both answers: it has scopes the
+					   game uses and scopes it does not. */
+					const state = row.getAttribute('data-effect-value');
+					const show = (!query || row.getAttribute('data-search')?.includes(query)) &&
+						(!selected || row.getAttribute('data-facet-value') === selected) &&
+						(!runtime || state === 'partial' || state === runtime) &&
+						(!image || row.getAttribute('data-via-image') === 'yes');
+					row.toggleAttribute('hidden', !show);
+					if (show) visible++;
+				}
+				if (count) count.textContent = String(visible);
+				if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+				const next = new URLSearchParams(location.search);
+				query ? next.set('q', query) : next.delete('q');
+				selected ? next.set('type', selected) : next.delete('type');
+				runtime ? next.set('effect', runtime) : next.delete('effect');
+				image ? next.set('image', 'yes') : next.delete('image');
+				history.replaceState(null, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
+			};
+			input?.addEventListener('input', apply);
+			facet?.addEventListener('change', apply);
+			effect?.addEventListener('change', apply);
+			imageOnly?.addEventListener('change', apply);
+			apply();
+		}
+	}
+	document.addEventListener('astro:page-load', initializeReferenceTables);
+	initializeReferenceTables();
+</script>

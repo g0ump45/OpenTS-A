@@ -1,0 +1,7738 @@
+/*******************************************************************************
+ *                                O P E N  T S
+ *******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2025 Electronic Arts Inc.
+ * Copyright 2026 OpenTS contributors
+ *
+ * Contains material derived from Electronic Arts source code.
+ * Modified by OpenTS contributors, 2026.
+ * EA's GPLv3 Section 7 additional terms and supplemental warranty
+ * disclaimers apply; see LICENSE.md.
+ ******************************************************************************/
+
+/* $Header: /CounterStrike/INIT.CPP 8     3/14/97 5:15p Joe_b $ */
+/***********************************************************************************************
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Project Name : Command & Conquer                                            *
+ *                                                                                             *
+ *                    File Name : INIT.CPP                                                     *
+ *                                                                                             *
+ *                   Programmer : Joe L. Bostic                                                *
+ *                                                                                             *
+ *                   Start Date : January 20, 1992                                             *
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Functions:                                                                                  *
+ *   Anim_Init -- Initialize the VQ animation control structure.                               *
+ *   Bootstrap -- Perform the initial bootstrap procedure.                                     *
+ *   Calculate_CRC -- Calculates a one-way hash from a data block.                             *
+ *   Init_Authorization -- Verifies that the player is authorized to play the game.            *
+ *   Init_Bootstrap_Mixfiles -- Registers and caches any mixfiles needed for bootstrapping.    *
+ *   Init_Bulk_Data -- Initialize the time-consuming mixfile caching.                          *
+ *   Init_CDROM_Access -- Initialize the CD-ROM access handler.                                *
+ *   Init_Color_Remaps -- Initialize the text remap tables.                                    *
+ *   Init_Expansion_Files -- Fetch any override expansion mixfiles.                            *
+ *   Init_Fonts -- Initialize all the game font pointers.                                      *
+ *   Init_Game -- Main game initialization routine.                                            *
+ *   Init_Heaps -- Initialize the game heaps and buffers.                                      *
+ *   Init_Keys -- Initialize the cryptographic keys.                                           *
+ *   Init_Mouse -- Initialize the mouse system.                                                *
+ *   Init_One_Time_Systems -- Initialize internal pointers to the bulk data.                   *
+ *   Init_Random -- Initializes the random-number generator                                    *
+ *   Init_Secondary_Mixfiles -- Register and cache secondary mixfiles.                         *
+ *   Load_Recording_Values -- Loads recording values from recording file                       *
+ *   Load_Title_Page -- Load the background art for the title page.                            *
+ *   Obfuscate -- Sufficiently transform parameter to thwart casual hackers.                   *
+ *   Parse_Command_Line -- Parses the command line parameters.                                 *
+ *   Parse_INI_File -- Parses CONQUER.INI for special options                                  *
+ *   Play_Intro -- plays the introduction & logo movies                                        *
+ *   Save_Recording_Values -- Saves recording values to a recording file                       *
+ *   Select_Game -- The game's main menu                                                       *
+ *   Load_Prolog_Page -- Loads the special pre-prolog "please wait" page.                      *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#include "always.h"
+#ifdef __ANDROID__
+#include "android_compat.h"
+#include "android_options.h"
+#endif
+
+#include "init.h"
+
+#include "_bench.h"
+#include "_command.h"
+#include "_convert.h"
+#include "_deploymentconfig.h"
+#include "_font.h"
+#include "_keyboar.h"
+#include "_logic.h"
+#include "_map.h"
+#include "_mixfile.h"
+#include "_mono.h"
+#include "_palette.h"
+#include "_pk.h"
+#include "_rand.h"
+#include "_rect.h"
+#include "_rules.h"
+#include "_script.h"
+#include "_surface.h"
+#include "_tactica.h"
+#include "_theater.h"
+#include "_timer.h"
+#include "_tooltip.h"
+#include "_uicontrol.h"
+#include "_voxel.h"
+#include "abstract.h"
+#include "addon.h"
+#include "aircraft.h"
+#include "airctype.h"
+#include "alphashp.h"
+#include "anim.h"
+#include "autosave.h"
+#include "bench.h"
+#include "blight.h"
+#include "building.h"
+#include "builtype.h"
+#include "bullet.h"
+#include "bullettype.h"
+#include "campaign.h"
+#include "ccfile.h"
+#include "cctooltip.h"
+#include "cell.h"
+#include "chat.h"
+#include "command.h"
+#include "conquer.h"
+#include "data.h"
+#include "dbgprint.h"
+#include "deploymentconfig.h"
+#include "dialog.h"
+#include "audio/audioengine.h"
+#include "dsurface.h"
+#include "egos.h"
+#include "empulse.h"
+#include "enviro.h"
+#include "except.h"
+#include "expand.h"
+#include "factory.h"
+#include "fog.h"
+#include "gamedirs.h"
+#include "gamedlg.h"
+#include "getcpu.h"
+#include "globals.h"
+#include "houstype.h"
+#include "incdec.h"
+#include "infatype.h"
+#include "inline.h"
+#include "intro.h"
+#include "ionblast.h"
+#include "ipxmgr.h"
+#include "keyboard.h"
+#include "language/language.h"
+#include "laser.h"
+#include "light.h"
+#include "lightcon.h"
+#include "loaddlg.h"
+#include "logic.h"
+#include "mainopt.h"
+#include "mixfile.h"
+#include "misc.h"
+#include "mono.h"
+#include "movie.h"
+#include "mplayer.h"
+#include "msgbox.h"
+#include "netdlg.h"
+#include "netdlg2.h"
+#include "newmenu.h"
+#include "obscure.h"
+#include "opents_build.h"
+#include "overlay.h"
+#include "overtype.h"
+#include "ovrlight.h"
+#include "ownrdraw.h"
+#include "partsys.h"
+#include "pcx.h"
+#include "queue.h"
+#include "ramfile.h"
+#include "revent.h"
+#include "rndstraw.h"
+#include "rules.h"
+#include "saveload.h"
+#include "savemgr.h"
+#include "savever.h"
+#include "scenario.h"
+#include "scheme.h"
+#include "script.h"
+#include "session.h"
+#include "spawner.h"
+#include "side.h"
+#include "skirmish.h"
+#include "smudtype.h"
+#include "stimer.h"
+#include "tactical.h"
+#include "tag.h"
+#include "team.h"
+#include "techno.h"
+#include "terrain.h"
+#include "theme.h"
+#include "timer.h"
+#include "tracker.h"
+#include "trigger.h"
+#include "tube.h"
+#include "tutorial.h"
+#include "uicontrol.h"
+#include "unit.h"
+#include "unittype.h"
+#include "vein.h"
+#include "voc.h"
+#include "vox.h"
+#include "vqoption.h"
+#include "wave.h"
+#include "waypoint.h"
+#include "winstub.h"
+#include "wsproto.h"
+#include "wspudp.h"
+#include "wwfont.h"
+
+#include "bench.hh"
+#include "scrnsel.hh"
+
+#include <algorithm>
+#include <conio.h>
+#include <ctime>
+#include <dos.h>
+#include <unordered_set>
+#include <vector>
+
+extern VoxelDataStruct DropPodVoxel;
+
+struct ChooseCampaignStruct {
+        CampaignType ChosenCampaign;
+        bool ChoiceMade;
+};
+
+/**********************************************************************
+**      Optional parameter control for special options.
+*/
+
+/*
+**      Enable the set of limited cheat key options.
+*/
+#ifdef _DEBUG
+#define PARM_PLAYTEST           static_cast<int>(0xF7DDC227u)           // "PLAYTEST"
+#endif
+
+/*
+**      Enable the full set of cheat key options.
+*/
+#ifdef _DEBUG
+#ifndef PARM_PLAYTEST
+#define PARM_PLAYTEST           static_cast<int>(0xF7DDC227u)           // "PLAYTEST"
+#endif
+#endif
+
+#define PARM_INSTALL            static_cast<int>(0xD95C68A2u)           //      "FROMINSTALL"
+
+
+/****************************************
+**      Function prototypes for this module **
+*****************************************/
+static void Play_Intro(bool sequenced=false);
+static void Init_Color_Remaps(void);
+static void Init_Heaps(void);
+static bool Init_Expansion_Files(void);
+static bool Init_One_Time_Systems(void);
+static bool Init_Fonts(void);
+static bool Init_Bootstrap_Mixfiles(void);
+static bool Init_Secondary_Mixfiles(void);
+static void Init_Mouse(void);
+static bool Bootstrap(void);
+static bool Init_Bulk_Data(void);
+static void Init_Keys(void);
+static bool Init_Rules(void);
+static void Init_Commands(void);
+static CampaignType Choose_Campaign(void);
+static void Init_Threads(void);
+void Draw_Version_Text(Surface * surface);
+void Version_Dialog(void);
+
+INT_PTR CALLBACK Rules_Choice_Dialog_Proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+INT_PTR CALLBACK Main_Menu_Dialog_Proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam);
+
+void Init_Random(void);
+
+#define ATTRACT_MODE_TIMEOUT    TIMER_MINUTE            // timeout for attract mode
+
+bool Load_Recording_Values(CCFileClass & file);
+bool Save_Recording_Values(CCFileClass & file);
+
+struct CheatEntryStruct {
+        bool * State;
+        char const * CheatString;
+        char const * VersionSuffix;     /// Suffix appended to version string
+        bool IsAllowedInMP;
+};
+
+static CheatEntryStruct CheatEntries[] = {
+        { &VisceroidsAsSnoBees,    "PENGO",    " PG", false },
+        { &Just4Fun,               "THETEAM",  NULL,  false },
+};
+
+static void Cheat_Disable(void);
+static bool Cheat_Key_Process(char chr);
+static void Cheat_Version_Suffix(char * string);
+
+
+
+/// <summary>
+/// Reads a base game file and the expansion's counterpart into one database.
+/// The expansion's file is read over the base one, and either file on its own is enough, so a
+/// deployment may ship the content in whichever of the two it belongs in.
+/// </summary>
+/// <param name="ini">The database both files are read into.</param>
+/// <param name="basename">The name of the base game's file.</param>
+/// <param name="expansion">The name of the expansion's file.</param>
+/// <returns>bool; Was either file read?</returns>
+#ifdef __ANDROID__
+// Simple MIX extractor for Android when MFCD::Cache fails
+// Parses TIBSUN.MIX via fopen and extracts a file by hash
+static unsigned int Mix_Hash(const char* name) {
+    // TS MIX hash - rotate left 1 + char (from CnC Remastered source)
+    unsigned int hash = 0;
+    for (const char* p = name; *p; ++p) {
+        char c = *p;
+        if (c >= 'a' && c <= 'z') c = c - 'a' + 'A';
+        unsigned int carry = (hash >> 31) & 1;
+        hash = (hash << 1) | carry;
+        hash += (unsigned int)(unsigned char)c;
+    }
+    return hash;
+}
+
+static unsigned int Mix_Hash_Simple(const char* name) {
+    unsigned int hash = 0;
+    for (const char* p = name; *p; ++p) {
+        char c = *p;
+        if (c >= 'a' && c <= 'z') c = c - 'a' + 'A';
+        hash = (hash << 1) + (unsigned int)c;
+    }
+    return hash;
+}
+
+static bool Extract_File_From_MIX(const char* mixPath, const char* targetName, std::vector<char>& outData) {
+    FILE* f = fopen(mixPath, "rb");
+    if (!f) {
+        char lower[512];
+        strncpy(lower, mixPath, sizeof(lower)-1);
+        lower[sizeof(lower)-1]=0;
+        for(char* p=lower; *p; ++p) if (*p>='A' && *p<='Z') *p+=32;
+        f = fopen(lower, "rb");
+        if (!f) return false;
+    }
+    fseek(f, 0, SEEK_END);
+    long fileSize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    if (fileSize < 6) { fclose(f); return false; }
+    
+    uint16_t numFiles = 0;
+    uint32_t dataSize = 0;
+    long dataStart = 0;
+    
+    // TS MIX files can have flags header: first 2 bytes == 0 means flags present
+    uint16_t firstWord;
+    fread(&firstWord, 2, 1, f);
+    fseek(f, 0, SEEK_SET);
+    
+    if (firstWord == 0) {
+        // New format with flags
+        uint32_t flags;
+        fread(&flags, 4, 1, f);
+        bool isEncrypted = (flags & 0x00020000) != 0;
+        bool isChecksum = (flags & 0x00010000) != 0;
+        if (isEncrypted) {
+            // Can't extract from encrypted MIX without Blowfish key - TIBSUN.MIX is encrypted
+            // " %s is encrypted, skipping direct extract\n", mixPath);
+            fclose(f);
+            return false;
+        }
+        // Not encrypted, but has flags header
+        fread(&numFiles, 2, 1, f);
+        fread(&dataSize, 4, 1, f);
+        dataStart = 10; // 4 flags + 2 count + 4 size
+        if (isChecksum) {
+            // 20 bytes SHA1 at end, but doesn't affect header
+        }
+    } else {
+        // Old format, no flags
+        fread(&numFiles, 2, 1, f);
+        fread(&dataSize, 4, 1, f);
+        dataStart = 6;
+    }
+    
+    if (numFiles == 0 || numFiles > 20000) {
+        // Still invalid - likely encrypted or corrupt
+        fclose(f);
+        return false;
+    }
+    
+    struct MixEntry { uint32_t id; uint32_t offset; uint32_t size; };
+    std::vector<MixEntry> entries;
+    entries.resize(numFiles);
+    for (int i=0;i<numFiles;i++) {
+        if (fread(&entries[i], 12, 1, f)!=1) { fclose(f); return false; }
+    }
+    unsigned int targetHash = Mix_Hash(targetName);
+    unsigned int targetHashSimple = Mix_Hash_Simple(targetName);
+    DebugString(" Looking for %s hash %08X / simple %08X in %s (%d files, dataStart %ld)\n", targetName, targetHash, targetHashSimple, mixPath, numFiles, dataStart);
+    for (auto &e : entries) {
+        if (e.id == targetHash || e.id == targetHashSimple) {
+            long absOffset = 0;
+            // Try absolute offset first (TS stores absolute from start of file)
+            if (e.offset + e.size <= (uint32_t)fileSize) {
+                absOffset = e.offset;
+            } else if (dataStart + e.offset + e.size <= fileSize) {
+                absOffset = dataStart + e.offset;
+            } else {
+                continue;
+            }
+            fseek(f, absOffset, SEEK_SET);
+            outData.resize(e.size);
+            size_t read = fread(outData.data(), 1, e.size, f);
+            fclose(f);
+            DebugString("  Found %s in %s at %ld size %u\n", targetName, mixPath, absOffset, e.size);
+            return read == e.size;
+        }
+    }
+    fclose(f);
+    return false;
+}
+
+static bool Load_INI_From_MIX(CCINIClass& ini, const char* mixPath, const char* iniName) {
+    std::vector<char> data;
+    // List of MIX files to try - includes base and expansion (EXPAND01.MIX is where you found the INIs)
+    const char* mixList[] = {
+        mixPath, "TIBSUN.MIX", "tibsun.mix",
+        "EXPAND01.MIX", "expand01.mix",
+        "EXPAND02.MIX", "expand02.mix",
+        "EXPAND03.MIX", "expand03.mix",
+        "EXPAND04.MIX", "expand04.mix",
+        "LOCAL.MIX", "local.mix",
+        "CACHE.MIX", "cache.mix",
+        "CONQUER.MIX", "conquer.mix"
+    };
+    bool found = false;
+    for (const char* tryMix : mixList) {
+        if (Extract_File_From_MIX(tryMix, iniName, data)) {
+            DebugString(" %s found inside %s via direct extract\n", iniName, tryMix);
+            found = true;
+            break;
+        }
+    }
+    if (!found) return false;
+
+    // Write to temp file and load
+    char tempPath[64];
+    snprintf(tempPath, sizeof(tempPath), "%s.tmp", iniName);
+    FILE* out = fopen(tempPath, "wb");
+    if (!out) return false;
+    fwrite(data.data(), 1, data.size(), out);
+    fclose(out);
+    CCFileClass file(tempPath);
+    bool ok = false;
+    if (file.Is_Available() || fopen(tempPath,"rb")) {
+        ok = ini.Load(file, false);
+    }
+    // remove(tempPath);
+    return ok;
+}
+#endif
+
+static bool Read_INI_And_Expansion(CCINIClass & ini, char const * basename, char const * expansion)
+{
+        char const * const names[] = {basename, expansion};
+        bool read = false;
+
+        for (char const * fname : names) {
+                if (fname == NULL || fname[0] == '\0') continue;
+                CCFileClass file(fname);
+
+#ifdef __ANDROID__
+                // Android: try loose file FIRST via fopen (bypass broken MFCD::Cache)
+                bool available = false;
+                FILE* testF = fopen(fname, "rb");
+                if (!testF) {
+                    char lower[512];
+                    strncpy(lower, fname, sizeof(lower)-1);
+                    lower[sizeof(lower)-1]=0;
+                    for(char* p=lower; *p; ++p) *p=tolower(*p);
+                    testF = fopen(lower, "rb");
+                }
+                if (testF) {
+                    fclose(testF);
+                    available = true;
+                    DebugString(" %s found via fopen loose file (first try)\n", fname);
+                } else {
+                    // Then try MFCD::Retrieve
+                    void const * data = MFCD::Retrieve(fname);
+                    if (data) {
+                        available = true;
+                        DebugString(" %s found via MFCD::Retrieve fallback\n", fname);
+                    } else {
+                        // Try direct MIX extraction
+                        if (Load_INI_From_MIX(ini, "TIBSUN.MIX", fname)) {
+                            DebugString(" %s loaded via direct MIX extraction\n", fname);
+                            read = true;
+                            continue;
+                        }
+                        // Try CCFileClass as last resort
+                        if (file.Is_Available()) {
+                            available = true;
+                        } else {
+                            DebugString(" %s not found even via fopen/MFCD/MIX extract\n", fname);
+                        }
+                    }
+                }
+                if (!available) continue;
+#else
+                if (file.Is_Available() == false) {
+                        continue;
+                }
+#endif
+                if (ini.Load(file, false)) {
+                        read = true;
+                        DebugString(" Loaded %s\n", fname);
+                } else {
+                        // CCFileClass Load failed even though file exists (Android case) - try direct fopen + temp file fallback
+                        DebugString(" CCFileClass Load failed for %s, trying fopen fallback\n", fname);
+                        FILE* f = fopen(fname, "rb");
+                        if (!f) {
+                            char lower[512];
+                            strncpy(lower, fname, sizeof(lower)-1);
+                            lower[sizeof(lower)-1]=0;
+                            for(char* p=lower; *p; ++p) *p=tolower(*p);
+                            f = fopen(lower, "rb");
+                        }
+                        if (f) {
+                            fseek(f, 0, SEEK_END);
+                            long sz = ftell(f);
+                            fseek(f, 0, SEEK_SET);
+                            if (sz > 0 && sz < 10*1024*1024) {
+                                char* buf = (char*)malloc(sz);
+                                if (buf && fread(buf, 1, sz, f) == (size_t)sz) {
+                                    char tmpName[128];
+                                    snprintf(tmpName, sizeof(tmpName), "%s.fallback.tmp", fname);
+                                    FILE* out = fopen(tmpName, "wb");
+                                    if (out) {
+                                        fwrite(buf, 1, sz, out);
+                                        fclose(out);
+                                        CCFileClass tmpFile(tmpName);
+                                        if (ini.Load(tmpFile, false)) {
+                                            read = true;
+                                            DebugString(" Loaded %s via fallback temp file (%ld bytes)\n", fname, sz);
+                                        } else {
+                                            DebugString(" Fallback temp load also failed for %s\n", fname);
+                                        }
+                                    }
+                                }
+                                if (buf) free(buf);
+                            }
+                            fclose(f);
+                        } else {
+                            DebugString("Failed to load %s!\n", fname);
+                        }
+                }
+        }
+        return(read);
+}
+
+
+/***********************************************************************************************
+ * Init_Game -- Main game initialization routine.                                              *
+ *                                                                                             *
+ *    Perform all one-time game initializations here. This includes all                        *
+ *    allocations and table setups. The intro and other one-time startup                       *
+ *    tasks are also performed here.                                                           *
+ *                                                                                             *
+ * INPUT:   argc,argv   -- Command line arguments.                                             *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   Only call this ONCE!                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   10/07/1992 JLB : Created.                                                                 *
+ *=============================================================================================*/
+int Init_Game(int , char * [])
+{
+        DebugString("Init Game\n");
+        Scen = new ScenarioClass;
+
+        if (Scen == NULL) {
+                DebugString("Failed to instantiate Scenario!\n");
+                return(-1);
+        }
+
+        Rule = new RulesClass;
+
+        if (Rule == NULL) {
+                DebugString("Failed to instantiate Rules!\n");
+                return(-1);
+        }
+
+        /*
+        **      Allocate the benchmark tracking objects in debug builds; no runtime capability check
+        **      is needed since the supported minimum hardware always qualifies.
+        */
+#ifdef _DEBUG
+        DebugString("Creating benchmarks\n");
+        Benches = new Benchmark [BENCH_COUNT];
+#endif
+
+        /*
+        **      Initialize the encryption keys.
+        */
+        DebugString("Init Encryption Keys.\n");
+
+        Init_Keys();
+
+        /*
+        **      Bootstrap as much as possible before error-prone initializations are
+        **      performed. This bootstrap process will enable the error message
+        **      handler to function.
+        */
+        DebugString("Bootstrap.....");
+
+        if (!Bootstrap()) {
+                DebugStringNoPrefix(" ..Failed to bootstrap!\n");
+                return(-1);
+        }
+
+        DebugStringNoPrefix(" ...OK\n");
+
+        /*
+        **      Check for an initialize a working mouse pointer. Display error and bail if
+        **      no mouse driver is installed.
+        */
+        DebugString("Init Mouse\n");
+
+        Init_Mouse();
+
+        /*
+        **      Register and cache any secondary mixfiles.
+        */
+        DebugString("Init Secondary Mixfiles.....");
+
+        if (!Init_Secondary_Mixfiles()) {
+                DebugStringNoPrefix(" ...Failed!!!\n");
+                return(-1);
+        }
+
+        DebugStringNoPrefix(" ...OK\n");
+
+        DebugString("Init Campaigns\n");
+        Init_Campaigns();
+
+        /*
+        **      Initialize the game object heaps as well as other rules-dependant buffer allocations.
+        */
+        DebugString("Init Heaps\n");
+        Init_Heaps();
+
+        DebugString("Init Threads\n");
+        Init_Threads();
+
+        /*
+        **      Read game options, so the GameSpeed is initialized when multiplayer
+        **      dialogs are invoked. (GameSpeed must be synchronized between systems.)
+        */
+        DebugString("Reading Game Settings\n");
+        Options.Load_Settings();
+        SaveManager.Autosave.Set_Interval(Options.AutoSaveInterval);
+
+        /*
+        **      Initialize the animation system.
+        */
+        DebugString("Init Anim System\n");
+        Anim_Init();
+
+        /*
+        **      Play the startup animation.
+        */
+#ifdef __ANDROID__
+        DebugString("Skipping startup movies on Android - bypassing Get_New_Menu to avoid GMENU.MIX bad_alloc\n");
+        try {
+                // Try to get new menu but don't crash if it fails
+                auto* menu = Get_New_Menu();
+                if (menu && !menu->MixFile) {
+                        DebugString(" NewMenu MixFile null, skipping FS_TITLE/STARTUP movies\n");
+                }
+        } catch (std::bad_alloc&) {
+                DebugString(" Get_New_Menu bad_alloc - skipping movies on Android\n");
+        } catch (...) {
+                DebugString(" Get_New_Menu exception - skipping movies on Android\n");
+        }
+#else
+        if (!Spawner_Is_Requested()) {
+                if (Special.IsFromInstall == true) {
+                        DebugString("Playing first time intro sequence.\n");
+                        Play_Movie("EVA.VQA", THEME_NONE, false);
+                }
+
+                DebugString("Playing startup movies.\n");
+                Play_Movie("WWLOGO.VQA", THEME_NONE);
+                if (!Get_New_Menu()->MixFile) {
+                        if (CCFileClass("FS_TITLE.VQA").Is_Available() == true) {
+                                Play_Movie("FS_TITLE.VQA", THEME_NONE, false);
+                        } else {
+                                Play_Movie("STARTUP.VQA", THEME_NONE, false);
+                        }
+                }
+        }
+#endif
+
+#ifdef __ANDROID__
+        try {
+                DebugString("Android: Draw_Menu_Background tolerant call\n");
+                Draw_Menu_Background();
+                DebugString("Android: Draw_Menu_Background OK\n");
+        } catch (std::bad_alloc&) {
+                DebugString("Android: Draw_Menu_Background bad_alloc (GMENU.MIX), skipping background\n");
+        } catch (...) {
+                DebugString("Android: Draw_Menu_Background exception, skipping background\n");
+        }
+#else
+        Draw_Menu_Background();
+#endif
+        Call_Back();
+
+        /*
+        **      Initialize the text remap tables.
+        */
+        DebugString("Init Color Remap Tables\n");
+        Init_Color_Remaps();
+
+        /*
+        **
+        */
+        DebugString("Creating TacticalMap\n");
+
+        delete TacticalMap;
+        TacticalMap = new Tactical;
+
+        if (TacticalMap == NULL) {
+                DebugString("Failed to create TacticalMap!\n");
+                return(-1);
+        }
+
+        /*
+        **      Set the logic page to the seenpage.
+        */
+        LogicalSurface = HiddenSurface;
+
+        /*
+        **      Initialize the bulk data. This takes the longest time and must be performed once
+        **      before the regular game starts.
+        */
+        DebugString("Init Bulk Data\n");
+
+        if (!Init_Bulk_Data()) {
+                return(-1);
+        }
+
+                DebugString("Reading %s\n", DeploymentConfig.UIFile.c_str());
+        if (!UIControls.Read_INI_File(DeploymentConfig.UIFile.c_str(), true)) {
+                DebugString("%s not found, using the defaults.\n", DeploymentConfig.UIFile.c_str());
+        }
+
+#ifdef __ANDROID__
+        DebugString("Android: attempting to load SOUND, RULES, THEME with MIX fallback\n");
+        // On Android we still try to load, but don't hard-fail if SOUND/THEME missing
+        DebugString("Reading %s\n", DeploymentConfig.SoundFile.c_str());
+        CCINIClass voc_ini;
+        if (!Read_INI_And_Expansion(voc_ini, DeploymentConfig.SoundFile.c_str(), DeploymentConfig.SoundExpansionFile.c_str())) {
+                DebugString("Failed to read %s or %s! Continuing without vocs\n", DeploymentConfig.SoundFile.c_str(), DeploymentConfig.SoundExpansionFile.c_str());
+        } else {
+                Free_Vocs();
+                Init_Vocs(voc_ini);
+        }
+        DebugString("Init Rules\n");
+        bool rulesOK = Init_Rules();
+        if (!rulesOK) {
+                DebugString("Failed to initialize Rules! Trying MFCD fallback\n");
+                // Try direct MFCD retrieve for RULES.INI
+                void const * rules_data = MFCD::Retrieve("RULES.INI");
+                if (!rules_data) rules_data = MFCD::Retrieve("rules.ini");
+                if (!rules_data) rules_data = MFCD::Retrieve("RULES.ini");
+                if (rules_data) {
+                        DebugString(" RULES.INI found via MFCD::Retrieve, retrying Init_Rules\n");
+                        rulesOK = Init_Rules();
+                        if (!rulesOK) {
+                                DebugString(" Still failed to init Rules after fallback!\n");
+                        }
+                } else {
+                        DebugString(" RULES.INI not in MIX cache either!\n");
+                }
+        }
+        if (!rulesOK || !Rule) {
+                DebugString("CRITICAL: Rule is NULL or Init_Rules failed (%d) - cannot continue Prepare_Theater_Roster, aborting Init_Game to avoid 0x28 crash\n", rulesOK);
+                // Don't call Prepare_Theater_Roster with null/bad Rule - would crash at 0x28
+                return(-1);
+        }
+        Prepare_Theater_Roster();
+        Prepare_Side_Roster();
+        DebugString("Reading %s\n", DeploymentConfig.ThemeFile.c_str());
+        CCINIClass theme_ini;
+        if (!Read_INI_And_Expansion(theme_ini, DeploymentConfig.ThemeFile.c_str(), DeploymentConfig.ThemeExpansionFile.c_str())) {
+                DebugString("Failed to read %s or %s! Continuing\n", DeploymentConfig.ThemeFile.c_str(), DeploymentConfig.ThemeExpansionFile.c_str());
+        } else {
+                Theme.Free_Themes();
+                Theme.Init_Themes(theme_ini);
+                Theme.Scan();
+                if (Rule) Session.MaxPlayers = Rule->MaxPlayers;
+        }
+        if (!Rule) {
+                DebugString("Rule is still NULL after Android load, setting defaults\n");
+                Session.MaxPlayers = 8;
+        } else {
+                Session.MaxPlayers = Rule->MaxPlayers;
+        }
+        GadgetClass::Set_Color_Scheme(DEFAULT_GADGET_SCHEME);
+        Session.GamesPlayed = 0;
+        Session.NumScores = 0;
+        Session.CurGame = 0;
+        for (int i = 0; i < MAX_MULTI_NAMES; i++) {
+                Session.Score[i].Name[0] = '\0';
+                Session.Score[i].Wins = 0;
+                for (int j = 0; j < MAX_MULTI_GAMES; j++) {
+                        Session.Score[i].Kills[j] = -1;
+                        Session.Score[i].Lost[j] = -1;
+                        Session.Score[i].Built[j] = -1;
+                        Session.Score[i].Score[j] = -1;
+                }
+        }
+        Init_Random();
+        DebugString("Init Commands\n");
+        Init_Commands();
+        DebugString("Game Init Completed. (Android with MIX fallback)\n");
+        return(0);
+#else
+        DebugString("Reading %s\n", DeploymentConfig.SoundFile.c_str());
+        CCINIClass voc_ini;
+        if (!Read_INI_And_Expansion(voc_ini, DeploymentConfig.SoundFile.c_str(), DeploymentConfig.SoundExpansionFile.c_str())) {
+                DebugString("Failed to read %s or %s!\n", DeploymentConfig.SoundFile.c_str(), DeploymentConfig.SoundExpansionFile.c_str());
+                return(-1);
+        }
+        Free_Vocs();
+        Init_Vocs(voc_ini);
+
+        DebugString("Init Rules\n");
+        if (!Init_Rules()) {
+                DebugString("Failed to initialize Rules!\n");
+                return(-1);
+        }
+        Prepare_Theater_Roster();
+        Prepare_Side_Roster();
+        DebugString("Reading %s\n", DeploymentConfig.ThemeFile.c_str());
+        CCINIClass theme_ini;
+        if (!Read_INI_And_Expansion(theme_ini, DeploymentConfig.ThemeFile.c_str(), DeploymentConfig.ThemeExpansionFile.c_str())) {
+                DebugString("Failed to read %s or %s!\n", DeploymentConfig.ThemeFile.c_str(), DeploymentConfig.ThemeExpansionFile.c_str());
+                return(-1);
+        }
+        Theme.Free_Themes();
+        Theme.Init_Themes(theme_ini);
+        Theme.Scan();
+        Session.MaxPlayers = Rule->MaxPlayers;
+        GadgetClass::Set_Color_Scheme(DEFAULT_GADGET_SCHEME);
+        Session.GamesPlayed = 0;
+        Session.NumScores = 0;
+        Session.CurGame = 0;
+        for (int i = 0; i < MAX_MULTI_NAMES; i++) {
+                Session.Score[i].Name[0] = '\0';
+                Session.Score[i].Wins = 0;
+                for (int j = 0; j < MAX_MULTI_GAMES; j++) {
+                        Session.Score[i].Kills[j] = -1;
+                        Session.Score[i].Lost[j] = -1;
+                        Session.Score[i].Built[j] = -1;
+                        Session.Score[i].Score[j] = -1;
+                }
+        }
+        Init_Random();
+        DebugString("Init Commands\n");
+        Init_Commands();
+        DebugString("Game Init Completed.\n");
+        return(0);
+#endif
+}
+
+
+/// <summary>
+/// Handles the messages for the rules file choice dialog.
+/// This routine lists the name of every rules file that was found, and ends the dialog
+/// with the index of the one that the player settled upon.
+/// </summary>
+/// <remarks>The dialog must be created with the vector of rules files as its parameter.</remarks>
+INT_PTR CALLBACK Rules_Choice_Dialog_Proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
+{
+        char buffer[128];
+
+        switch (message) {
+                case WM_INITDIALOG: {
+                        Center_Window_Within_Window(window);
+
+                        DynamicVectorClass<CCINIClass*> * rules;
+                        rules = (DynamicVectorClass<CCINIClass*> *)lparam;
+
+                        HWND list = GetDlgItem(window, IDC_RULES_LIST);
+
+                        for (int index = 0; index < rules->Count(); index++) {
+                                (*rules)[index]->Get_String("General", "Name", "", buffer, sizeof(buffer));
+                                ListBox_AddString(list, buffer);
+                        }
+                        ListBox_SetCurSel(list, 0);
+                }
+                break;
+
+                case WM_HELP:
+                        On_WM_HELP(lparam);
+                        break;
+
+                case WM_CONTEXTMENU:
+                        On_WM_CONTEXTMENU(wparam);
+                        break;
+
+                case WM_MOVING:
+                        return(On_WM_MOVING(window, wparam, lparam));
+
+                case WM_COMMAND:
+                        switch (LOWORD(wparam)) {
+                                case IDCANCEL:
+                                case IDC_RULES_OK:
+                                        if (HIWORD(wparam) == BN_CLICKED) {
+                                                HWND list = GetDlgItem(window, IDC_RULES_LIST);
+                                                EndDialog(window, ListBox_GetCurSel(list));
+                                                DestroyWindow(window);
+                                        }
+                                        break;
+                        }
+                        break;
+        }
+
+        return(0);
+}
+
+
+/// <summary>
+/// Reads the campaign definitions out of the battle control files.
+/// This routine gathers every battle file it can find, along with the expansion's own,
+/// so that added campaigns show up in the list beside the ones that shipped.
+/// </summary>
+void Init_Campaigns(void)
+{
+DebugString("=== Init_Campaigns ===\n");
+DebugString("BattleFile: %s\n", DeploymentConfig.BattleFile.c_str());
+DebugString("BattleExpansionFile: %s\n", DeploymentConfig.BattleExpansionFile.c_str());
+DebugString("BATTLE.INI available: %d\n", CCFileClass("BATTLE.INI").Is_Available());
+DebugString("BATTLEFS.INI available: %d\n", CCFileClass("BATTLEFS.INI").Is_Available());
+
+        bool found = false;
+
+        for (std::string const & name : Search_Files("BATTLE*.INI")) {
+                CCFileClass file(name.c_str());
+                CCINIClass * ini = new CCINIClass;
+                int loaded = ini->Load(file, false);
+                DebugString("Battle candidate %s available=%d loaded=%d sections=%d\n", name.c_str(), file.Is_Available(), loaded, ini->Entry_Count("Battles"));
+
+                if (stricmp(name.c_str(), DeploymentConfig.BattleFile.c_str()) == 0) {
+                        found = true;
+                }
+
+                if (loaded != 0) Read_Battle_INI(*ini);
+                delete ini;
+        }
+
+        if (!found) {
+                CCFileClass file(DeploymentConfig.BattleFile.c_str());
+                CCINIClass * ini = new CCINIClass;
+
+                if (ini != NULL) {
+                        int loaded = ini->Load(file, false);
+                        DebugString("Battle default %s available=%d loaded=%d sections=%d\n", DeploymentConfig.BattleFile.c_str(), file.Is_Available(), loaded, ini->Entry_Count("Battles"));
+                        if (loaded != 0) Read_Battle_INI(*ini);
+                        delete ini;
+                }
+        }
+
+        CCFileClass file(DeploymentConfig.BattleExpansionFile.c_str());
+        if (file.Is_Available() == true) {
+                CCINIClass * ini = new CCINIClass;
+
+                if (ini != NULL) {
+                        int loaded = ini->Load(file, false);
+                        DebugString("Battle expansion %s available=%d loaded=%d sections=%d\n", DeploymentConfig.BattleExpansionFile.c_str(), file.Is_Available(), loaded, ini->Entry_Count("Battles"));
+                        if (loaded != 0) Read_Battle_INI(*ini);
+                        delete ini;
+                }
+        }
+	DebugString("Campaign count after initialization: %d\n", Campaigns.Count());
+}
+
+
+/// <summary>
+/// Reads the theaters the rules declare, once, before anything can mount one.
+/// A theater list replaces the two theaters Tiberian Sun hard-coded rather than adding to
+/// them, so a rules file may drop or reorder them; a list naming none leaves those two.
+/// Firestorm's theaters are read whenever its rules are installed, not only when its addon
+/// is enabled, because a theater's position must not move between games.
+/// </summary>
+void Prepare_Theater_Roster(void)
+{
+        bool declared = Rule->Do_Theaters(*RuleINI);
+
+        if (Addon_Installed(ADDON_FIRESTORM)) {
+                declared |= Rule->Do_Theaters(FSRuleINI);
+        }
+
+        if (!declared) {
+                TheaterClass::One_Time();
+        }
+
+        for (int index = 0; index < Theaters.Count(); index++) {
+                Theaters[index]->Read_INI(*RuleINI);
+
+                if (Addon_Installed(ADDON_FIRESTORM)) {
+                        Theaters[index]->Read_INI(FSRuleINI);
+                }
+
+                DebugString("Theater %d: %s\n", index, Theaters[index]->Name());
+        }
+}
+
+
+/// <summary>
+/// Reads the countries and the sides they belong to from the rules, so a house's side is
+/// known before anything asks for it.
+/// </summary>
+void Prepare_Side_Roster(void)
+{
+        Rule->Do_HouseTypes(*RuleINI);
+        Rule->Do_Sides(*RuleINI);
+
+        for (int index = 0; index < HouseTypes.Count(); index++) {
+                HouseTypes[index]->Read_INI(*RuleINI);
+        }
+}
+
+
+/// <summary>
+/// Can this campaign be played with the addons that are enabled?
+/// A base game campaign is offered only when no addon is running, and an addon's own
+/// campaign only when that particular addon is running.
+/// </summary>
+/// <param name="campaign">The campaign to be tested.</param>
+/// <returns>bool; Is the campaign available for the player to select?</returns>
+static bool Campaign_Available(CampaignClass * campaign)
+{
+        if (Addon_Enabled(ADDON_ANY) == true) {
+                if (campaign->RequiredAddon == ADDON_BASE_GAME) {
+                        return(false);
+                }
+                if (Addon_Enabled((AddonType)campaign->RequiredAddon)) {
+                        return(true);
+                }
+                return(false);
+        }
+
+        if (campaign->RequiredAddon == ADDON_BASE_GAME) {
+                return(true);
+        }
+
+        return(false);
+}
+
+
+/// <summary>
+/// Handles the messages for the campaign choice dialog.
+/// This routine lists the campaigns that the player is entitled to play, drives the
+/// difficulty slider, and leaves the choice where Choose_Campaign will collect it.
+/// </summary>
+static INT_PTR CALLBACK Campaign_Choice_Dialog_Proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
+{
+        HWND item;
+        struct ChooseCampaignStruct * state;
+
+        INT_PTR rc;
+        rc = OwnerDraw::Default_Dialog_Proc(window, message, wparam, lparam);
+
+        if (rc) {
+                return(rc);
+        }
+
+        switch (message) {
+
+                case WM_INITDIALOG:
+                        item = GetDlgItem(window, IDC_LIST);
+
+                        if (item != NULL) {
+                                DebugString("Initializing Choose_Campaign() Dialog.\n");
+                                for (int index = 0; index < Campaigns.Count(); index++) {
+                                        CampaignClass * campaign = Campaigns[index];
+
+                                        if (!Campaign_Available(campaign)) {
+                                                DebugString("\tSkipping Campaign [%d] - %s\n", index, campaign->Description);
+                                                continue;
+                                        }
+
+                                        DebugString("\tAdding Campaign [%d] - %s\n", index, campaign->Description);
+                                        int pos = ListBox_AddString(item, campaign->Description);
+                                        ListBox_SetItemData(item, pos, index);
+                                }
+
+                                ListBox_SetCurSel(item, 0);
+                        }
+
+                        item = GetDlgItem(window, IDC_DIFFICULTY_SLIDER);
+
+                        if (item != NULL) {
+                                SendMessage(item, OD_TRACKNUMBERS, 0, 0);
+                                Slider_SetRange(item, 0,2);
+                                Slider_SetPos(item, Options.Difficulty);
+                        }
+                        break;
+
+                case WM_COMMAND:
+                        switch (LOWORD(wparam)) {
+                                case IDOK:
+                                        if (HIWORD(wparam) == BN_CLICKED) {
+                                                state = (ChooseCampaignStruct *)GetWindowLongPtr(window, DWLP_USER);
+
+                                                if (state != NULL) {
+                                                        item = GetDlgItem(window, IDC_LIST);
+
+                                                        if (item != NULL) {
+                                                                int pos = ListBox_GetCurSel(item);
+                                                                state->ChosenCampaign = (CampaignType)ListBox_GetItemData(item, pos);
+                                                                state->ChoiceMade = true;
+                                                        }
+                                                }
+
+                                                item = GetDlgItem(window, IDC_DIFFICULTY_SLIDER);
+
+                                                if (item != NULL) {
+                                                        Options.Difficulty = Slider_GetPos(item);
+                                                }
+                                        }
+                                        break;
+
+                                case IDCANCEL:
+                                        if (HIWORD(wparam) == BN_CLICKED) {
+                                                state = (ChooseCampaignStruct *)GetWindowLongPtr(window, DWLP_USER);
+
+                                                if (state != NULL) {
+                                                        state->ChosenCampaign = CAMPAIGN_NONE;
+                                                        state->ChoiceMade = true;
+                                                }
+                                        }
+
+                                        break;
+                        }
+                        break;
+
+                case WM_HSCROLL: {
+                        int diff = HIWORD(wparam);
+                        int stringID = 0;
+
+                        if ((HWND)lparam == GetDlgItem(window, IDC_DIFFICULTY_SLIDER)) {
+                                stringID = GameDifficultyNames[diff];
+                                item = GetDlgItem(window, IDC_DIFFICULTY_LABEL);
+                                Static_SetText(item, Fetch_String(stringID));
+                        }
+                        break;
+                }
+
+                default:
+                        break;
+        }
+
+        return(FALSE);
+}
+
+
+/// <summary>
+/// Asks the player which campaign to play.
+/// This routine reads the campaign list first if that has not already happened, and then
+/// runs the campaign dialog until the player either commits or backs out.
+/// </summary>
+/// <returns>Returns with the campaign chosen, or CAMPAIGN_NONE if the player backed out.</returns>
+static CampaignType Choose_Campaign(void)
+{
+        HWND dialog;
+        struct ChooseCampaignStruct state;
+
+        state.ChoiceMade = false;
+        state.ChosenCampaign = CAMPAIGN_NONE;
+
+        if (Campaigns.Count() == 0) {
+                Init_Campaigns();
+
+                if (Campaigns.Count() == 0) {
+                        return(CAMPAIGN_NONE);
+                }
+        }
+
+        dialog = OwnerDraw::Begin_Dialog(IDD_CAMPAIGN, Campaign_Choice_Dialog_Proc);
+
+        if (dialog != NULL) {
+                SetWindowLongPtr(dialog, DWLP_USER, (LONG_PTR) &state);
+
+                OwnerDraw::Move_Dialog(dialog, -1, (HiddenSurface->Get_Height() - 400) / 2 + 147);
+                OwnerDraw::Display_Dialog(dialog);
+
+                while (state.ChoiceMade == false) {
+                        if (OwnerDraw::Dialog_Message_Handler() == true) {
+                                break;
+                        }
+                        Title_Screen_Restore();
+                }
+
+                OwnerDraw::End_Dialog(dialog);
+        }
+
+        return(state.ChosenCampaign);
+}
+
+
+#ifdef __ANDROID__
+// Android helper: CCFileClass is broken on Android for loose files, so we try everything:
+// 1. CCFileClass, 2. RawFileClass, 3. direct MIX extract, 4. fopen + RawFileClass fallback
+static bool Android_LoadINI(CCINIClass& ini, const char* name) {
+    // Try CCFileClass first (works for some files)
+    CCFileClass f1(name);
+    if (ini.Load(f1, false)) {
+        DebugString(" Android_LoadINI %s loaded via CCFileClass\n", name);
+        return true;
+    }
+    // Try lower case
+    char lower[512];
+    strncpy(lower, name, sizeof(lower)-1);
+    lower[sizeof(lower)-1]=0;
+    for(char* p=lower; *p; ++p) *p=tolower(*p);
+    CCFileClass f2(lower);
+    if (ini.Load(f2, false)) {
+        DebugString(" Android_LoadINI %s loaded via CCFileClass lower\n", lower);
+        return true;
+    }
+    // Try RawFileClass - this bypasses CD search and works on Android
+    RawFileClass rf1(name);
+    if (ini.Load(rf1, false)) {
+        DebugString(" Android_LoadINI %s loaded via RawFileClass\n", name);
+        return true;
+    }
+    RawFileClass rf2(lower);
+    if (ini.Load(rf2, false)) {
+        DebugString(" Android_LoadINI %s loaded via RawFileClass lower\n", lower);
+        return true;
+    }
+    // Try direct MIX extraction (EXPAND01.MIX etc) - for files that are inside MIX but cache failed
+    std::vector<char> data;
+    if (Extract_File_From_MIX("EXPAND01.MIX", name, data) || Extract_File_From_MIX("expand01.mix", name, data) ||
+        Extract_File_From_MIX("LOCAL.MIX", name, data) || Extract_File_From_MIX("local.mix", name, data) ||
+        Extract_File_From_MIX("EXPAND02.MIX", name, data) || Extract_File_From_MIX("EXPAND03.MIX", name, data)) {
+        char tmp[128];
+        snprintf(tmp, sizeof(tmp), "%s.android.tmp", name);
+        FILE* out = fopen(tmp, "wb");
+        if (out) {
+            fwrite(data.data(), 1, data.size(), out);
+            fclose(out);
+            // Try both CCFileClass and RawFileClass for temp
+            CCFileClass ftmp(tmp);
+            if (ini.Load(ftmp, false)) {
+                DebugString(" Android_LoadINI %s loaded via MIX extract CCFileClass fallback (%zu bytes)\n", name, data.size());
+                return true;
+            }
+            RawFileClass rftmp(tmp);
+            if (ini.Load(rftmp, false)) {
+                DebugString(" Android_LoadINI %s loaded via MIX extract RawFileClass fallback (%zu bytes)\n", name, data.size());
+                return true;
+            }
+        }
+    }
+    // Try fopen direct read + temp file with RawFileClass - this is the ultimate fallback
+    // Also try existing fallback tmp files from previous runs
+    const char* tryNames[] = {name, lower, "RULES.INI.fallback2.tmp", "RULES.INI", "rules.ini", "ART.INI", "art.ini", "AI.INI", "ai.ini", "SOUND01.INI", "sound01.ini", "THEME01.INI", "theme01.ini"};
+    for (const char* tryName : tryNames) {
+        if (stricmp(tryName, name) != 0 && stricmp(tryName, lower) != 0) {
+            // Only try fallback tmps if we're looking for RULES.INI
+            if (stricmp(name, "RULES.INI") != 0 && strstr(tryName, "fallback") != nullptr) continue;
+        }
+        FILE* f = fopen(tryName, "rb");
+        if (!f) continue;
+        fseek(f, 0, SEEK_END);
+        long sz = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        if (sz > 0 && sz < 10*1024*1024) {
+            char* buf = (char*)malloc(sz+1);
+            if (buf && fread(buf, 1, sz, f) == (size_t)sz) {
+                buf[sz] = 0;
+                char tmp2[128];
+                snprintf(tmp2, sizeof(tmp2), "%s.fallback2.tmp", name);
+                // Avoid overwriting if tryName is already a fallback
+                if (strstr(tryName, "fallback") == nullptr) {
+                    FILE* out = fopen(tmp2, "wb");
+                    if (out) {
+                        fwrite(buf, 1, sz, out);
+                        fclose(out);
+                        CCFileClass ftmp2(tmp2);
+                        if (ini.Load(ftmp2, false)) {
+                            DebugString(" Android_LoadINI %s loaded via fopen CCFileClass fallback (%ld bytes from %s)\n", name, sz, tryName);
+                            free(buf);
+                            fclose(f);
+                            return true;
+                        }
+                        RawFileClass rftmp2(tmp2);
+                        if (ini.Load(rftmp2, false)) {
+                            DebugString(" Android_LoadINI %s loaded via fopen RawFileClass fallback (%ld bytes from %s)\n", name, sz, tryName);
+                            free(buf);
+                            fclose(f);
+                            return true;
+                        }
+                    }
+                }
+                // Try loading directly from the file we found via RawFileClass
+                RawFileClass rfDirect(tryName);
+                if (ini.Load(rfDirect, false)) {
+                    DebugString(" Android_LoadINI %s loaded via direct RawFileClass from %s (%ld bytes)\n", name, tryName, sz);
+                    free(buf);
+                    fclose(f);
+                    return true;
+                }
+            }
+            if (buf) free(buf);
+        }
+        fclose(f);
+    }
+    DebugString(" Android_LoadINI %s FAILED all fallbacks\n", name);
+    return false;
+}
+#endif
+
+/// <summary>
+/// Loads the rules and the art control files.
+/// This routine gathers every rules file it can find and, should there be more than one,
+/// asks the player which of them to play with. It then loads the art, expansion, AI and
+/// language override files, and seeds the multiplayer defaults from the rules just read.
+/// </summary>
+/// <returns>bool; Were the rules loaded successfully?</returns>
+static bool Init_Rules(void)
+{
+        DynamicVectorClass<CCINIClass*> Rules;
+
+        bool found = false;
+
+#ifdef __ANDROID__
+        // Android: Search_Files may return names but CCFileClass may fail - use Android_LoadINI
+        for (std::string const & name : Search_Files("RULE*.INI")) {
+                CCINIClass * rule = new CCINIClass;
+                if (Android_LoadINI(*rule, name.c_str())) {
+                        if (stricmp(name.c_str(), DeploymentConfig.RulesFile.c_str()) == 0) {
+                                found = true;
+                                Rules.Add_Head(rule);
+                        } else {
+                                Rules.Add(rule);
+                        }
+                        DebugString(" Android found RULE file via Search_Files + Android_LoadINI: %s\n", name.c_str());
+                } else {
+                        // Try direct load as well
+                        CCFileClass file(name.c_str());
+                        if (rule->Load(file, false)) {
+                                if (stricmp(name.c_str(), DeploymentConfig.RulesFile.c_str()) == 0) {
+                                        found = true;
+                                        Rules.Add_Head(rule);
+                                } else {
+                                        Rules.Add(rule);
+                                }
+                        } else {
+                                delete rule;
+                        }
+                }
+        }
+        // Also try explicit loose files
+        const char* explicitRules[] = {"RULES.INI", "rules.ini", "RULES01.INI", "rules01.ini", "RULES.INI"};
+        for (const char* rname : explicitRules) {
+                if (found) break;
+                // Check if already added
+                bool already = false;
+                for (int i=0;i<Rules.Count();i++) {
+                        // skip check - just try to avoid duplicate loads by trying to load anyway, Search_Files may have missed due to case
+                }
+                CCINIClass* rule = new CCINIClass;
+                if (Android_LoadINI(*rule, rname)) {
+                        if (!found && stricmp(rname, DeploymentConfig.RulesFile.c_str())==0) {
+                                found = true;
+                                Rules.Add_Head(rule);
+                        } else if (!found) {
+                                found = true;
+                                Rules.Add_Head(rule);
+                        } else {
+                                Rules.Add(rule);
+                        }
+                        DebugString(" Android explicit RULE file loaded: %s\n", rname);
+                        break;
+                } else {
+                        delete rule;
+                }
+        }
+#else
+        for (std::string const & name : Search_Files("RULE*.INI")) {
+                CCFileClass file(name.c_str());
+                CCINIClass * rule = new CCINIClass;
+
+                rule->Load(file, false);
+
+                if (stricmp(name.c_str(), DeploymentConfig.RulesFile.c_str()) == 0) {
+                        found = true;
+                        Rules.Add_Head(rule);
+                } else {
+                        Rules.Add(rule);
+                }
+        }
+
+        if (!found) {
+                CCFileClass file(DeploymentConfig.RulesFile.c_str());
+                CCINIClass * rule = new CCINIClass;
+                rule->Load(file, false);
+                Rules.Add_Head(rule);
+        }
+#endif
+
+#ifndef __ANDROID__
+        assert(Rules.Count() > 0);
+#endif
+
+        if (Rules.Count() <= 0) {
+#ifdef __ANDROID__
+                // Android fallback: try direct loose file load for RULES.INI
+                DebugString(" No RULE*.INI found via Search_Files, trying Android_LoadINI fallback for %s\n", DeploymentConfig.RulesFile.c_str());
+                DebugString(" DEBUG: Current dir files should include RULES.INI (you have 0.23MB per screenshot)\n");
+                CCINIClass* rule = new CCINIClass;
+                // Try all possible names, including the tmp that exists
+                if (Android_LoadINI(*rule, DeploymentConfig.RulesFile.c_str()) || 
+                    Android_LoadINI(*rule, "RULES.INI") ||
+                    Android_LoadINI(*rule, "RULES.INI.fallback2.tmp") ||
+                    Android_LoadINI(*rule, "rules.ini") ||
+                    Android_LoadINI(*rule, "RULES01.INI") ||
+                    Android_LoadINI(*rule, "RULES.INI")) {
+                    Rules.Add_Head(rule);
+                    found = true;
+                    DebugString(" Android fallback found RULES.INI\n");
+                } else {
+                    DebugString(" Android fallback FAILED to find RULES.INI even though screenshot shows it exists! Trying RawFileClass directly\n");
+                    // Ultimate fallback: try RawFileClass directly without Android_LoadINI wrapper
+                    RawFileClass rf("RULES.INI");
+                    if (rule->Load(rf, false)) {
+                        Rules.Add_Head(rule);
+                        found = true;
+                        DebugString(" Android fallback found RULES.INI via direct RawFileClass\n");
+                    } else {
+                        RawFileClass rf2("RULES.INI.fallback2.tmp");
+                        if (rule->Load(rf2, false)) {
+                            Rules.Add_Head(rule);
+                            found = true;
+                            DebugString(" Android fallback found RULES.INI via RawFileClass fallback2.tmp\n");
+                        } else {
+                            delete rule;
+                            DebugString(" CRITICAL: Even RawFileClass failed for RULES.INI - file may be corrupt or CCINIClass bug\n");
+                            return(false);
+                        }
+                    }
+                }
+#else
+                return(false);
+#endif
+        }
+
+#ifdef __ANDROID__
+        if (!Android_LoadINI(ArtINI, DeploymentConfig.ArtFile.c_str())) {
+                // Try ART01.INI as fallback (Firestorm expansion file you have as THEME01/SOUND01)
+                if (!Android_LoadINI(ArtINI, "ART01.INI") && !Android_LoadINI(ArtINI, "art.ini")) {
+                        DebugString("Failed to load %s even via Android fallback!\n", DeploymentConfig.ArtFile.c_str());
+                        return(false);
+                }
+        }
+#else
+        CCFileClass art_file(DeploymentConfig.ArtFile.c_str());
+
+        if (!ArtINI.Load(art_file, false)) {
+                DebugString("Failed to load %s!\n", DeploymentConfig.ArtFile.c_str());
+                return(false);
+        }
+#endif
+
+        CCINIClass art_ini;
+        CCFileClass art_fs_file(DeploymentConfig.ArtExpansionFile.c_str());
+
+        if (art_fs_file.Is_Available() == true) {
+                art_ini.Load(art_fs_file, false);
+        }
+
+        if (Addon_Installed(ADDON_FIRESTORM)) {
+                CCFileClass rules_fs_file(DeploymentConfig.RulesExpansionFile.c_str());
+                if (rules_fs_file.Is_Available() == true) {
+                        CCINIClass rule_fs;
+                        if (!FSRuleINI.Load(rules_fs_file, false)) {
+                                DebugString("Failed to load %s!\n", DeploymentConfig.RulesExpansionFile.c_str());
+                                return(false);
+                        }
+                }
+        }
+
+        if (Rules.Count() == 1) {
+                RuleINI = Rules[0];
+        } else {
+                MouseCursor->Release_Mouse();
+                int rules_choice = DialogBoxParam(ProgramInstance, MAKEINTRESOURCE(IDD_RULES_CHOICE), MainWindow, Rules_Choice_Dialog_Proc, (LPARAM)&Rules);
+                MouseCursor->Capture_Mouse();
+
+                if (rules_choice == -1) {
+                        rules_choice = 0;
+                }
+
+                RuleINI = Rules[rules_choice];
+        }
+
+#ifdef __ANDROID__
+        // Android: Color_Schemes creates LightConvertClass which needs VisibleSurface (null on Quest)
+        // Our RULES_COLOR_FIX.cpp bypasses it, but also add safety here
+        try {
+                DebugString("Color_Schemes - Android tolerant call\n");
+                Rule->Color_Schemes(*RuleINI);
+                DebugString("Color_Schemes OK on Android (bypassed)\n");
+        } catch (...) {
+                DebugString("Color_Schemes exception on Android, continuing with defaults\n");
+        }
+#else
+        Rule->Color_Schemes(*RuleINI);
+#endif
+        Rule->Do_Movies(ArtINI);
+        Rule->Do_Movies(art_ini);
+        Rule->Audio_Visual_Rules(*RuleINI);
+        Rule->MPlayer(*RuleINI);
+
+        Session.Options.UnitCount = Rule->MPUnitCount;
+        BuildLevel = Rule->MPBuildLevel;
+        Session.Options.Credits = Rule->MPMoney;
+        Session.Options.FogOfWar = false;
+        Session.Options.BridgeDestruction = Rule->IsMPBridgeDestruction;
+        Session.Options.Goodies = Rule->IsMPCrates;
+        Session.Options.Bases = Rule->IsMPBasesOn;
+        Session.Options.CTF = Rule->IsMPCaptureTheFlag;
+        Session.Options.AIPlayers = 0;
+        Session.Options.AIDifficulty = DIFF_NORMAL;
+
+        CCFileClass lang_file(DeploymentConfig.LanguageRulesFile.c_str());
+
+        if (lang_file.Is_Available() == true) {
+                CCINIClass lang_ini;
+
+                if (lang_ini.Load(lang_file, true) > 1) {
+                        return(false);
+                }
+
+                Rule->Addition(lang_ini);
+        }
+
+        for (int index = 0; index < Rules.Count(); index++) {
+                if (Rules[index] != RuleINI) {
+                        delete Rules[index];
+                }
+        }
+
+        CCFileClass ai_file(DeploymentConfig.AIFile.c_str());
+        AIINI.Load(ai_file, true);
+
+        if (Addon_Installed(ADDON_FIRESTORM)) {
+                CCFileClass ai_fs_file(DeploymentConfig.AIExpansionFile.c_str());
+                if (ai_fs_file.Is_Available() == true) {
+                        CCINIClass ai_fs_ini;
+                        if (!FSAIINI.Load(ai_fs_file, false)) {
+                                DebugString("Failed to load %s!\n", DeploymentConfig.AIExpansionFile.c_str());
+                                return(false);
+                        }
+                }
+        }
+
+        return(true);
+}
+
+
+/***********************************************************************************************
+ * Select_Game -- The game's main menu                                                         *
+ *                                                                                             *
+ * INPUT:                                                                                      *
+ *    fade     if true, will fade the palette in gradually                                     *
+ *                                                                                             *
+ * OUTPUT:                                                                                     *
+ *    none.                                                                                    *
+ *                                                                                             *
+ * WARNINGS:                                                                                   *
+ *    none.                                                                                    *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/05/1995 BRR : Created.                                                                 *
+ *=============================================================================================*/
+bool Select_Game(bool )
+{
+        bool gameloaded;                                // Has the game been loaded from the menu?
+        int selection;                                  // the default selection
+        bool process;                                   // false = break out of while loop
+
+        static int protocol = -1;
+
+        /// RA2 calls this here, bugfix?
+        //Theme.Play_Song(Fetch_Main_Menu_Theme());
+
+        Show_Mouse();
+
+restart:
+        gameloaded = false;
+        process = true;
+
+        /*
+        **      [Re]set any globals that need it, in preparation for a new scenario
+        */
+        GameActive = true;
+        PlayerPtr = NULL;
+        DoList.clear();
+        OutList.clear();
+        Frame = 0;
+        Scen->MissionTimer = 0;
+        Scen->MissionTimer.Stop();
+        Scen->CDifficulty = DIFF_NORMAL;
+        Scen->Difficulty = DIFF_NORMAL;
+        PlayerWins = false;
+        PlayerLoses = false;
+        PlayerRestarts = false;
+        PlayerAborts = false;
+        Session.ObiWan = false;
+        Session.AIOnly = false;
+#ifdef _DEBUG
+        Debug_Unshroud = false;
+#endif
+        Map.Set_Cursor_Shape(NULL);
+        Map.PendingObjectPtr = 0;
+        Map.PendingObject = 0;
+        Map.PendingHouse = HOUSE_NONE;
+
+        Session.ProcessTicks = 0;
+        Session.ProcessFrames = 0;
+        Session.WorstStallTicks = 0;
+        Session.PreviousWorstStallTicks = 0;
+        Session.DesiredFrameRate = 30;
+        NewMaxAheadFrame1 = 0;
+        NewMaxAheadFrame2 = 0;
+
+        /*
+        **      Init multiplayer game scores.  Let Wins accumulate; just init the current
+        **      Kills for this game.  Kills of -1 means this player didn't play this round.
+        */
+        for (int i = 0; i < MAX_MULTI_GAMES; i++) {
+                Session.Score[i].Kills[Session.CurGame] = -1;
+        }
+
+        /*
+        **      Set default mouse shape
+        */
+        Map.Set_Default_Mouse(MOUSE_NORMAL, false);
+
+        if (ToolTips != NULL) {
+                ToolTips->Activate(false);
+        }
+
+        /*
+        **      If the last game we played was a multiplayer game, jump right to that
+        **      menu by pre-setting 'selection'.
+        */
+        if (Session.Type == GAME_NORMAL) {
+                selection = SEL_NONE;
+        } else {
+                selection = SEL_MULTIPLAYER_GAME;
+        }
+
+        /*
+        **      Main menu processing; only do this if we're not in editor mode.
+        */
+#ifdef __ANDROID__
+          int const menu_result = Android_Main_Menu();
+          if (menu_result == 0) return(false);
+          gameloaded = menu_result == 2;
+          selection = menu_result == 3 ? SEL_MULTIPLAYER_GAME : SEL_CAMPAIGN_GAME;
+          process = false;
+#else
+        if (!Debug_Map) {
+
+                /*
+                **      Menu selection processing loop
+                */
+                Theme.Play_Song(Fetch_Main_Menu_Theme());
+
+                /*
+                **      If we're playing back a recording, load all pertinent values & skip
+                **      the menu loop.  Hide the now-useless mouse pointer.
+                */
+                if (Session.Play && Session.RecordFile.Is_Available()) {
+                        if (Session.RecordFile.Open(FileClass::READ)) {
+                                Load_Recording_Values(Session.RecordFile);
+                                process = false;
+                                Theme.Stop(true);
+                        } else {
+                                Session.Play = false;
+                        }
+                }
+
+                /*
+                 * A launch replaces the menu once. An ended match or a refusal answers false, so the
+                 * process exits and the client sees it go.
+                 */
+                if (Spawner_Is_Requested()) {
+                        if (!Spawner_Prepare(gameloaded)) {
+                                return(false);
+                        }
+                        process = false;
+                        Theme.Stop(true);
+                }
+
+                while (process) {
+
+                        /*
+                        **      Display menu and fetch selection from player.
+                        */
+                        if (PacketTransport) {
+                                Ipx.Shutdown();
+                        }
+
+                        if ((selection == SEL_NONE) && !Debug_ForceScenario) {
+                                if (Get_New_Menu()->MixFile) {
+                                        selection = New_Main_Menu();
+                                } else {
+                                        selection = Main_Menu(ATTRACT_MODE_TIMEOUT);
+                                }
+                        }
+
+                        if (Debug_ForceScenario) {
+                                selection = SEL_CAMPAIGN_GAME;
+                        }
+
+                        Call_Back();
+
+                        switch (selection) {
+
+                                case SEL_NEW_SCENARIO:
+                                        new (&Environment) EnvironmentClass;
+                                        Expansion_Dialog();
+                                        Theme.Stop(true);
+                                        Session.Type = GAME_NORMAL;
+                                        process = false;
+                                        break;
+
+                                /*
+                                 * SEL_CAMPAIGN_GAME: Play the game
+                                 */
+                                case SEL_CAMPAIGN_GAME: {
+                                        new (&Environment) EnvironmentClass;
+
+#ifdef __ANDROID__
+                                        {
+                                            Scen->Campaign = CAMPAIGN_GDI;
+                                            FILE* f = fopen("QUEST_CAMPAIGN.TXT", "r");
+                                            if (!f) f = fopen("/storage/emulated/0/Android/data/com.opents.game/files/QUEST_CAMPAIGN.TXT", "r");
+                                            if (!f) f = fopen("QUEST_CAMPAIGN.txt", "r");
+                                            if (f) {
+                                                char buf[32] = {0};
+                                                if (fgets(buf, sizeof(buf), f)) {
+                                                    for (char* p = buf; *p; ++p) *p = toupper(*p);
+                                                    if (strstr(buf, "FS") || strstr(buf, "FIRESTORM")) {
+                                                        if (strstr(buf, "GDI")) Scen->Campaign = CAMPAIGN_FIRESTORM_GDI;
+                                                        else Scen->Campaign = CAMPAIGN_FIRESTORM_NOD;
+                                                    } else if (strstr(buf, "NOD")) {
+                                                        Scen->Campaign = CAMPAIGN_NOD;
+                                                    } else {
+                                                        Scen->Campaign = CAMPAIGN_GDI;
+                                                    }
+                                                    DebugString(" Quest campaign from file: %s -> %d\n", buf, (int)Scen->Campaign);
+                                                }
+                                                fclose(f);
+                                            } else {
+                                                DebugString(" Quest campaign file not found, default GDI\n");
+                                            }
+                                        }
+#else
+                                        Scen->Campaign = Choose_Campaign();
+                                        if (Scen->Campaign == CAMPAIGN_NONE) {
+                                                process = true;
+                                                selection = SEL_NONE;
+                                                break;
+                                        }
+#endif
+
+                                        Theme.Stop(true);
+
+                                        int timeout = (TickCount + 5 * TIMER_SECOND);
+
+                                        while (Theme.Still_Playing() && (timeout > TickCount)) {
+                                                Call_Back();
+                                        }
+
+                                        Theme.Stop();
+                                        Session.Type = GAME_NORMAL;
+                                        process = false;
+                                        break;
+                                }
+
+                                /*
+                                **      Load a saved game.
+                                */
+                                case SEL_LOAD_GAME:
+                                        if (LoadOptionsClass().Load()) {
+                                                Theme.Stop();
+                                                process = false;
+                                                gameloaded = true;
+                                        } else {
+                                                selection = SEL_NONE;
+                                        }
+
+                                        break;
+
+                                /*
+                                **      SEL_MULTIPLAYER_GAME: set 'Session.Type' to network play.
+                                */
+                                case SEL_MULTIPLAYER_GAME: {
+                                                Session.Read_MultiPlayer_Settings();
+                                                Prepare_Side_Roster();
+
+                                                Session.Suspended = 0;
+
+                                                switch (Session.Type) {
+                                                        /*
+                                                        **      If 'Session.Type' isn't already set up for a multiplayer game,
+                                                        **      we must prompt the user for which type of multiplayer game
+                                                        **      they want.
+                                                        */
+                                                case GAME_NORMAL:
+                                                        if (Get_New_Menu()->MixFile == NULL) {
+                                                                Session.Type = Select_MPlayer_Game();
+                                                                Session.IsWDT = false;
+                                                                if (Session.Type == GAME_NORMAL) {
+                                                                        selection = SEL_NONE;
+                                                                }
+                                                                if (Session.Type == GAME_SKIRMISH) {
+                                                                        continue;
+                                                                }
+                                                        } else {
+                                                                selection = SEL_NONE;
+                                                                continue;
+                                                        }
+                                                        break;
+
+                                                case GAME_SKIRMISH:
+                                                        if (!Skirmish_Mode_Dialog()) {
+                                                                Session.Type = GAME_NORMAL;
+                                                                selection = SEL_NONE;
+                                                        }
+                                                        break;
+
+                                                }
+                                        }
+                                        switch (Session.Type) {
+                                                /*
+                                                **      Internet
+                                                */
+                                                case GAME_INTERNET:
+                                                case GAME_SKIRMISH:
+                                                        Theme.Stop(true);
+                                                        process = false;
+                                                        break;
+
+                                                /*
+                                                **      Network: start a new local network game.
+                                                */
+                                                case GAME_IPX: {
+                                                        Cheat_Disable();
+                                                        Session.Read_MultiPlayer_Settings();
+                                                        Prepare_Side_Roster();
+
+                                                        Session.Type = GAME_IPX;
+                                                        Session.CommProtocol = COMM_PROTOCOL_MULTI_E_COMP;
+
+                                                        Ipx.Configure_LAN();
+
+                                                        /*
+                                                        **      Init network system & remote-connect
+                                                        */
+                                                        Draw_Menu_Background();
+
+                                                        if (Net2Init_Network() && Net2Remote_Connect()) {
+                                                                process = false;
+                                                                Theme.Stop(true);
+                                                        } else {
+                                                                // user hit cancel, or init failed
+                                                                Session.Type = GAME_NORMAL;
+                                                                selection = SEL_NONE;
+
+                                                                Ipx.Shutdown();
+                                                        }
+                                                }
+                                                break;
+                                        }
+                                        break;
+
+                                /*
+                                **      Play a VQ
+                                */
+                                case SEL_INTRO:
+                                        Theme.Stop();
+                                        if (Debug_Flag) {
+                                                Play_Intro(Debug_Flag);
+                                        } else {
+                                                Choose_Side();
+                                                Clear_Option(OPTION_PLAY_FROM_MIXFILE);
+                                                Play_Movie("SIZZLE1.VQA");
+                                                Set_Option(OPTION_PLAY_FROM_MIXFILE);
+                                        }
+                                        Theme.Queue_Song(Fetch_Main_Menu_Theme());
+                                        selection = SEL_NONE;
+                                        break;
+
+                                case SEL_OPTIONS:
+                                        selection = SEL_NONE;
+                                        Main_Options_Dialog();
+                                        break;
+
+                                case SEL_VERSION: {
+                                        selection = SEL_NONE;
+                                        Version_Dialog();
+                                        break;
+                                }
+
+                                case SEL_VIEW_CREDITS: {
+                                                selection = SEL_NONE;
+                                                Show_Who_Was_Responsible();
+                                                Theme.Queue_Song(Fetch_Main_Menu_Theme());
+                                        }
+                                        break;
+
+                                /*
+                                **      Exit to DOS.
+                                */
+                                case SEL_EXIT: {
+                                                Theme.Stop(true);
+
+                                                int timeout = (TickCount + 50 * TIMER_SECOND);
+
+                                                while (Theme.Still_Playing() && Is_Speaking() && (timeout > TickCount)) {
+                                                        Call_Back();
+                                                }
+
+                                                Theme.Stop();
+
+                                                return(false);
+                                        }
+
+                                /*
+                                **      Display the hall of fame.
+                                */
+                                case SEL_FAME:
+                                        break;
+
+                                case SEL_TIMEOUT: {
+                                                if (Session.Attract && Session.RecordFile.Is_Available()) {
+                                                        Session.Play = true;
+
+                                                        if (Session.RecordFile.Open(FileClass::READ)) {
+                                                                Load_Recording_Values(Session.RecordFile);
+                                                                process = false;
+                                                                Theme.Stop(true);
+                                                        } else {
+                                                                Session.Play = false;
+                                                                selection = SEL_NONE;
+                                                        }
+                                                } else {
+                                                        selection = SEL_NONE;
+                                                }
+                                        }
+                                        break;
+
+                                default:
+                                        break;
+                        }
+                }
+        } else {
+
+                /*
+                ** For Debug_Map (editor) mode to load scenario
+                */
+                //Scen.Set_Scenario_Name("SCG01EA.INI");
+        }
+#endif
+
+        /*
+        **      Don't carry stray keystrokes into game.
+        */
+        Keyboard->Clear();
+        SaveManager.Reset_Multiplayer_Save_State();
+
+        /*
+        **      Initialize the random number generator(s)
+        */
+        Init_Random();
+
+        /*
+        **      Load the scenario.
+        */
+        if (!gameloaded && !Session.LoadGame) {
+                DebugString("About to load a %d player game.\n",Session.Players.Count());
+
+                /*
+                **      Start_Scenario() changes the palette; so, fade out & clear the screen
+                **      before calling it.
+                */
+                Hide_Mouse();
+
+                if (selection != SEL_CAMPAIGN_GAME) {
+#ifndef __ANDROID__
+	HiddenSurface->Fill(0);
+	Update_Visible_Surface(HiddenSurface);
+#endif
+                }
+
+                Show_Mouse();
+
+                if (Session.Type != GAME_NORMAL) {
+                        Session.PlayerHouse = (HousesType)Session.Players[0]->Player.House;
+                }
+
+                // The menu sets the difficulty pair on every path but a client launch, which chose it.
+                if (!Spawner_Is_Active()) {
+                        Session.CampaignDifficulty = (DiffType)Options.Difficulty;
+                        Session.CampaignCDifficulty = (DiffType)(DIFF_COUNT - 1 - Options.Difficulty);
+                }
+
+                if (Session.Type != GAME_NORMAL || Debug_ForceScenario || Session.Play || Spawner_Is_Active()) {
+                        if (!Start_Scenario(Scen->ScenarioName, true, Spawner_Is_Active() ? Scen->Campaign : CAMPAIGN_NONE)) {
+                                if (Debug_Map) {
+                                        return(false);
+                                } else {
+                                        goto restart;
+                                }
+                        }
+                } else {
+                        if (Scen->Campaign < 0 || Scen->Campaign >= Campaigns.Count() || Campaigns[Scen->Campaign] == NULL) {
+                                DebugString("Select_Game: invalid campaign %d (count=%d); check BATTLE.INI archive discovery.\n", Scen->Campaign, Campaigns.Count());
+                                return(false);
+                        }
+                        if (!Start_Scenario(Campaigns[Scen->Campaign]->ScenarioName, true, Scen->Campaign)) {
+                                if (Debug_Map) {
+                                        return(false);
+                                } else {
+                                        goto restart;
+                                }
+                        }
+                }
+
+                // The mission read clears these, so a launch file's carried-over flags are set after it.
+                if (Spawner_Is_Active() && Session.Type == GAME_NORMAL) {
+                        for (int index = 0; index < ARRAY_SIZE(Environment.Globals); index++) {
+                                Scen->Set_Global_To(index, Environment.Globals[index]);
+                        }
+                }
+
+                /*
+                **      Save initialization values if we're recording this game.
+                */
+                if (Session.Record) {
+                        if (Session.RecordFile.Open(FileClass::WRITE)) {
+                                Save_Recording_Values(Session.RecordFile);
+                        } else {
+                                Session.Record = false;
+                        }
+                }
+
+                if (Special.IsFromInstall == true) {
+                        Show_Mouse();
+                }
+
+                Special.IsFromInstall = false;
+        }
+
+        DebugString("IsTGrowth = %d\n", Special.IsTGrowth);
+        DebugString("IsTSpread = %d\n", Special.IsTSpread);
+
+        if (Session.Type != GAME_NORMAL && Session.Type != GAME_SKIRMISH && !Session.Play) {
+                Session.Create_Connections();
+                Spawner_Announce_Master();
+                SaveManager.Multiplayer_Saves_Begin_Match(gameloaded || Session.LoadGame);
+
+                if (Session.Type == GAME_IPX) {
+                        Ipx.Set_Timing(std::max<unsigned>(TIMER_SECOND / 4, Ipx.Global_Response_Time() + 2), (unsigned int) -1, 10 * TIMER_SECOND);
+
+                        Ipx.Set_External_Timing(std::max<unsigned>(TIMER_SECOND, Ipx.Global_Response_Time() + 2), (unsigned int) -1, 10 * TIMER_SECOND);
+                } else {
+                        if (Session.Type == GAME_INTERNET) {
+
+                                Ipx.Set_Timing(std::max<unsigned>(TIMER_SECOND, Ipx.Global_Response_Time() + 2), (unsigned int) -1, 10 * TIMER_SECOND);
+                        }
+                }
+        } else if (Session.Play && (Session.Type == GAME_IPX || Session.Type == GAME_INTERNET)) {
+                Session.Reset_Network_Timing(Frame >= 0 ? static_cast<unsigned int>(Frame) : 0u);
+        }
+
+        /*
+        **      Hide the SeenPage; force the map to render one frame.  The caller can
+        **      then fade the palette in.
+        **      (If we loaded a game, this step will fade out the title screen.  If we
+        **      started a scenario, Start_Scenario() will have played a couple of VQ
+        **      movies, which will have cleared the screen to black already.)
+        */
+	Call_Back();
+	Hide_Mouse();
+
+#ifndef __ANDROID__
+	HiddenSurface->Fill(0);
+	Update_Visible_Surface(HiddenSurface);
+#endif
+	Show_Mouse();
+        LogicalSurface = HiddenSurface;
+        Map.Override_Mouse_Shape(MOUSE_NO_MOVE);
+        Map.Revert_Mouse_Shape();
+
+        /*
+        **      Sidebar is always active in hi-res.
+        */
+        if (!Debug_Map) {
+                Map.Activate(1);
+        }
+
+        Map.Flag_To_Redraw();
+        Call_Back();
+
+        Hide_Mouse();
+
+        return(true);
+}
+
+
+/***********************************************************************************************
+ * Play_Intro -- plays the introduction & logo movies                                          *
+ *                                                                                             *
+ * INPUT:                                                                                      *
+ *                                                                                             *
+ * OUTPUT:                                                                                     *
+ *    none.                                                                                    *
+ *                                                                                             *
+ * WARNINGS:                                                                                   *
+ *    none.                                                                                    *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/06/1995 BRR : Created.                                                                 *
+ *   05/08/1996 JLB : Modified for Red Alert and direction control.                            *
+ *=============================================================================================*/
+static void Play_Intro(bool sequenced)
+{
+        static VQType _counter = VQ_FIRST;
+
+        //Keyboard->Clear();
+        if (sequenced) {
+                if (_counter <= VQ_FIRST) _counter = (VQType)Movies.Count();
+                if (_counter == Movies.Count()) _counter--;
+                //Hide_Mouse();
+                //VisiblePage.Clear();
+                //Show_Mouse();
+                Play_Movie(VQType(_counter--), THEME_NONE);
+
+//              Show_Mouse();
+        } else {
+                //Hide_Mouse();
+                //VisiblePage.Clear();
+                //Show_Mouse();
+                //Play_Movie(VQ_TITLE, THEME_NONE, false);
+        }
+}
+
+
+/***********************************************************************************************
+ * Anim_Init -- Initialize the VQ animation control structure.                                 *
+ *                                                                                             *
+ *    VQ animations are controlled by a structure passed to the VQ player. This routine        *
+ *    initializes the structure to values required by C&C.                                     *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   Only need to call this routine once at the beginning of the game.               *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   12/20/1994 JLB : Created.                                                                 *
+ *=============================================================================================*/
+void Anim_Init(void)
+{
+        Initialize_Options();
+        Set_Option(OPTION_PLAY_FROM_MIXFILE);
+}
+
+
+/***********************************************************************************************
+ * Parse_Command_Line -- Parses the command line parameters.                                   *
+ *                                                                                             *
+ *    This routine should be called before the graphic mode is initialized. It examines the    *
+ *    command line parameters and sets the appropriate globals. If there is an error, then     *
+ *    it outputs a command summary and then returns false.                                     *
+ *                                                                                             *
+ * INPUT:   argc  -- The number of command line arguments.                                     *
+ *                                                                                             *
+ *          argv  -- Pointer to character string array that holds the individual arguments.    *
+ *                                                                                             *
+ * OUTPUT:  bool; Was the command line parsed successfully?                                    *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   03/18/1995 JLB : Created.                                                                 *
+ *=============================================================================================*/
+bool Parse_Command_Line(int argc, char * argv[])
+{
+        /*
+        **      Parse the command line and set globals to reflect the parameters
+        **      passed in.
+        */
+        //Whom = HOUSE_GOOD;
+        Special.Init();
+
+        Debug_Map = false;
+#ifdef _DEBUG
+        Debug_Unshroud = false;
+#endif
+
+        for (int index = 1; index < argc; index++) {
+                char arg_string[512];
+                char * string = arg_string;             // Pointer to argument.
+
+                // Quotes are dropped on the way in so a quoted argument matches like an unquoted one.
+                char * dest = arg_string;
+                for (char * src = argv[index]; *src != '\0' && dest < &arg_string[sizeof(arg_string) - 1]; src++) {
+                        if (*src != '"') {
+                                *dest++ = *src;
+                        }
+                }
+                *dest = '\0';
+
+                // Matching is done on an upper case copy, so that an option carrying a directory
+                // can still take it in the case it was written.
+                char original[512];
+                strcpy(original, arg_string);
+                _strupr(string);
+
+                /*
+                **      Print usage text only if requested.
+                */
+                if (stricmp("/?", string) == 0 || stricmp("-?", string) == 0 || stricmp("-h", string) == 0 || stricmp("/h", string) == 0) {
+                        /*
+                        **      Unrecognized command line parameter... Display usage
+                        **      and then exit.
+                        */
+                        puts(Fetch_String(TXT_OPTION_HELP_01));
+                        puts(Fetch_String(TXT_OPTION_HELP_02));
+                        puts(Fetch_String(TXT_OPTION_HELP_03));
+                        puts(Fetch_String(TXT_OPTION_HELP_04));
+                        puts(Fetch_String(TXT_OPTION_HELP_05));
+                        puts(Fetch_String(TXT_OPTION_HELP_06));
+                        return(false);
+                }
+
+
+                bool processed = true;
+                int ob = Obfuscate(string);
+
+#ifdef _DEBUG
+                Debug_Playtest = true;
+                Debug_Flag = true;
+#endif
+
+                switch (ob) {
+
+#ifdef _DEBUG
+                        case PARM_PLAYTEST:
+                                Debug_Playtest = true;
+                                break;
+#endif
+
+                        /*
+                        **      Special flag - is C&C being run from the install program?
+                        */
+                        case PARM_INSTALL:
+                                Special.IsFromInstall = true;
+// If uncommented, will disable the <ESC> key during the first movie run.
+//                              BreakoutAllowed = false;
+                                break;
+
+                        default:
+                                processed = false;
+                                break;
+                }
+                if (processed) continue;
+
+
+#ifdef _DEBUG
+                /*
+                **      Scenario Editor Mode
+                */
+                if (stricmp(string, "-CHECKMAP") == 0) {
+                        Debug_Check_Map = true;
+                        continue;
+                }
+
+#endif
+
+                if (strnicmp(string, "-DATADIR=", strlen("-DATADIR=")) == 0) {
+                        Set_Data_Directory(&original[strlen("-DATADIR=")]);
+                        continue;
+                }
+
+                if (strnicmp(string, "-USERDIR=", strlen("-USERDIR=")) == 0) {
+                        Set_User_Directory(&original[strlen("-USERDIR=")]);
+                        continue;
+                }
+
+                // A client asking the game to launch what SPAWN.INI describes.
+                if (stricmp(string, "-SPAWN") == 0) {
+                        Spawner_Request();
+                        continue;
+                }
+
+                if (memcmp(string, "-TIME=", 6) == 0) {
+                        sscanf(&string[6], "%d", &TournamentTime);
+                }
+
+                if (strstr(string, "-MPDEBUG")) {
+                        Session.ShowInternetDebug = true;
+                }
+
+                /*
+                **      Set the Net Stealth option
+                */
+                if (strstr(string, "-STEALTH")) {
+                        Session.NetStealth = true;
+                        continue;
+                }
+
+                /*
+                **      Allow "attract" mode
+                */
+                if (strstr(string, "-ATTRACT")) {
+                        Session.Attract = true;
+                        continue;
+                }
+
+                if (isdigit((unsigned char)string[1])) {
+                        sscanf(string, "-%dX%d", &Options.ScreenWidth, &Options.ScreenHeight);
+                        continue;
+                }
+
+                /*
+                **      Set screen to 640x480 instead of 640x400
+                */
+                if (strcmp(string, "-480") == 0) {
+                        Options.ScreenHeight = 480;
+                        continue;
+                }
+
+                if (stricmp(string, "-WIN") == 0) {
+                        WindowedMode = true;
+                        continue;
+                }
+
+                /*
+                 * Arms a deliberate fault; the mode decides where it is raised later.
+                 */
+                if (strnicmp(string, "-EXCEPTIONTEST=", strlen("-EXCEPTIONTEST=")) == 0) {
+                        Exception_Set_Test_Mode(string + strlen("-EXCEPTIONTEST="));
+                        continue;
+                }
+
+                /*
+                 * Arms one deliberate checksum mismatch, so that the out-of-sync path can be
+                 * exercised without waiting for a real desynchronization.
+                 */
+                if (strnicmp(string, "-DESYNCTEST=", strlen("-DESYNCTEST=")) == 0) {
+                        Session.ForceDesyncFrame = atoi(string + strlen("-DESYNCTEST="));
+                        continue;
+                }
+#ifdef _DEBUG
+                /*
+                **      Specify the random number seed (for debugging)
+                */
+                if (strstr(string, "-SEED")) {
+                        CustomSeed = (unsigned short)(atoi(string + strlen("SEED")));
+                        continue;
+                }
+#endif
+
+                /*
+                **      Special command line control parsing.
+                */
+                if (strnicmp(string, "-X", strlen("-O")) == 0) {
+                        string += strlen("-X");
+                        while (*string) {
+                                char code = *string++;
+                                switch (toupper((unsigned char)code)) {
+
+#ifdef _DEBUG
+
+                                        /*
+                                        **      Monochrome debug screen enable.
+                                        */
+                                        case 'M':
+                                                MonoClass::Enable();
+                                                break;
+
+                                        /*
+                                        **      Inert weapons -- no units take damage.
+                                        */
+                                        case 'I':
+                                                Special.IsInert = true;
+                                                Debug_Inert = true;
+                                                break;
+
+                                        /*
+                                        **      Hussled recharge timer.
+                                        */
+                                        case 'H':
+                                                Special.IsSpeedBuild = true;
+                                                Debug_SpeedBuild = true;
+                                                break;
+
+                                        /*
+                                        **      "Record" a multi-player game
+                                        */
+                                        case 'X':
+                                                Session.Record = 1;
+                                                break;
+
+                                        /*
+                                        **      "Play Back" a multi-player game
+                                        */
+                                        case 'Y':
+                                                Session.Play = 1;
+                                                break;
+
+                                        /*
+                                        **      Print lots of debug stuff about events & packets
+                                        */
+                                        case 'P':
+                                                Debug_Print_Events = true;
+                                                break;
+#endif
+
+                                        /*
+                                         * Enable debug output to a console.
+                                         */
+                                        case 'C':
+                                                Debug_Console = true;
+                                                Debug_Init_Console();
+                                                break;
+
+                                        /*
+                                        **      Quiet mode override control.
+                                        */
+                                        case 'Q':
+                                                Debug_Quiet = true;
+                                                break;
+
+                                        default:
+                                                puts(Fetch_String(TXT_INVALID));
+                                                return(false);
+                                }
+
+                        }
+
+                        continue;
+                }
+        }
+        return(true);
+}
+
+
+/***************************************************************************
+ * Init_Random -- Initializes the random-number generator                  *
+ *                                                                         *
+ * INPUT:                                                                  *
+ *      none.                                                              *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *      none.                                                              *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *      none.                                                              *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   12/04/1995 BRR : Created.                                             *
+ *=========================================================================*/
+void Init_Random(void)
+{
+        DebugString("Init random number\n");
+        /*
+        **      Do nothing if we've loaded a multiplayer game, or we're playing back
+        **      a recording; the random number generator is initialized by loading
+        **      the game.
+        */
+        if (Session.LoadGame) {
+                return;
+        }
+
+        if (Session.Play) {
+                Scen->RandomNumber = Seed;
+                NonCriticalRandomNumber = Seed;
+                DebugString("Seed is %08x\n", Seed);
+                return;
+        }
+
+        /*
+        **      Initialize the random number Seed.  For multiplayer, this will have been done
+        **      in the connection dialogs.  For single-player games, AND if we're not playing
+        **      back a recording, init the Seed to a random value.
+        */
+        if (Session.Type == GAME_NORMAL || Session.Type == GAME_SKIRMISH) {
+
+        #ifdef WIN32
+                /*
+                **      Gather some "random" bits from the system timer. Actually, only the
+                **      low order millisecond bits are secure. The other bits could be
+                **      easily guessed from the system clock (most clocks are fairly accurate
+                **      and thus predictable).
+                */
+                SYSTEMTIME t;
+                GetSystemTime(&t);
+                CryptRandom.Seed_Byte(t.wMilliseconds);
+                CryptRandom.Seed_Bit(t.wSecond);
+                CryptRandom.Seed_Bit(t.wSecond>>1);
+                CryptRandom.Seed_Bit(t.wSecond>>2);
+                CryptRandom.Seed_Bit(t.wSecond>>3);
+                CryptRandom.Seed_Bit(t.wSecond>>4);
+                CryptRandom.Seed_Bit(t.wMinute);
+                CryptRandom.Seed_Bit(t.wMinute>>1);
+                CryptRandom.Seed_Bit(t.wMinute>>2);
+                CryptRandom.Seed_Bit(t.wMinute>>3);
+                CryptRandom.Seed_Bit(t.wMinute>>4);
+                CryptRandom.Seed_Bit(t.wHour);
+                CryptRandom.Seed_Bit(t.wDay);
+                CryptRandom.Seed_Bit(t.wDayOfWeek);
+                CryptRandom.Seed_Bit(t.wMonth);
+                CryptRandom.Seed_Bit(t.wYear);
+        #else
+
+                /*
+                **      Gather some "random" bits from the DOS mode timer.
+                */
+                struct timeb t;
+                ftime(&t);
+                CryptRandom.Seed_Byte(t.millitm);
+                CryptRandom.Seed_Byte(t.time);
+        #endif
+
+                /*
+                **      Set the optional user-specified seed
+                */
+                if (CustomSeed != 0) {
+                        Seed = CustomSeed;
+                } else {
+                        CryptRandom.Get(&Seed, sizeof(Seed));
+                        Seed = GetTickCount();
+                        //srand(time(NULL));
+                        //Seed = rand();
+                }
+        }
+
+        /*
+        **      Initialize the random-number generators
+        */
+        DebugString("Seed is %08x\n", Seed);
+        Scen->RandomNumber = Seed;
+        NonCriticalRandomNumber = Seed;
+}
+
+
+/***********************************************************************************************
+ * Load_Title_Page -- Load the background art for the title page.                              *
+ *                                                                                             *
+ *    This routine will load the background art in a machine independent format. There is      *
+ *    different art required for the hi-res and lo-res versions of the game.                   *
+ *                                                                                             *
+ * INPUT:   visible  -- Should the title page art be copied to the visible page by this        *
+ *                      routine?                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   Be sure the mouse is hidden if the image is to be copied to the visible page.   *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+void Load_Title_Page(const char * name, bool visible)
+{
+#ifdef __ANDROID__
+        DebugString(" Load_Title_Page(%s) - Android bypass, HiddenSurface may be null, skipping\n", name);
+        if (HiddenSurface == nullptr) {
+                DebugString("  HiddenSurface is null, skipping title page load\n");
+                return;
+        }
+#endif
+        HiddenSurface->Fill(0);
+        Load_Title_Screen(name, HiddenSurface, &CCPalette);
+        if (visible)
+                Update_Visible_Surface(HiddenSurface);
+}
+
+
+/***********************************************************************************************
+ * Init_Color_Remaps -- Initialize the text remap tables.                                      *
+ *                                                                                             *
+ *    There are various color scheme remap tables that are dependant upon the color remap      *
+ *    information embedded within the palette control file. This routine will fetch that       *
+ *    data and build the text remap tables as indicated.                                       *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static void Init_Color_Remaps(void)
+{
+        GadgetClass::Set_Color_Scheme(DEFAULT_GADGET_SCHEME);
+}
+
+
+/***********************************************************************************************
+ * Init_Heaps -- Initialize the game heaps and buffers.                                        *
+ *                                                                                             *
+ *    This routine will allocate the game heaps and buffers. The rules file has already been   *
+ *    processed by the time that this routine is called.                                       *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static void Init_Heaps(void)
+{
+}
+
+
+/***********************************************************************************************
+ * Init_Expansion_Files -- Fetch any override expansion mixfiles.                              *
+ *                                                                                             *
+ *    This routine will search for and register/cache any override mixfiles found.             *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Init_Expansion_Files(void)
+{
+#ifdef _DEMO
+        HANDLE handle;
+        WIN32_FIND_DATA ff;
+        MFCD * ptr;
+
+        /*
+        **      Before all else, cache any additional mixfiles.
+        */
+        handle = FindFirstFile("ECACHE*.MIX", &ff);
+
+        while (handle != INVALID_HANDLE_VALUE) {
+                if ((ff.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_TEMPORARY)) == 0) {
+
+                        ptr = new MFCD(ff.cFileName, &FastKey);
+
+                        ExpandMix.Add(ptr);
+                        ptr->Cache();
+                }
+
+                if (FindNextFile(handle, &ff) == false) {
+                        break;
+                }
+        }
+
+        if (handle != INVALID_HANDLE_VALUE) {
+                FindClose(handle);
+        }
+
+        handle = FindFirstFile("ELOCAL*.MIX", &ff);
+
+        while (handle != INVALID_HANDLE_VALUE) {
+                if ((ff.dwFileAttributes & (FILE_ATTRIBUTE_DIRECTORY | FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM | FILE_ATTRIBUTE_TEMPORARY)) == 0) {
+
+                        ptr = new MFCD(ff.cFileName, &FastKey);
+
+                        ExpandMix.Add(ptr);
+                }
+
+                if (FindNextFile(handle, &ff) == false) {
+                        break;
+                }
+        }
+
+        if (handle != INVALID_HANDLE_VALUE) {
+                FindClose(handle);
+        }
+#endif
+        return(true);
+}
+
+
+/***********************************************************************************************
+ * Init_One_Time_Systems -- Initialize internal pointers to the bulk data.                     *
+ *                                                                                             *
+ *    This performs the one-time processing required after the bulk data has been cached but   *
+ *    before the game actually starts. Typically, this routine extracts pointers to all the    *
+ *    embedded data sub-files within the main game data mixfile. This routine must be called   *
+ *    AFTER the bulk data has been cached.                                                     *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   Call this routine AFTER the bulk data has been cached.                          *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Init_One_Time_Systems(void)
+{
+        Call_Back();
+        Map.One_Time();
+        Logic.One_Time();
+        Options.One_Time();
+        Session.One_Time();
+        ObjectTypeClass::One_Time();
+        BuildingTypeClass::One_Time();
+        BulletTypeClass::One_Time();
+        OverlayTypeClass::One_Time();
+        SmudgeTypeClass::One_Time();
+        UnitTypeClass::One_Time();
+        InfantryTypeClass::One_Time();
+        AnimTypeClass::One_Time();
+        AircraftTypeClass::One_Time();
+        HouseClass::One_Time();
+        SpotLightClass::One_Time();
+        IonBlastClass::One_Time();
+
+	CCFileClass dropvxl("DPOD.VXL");
+	DropPodVoxel.VoxLib = new VoxelLibrary(dropvxl);
+
+	if (DropPodVoxel.VoxLib == NULL) {
+		DebugString("Failed to create VoxLib!\n");
+		return(false);
+	}
+
+	CCFileClass dropmot("DPOD.HVA");
+	DropPodVoxel.MotLib = new MotionLibrary(dropmot);
+
+	if (DropPodVoxel.MotLib == NULL) {
+		DebugString("Failed to create MotLib!\n");
+		return(false);
+	}
+        return(true);
+}
+
+
+/***********************************************************************************************
+ * Init_Fonts -- Initialize all the game font pointers.                                        *
+ *                                                                                             *
+ *    This routine is used to fetch pointers to the game fonts. The mixfile containing these   *
+ *    fonts must have been previously cached. This routine is a necessary prerequisite to      *
+ *    displaying any dialogs or printing any text.                                             *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Init_Fonts(void)
+{
+        const void * ptr;
+
+#ifdef __ANDROID__
+        // Android: try MFCD first, then loose file fopen fallback
+        auto LoadFontFile = [](const char* name) -> const void* {
+                const void* p = MFCD::Retrieve(name);
+                if (p) return p;
+                // Try loose file via RawFileClass / fopen
+                FILE* f = fopen(name, "rb");
+                if (!f) {
+                        char lower[256];
+                        strncpy(lower, name, sizeof(lower)-1);
+                        lower[sizeof(lower)-1]=0;
+                        for(char* c=lower; *c; ++c) *c=tolower(*c);
+                        f = fopen(lower, "rb");
+                }
+                if (f) {
+                        fseek(f, 0, SEEK_END);
+                        long sz = ftell(f);
+                        fseek(f, 0, SEEK_SET);
+                        char* buf = new char[sz];
+                        fread(buf, 1, sz, f);
+                        fclose(f);
+                        DebugString(" %s loaded as loose file (%ld bytes)\n", name, sz);
+                        return buf;
+                }
+                return nullptr;
+        };
+
+        ptr = LoadFontFile("12METFNT.FNT");
+        if (ptr == NULL) { DebugString(" 12METFNT.FNT not found\n"); return(false); }
+        Metal12FontPtr = new WWFontClass(ptr);
+        Metal12FontPtr->Set_XSpacing(1);
+        DebugString(" WWFontClass: %d glyphs\n", 219);
+
+        ptr = LoadFontFile("KIA6PT.FNT");
+        if (ptr == NULL) return(false);
+        MapFontPtr = new WWFontClass(ptr);
+        MapFontPtr->Set_XSpacing(1);
+
+        ptr = LoadFontFile("6POINT.FNT");
+        if (ptr == NULL) return(false);
+        Font6Ptr = new WWFontClass(ptr, true);
+        Font6Ptr->Set_XSpacing(1);
+
+        ptr = LoadFontFile("EDITFNT.FNT");
+        if (ptr == NULL) return(false);
+        EditorFont = new WWFontClass(ptr, true);
+        EditorFont->Set_XSpacing(1);
+
+        ptr = LoadFontFile("8POINT.FNT");
+        if (ptr == NULL) return(false);
+        Font8Ptr = new WWFontClass(ptr, true);
+        Font8Ptr->Set_XSpacing(1);
+
+        ptr = LoadFontFile("GRAD6FNT.FNT");
+        if (ptr == NULL) return(false);
+        GradFont6Ptr = new WWFontClass(ptr, true);
+        GradFont6Ptr->Set_XSpacing(2);
+
+        DebugString(" Fonts loaded on Android\n");
+        return(true);
+#else
+        ptr = MFCD::Retrieve("12METFNT.FNT");
+        if (ptr == NULL) { return(false); }
+        Metal12FontPtr = new WWFontClass(ptr);
+        Metal12FontPtr->Set_XSpacing(1);
+
+        ptr = MFCD::Retrieve("KIA6PT.FNT");
+        if (ptr == NULL) { return(false); }
+        MapFontPtr = new WWFontClass(ptr);
+        MapFontPtr->Set_XSpacing(1);
+
+        ptr = MFCD::Retrieve("6POINT.FNT");
+        if (ptr == NULL) { return(false); }
+        Font6Ptr = new WWFontClass(ptr, true);
+        Font6Ptr->Set_XSpacing(1);
+
+        ptr = MFCD::Retrieve("EDITFNT.FNT");
+        if (ptr == NULL) { return(false); }
+        EditorFont = new WWFontClass(ptr, true);
+        EditorFont->Set_XSpacing(1);
+
+        ptr = MFCD::Retrieve("8POINT.FNT");
+        if (ptr == NULL) { return(false); }
+        Font8Ptr = new WWFontClass(ptr, true);
+        Font8Ptr->Set_XSpacing(1);
+
+        ptr = MFCD::Retrieve("GRAD6FNT.FNT");
+        if (ptr == NULL) { return(false); }
+        GradFont6Ptr = new WWFontClass(ptr, true);
+        GradFont6Ptr->Set_XSpacing(2);
+
+        return(true);
+#endif
+}
+
+
+/// <summary>
+/// Mounts a named expansion mixfile straight off the disk.
+/// The archive must be a loose file. Unlike its cached counterpart, this routine will not
+/// find one that is buried inside another mixfile.
+/// </summary>
+/// <param name="name">The filename of the mixfile to mount.</param>
+/// <returns>bool; Was the mixfile found and mounted?</returns>
+static bool Add_Raw_Expansion_Mix(const char *name)
+{
+        if (RawFileClass(name).Is_Available()) {
+                MFCD * expand = new MFCD(name, &FastKey);
+
+                ExpandMix.Add(expand);
+                DebugStringNoPrefix(" %s", name);
+                return(true);
+        }
+        return(false);
+}
+
+
+/// <summary>
+/// Mounts a named expansion mixfile and caches its contents.
+/// The archive is looked for through the game's own file system, so it may itself be
+/// buried inside another mixfile.
+/// </summary>
+/// <param name="name">The filename of the mixfile to mount.</param>
+/// <returns>bool; Was the mixfile found and mounted?</returns>
+static bool Add_CC_Expansion_Mix(const char *name)
+{
+        if (CCFileClass(name).Is_Available()) {
+                MFCD * expand = new MFCD(name, &FastKey);
+
+                ExpandMix.Add(expand);
+                DebugStringNoPrefix(" %s", name);
+                expand->Cache();
+                return(true);
+        }
+        return(false);
+}
+
+
+/// <summary>
+/// Mounts the numbered expansion mixfiles.
+/// This routine brings in the loose expansion archives and the cached ones, which is how
+/// added content gets to override what the game ships with.
+/// </summary>
+static void Init_Expand_Mixfiles(void)
+{
+        int index;
+        char name[64];
+        MFCD * expand;
+
+        for (index = 99; index >= 0; index--) {
+                sprintf(name, "EXPAND%02d.MIX", index);
+                // Searched for as a loose file wherever the game's files are kept, but never
+                // inside another archive.
+#ifdef __ANDROID__
+                try {
+                        // Android: only load if loose file exists via fopen and size sane, skip bad_alloc crashes
+                        FILE* f = fopen(name, "rb");
+                        if (!f) {
+                                char lower[64];
+                                strncpy(lower, name, sizeof(lower)-1);
+                                lower[sizeof(lower)-1]=0;
+                                for(char* p=lower; *p; ++p) *p=tolower(*p);
+                                f = fopen(lower, "rb");
+                        }
+                        if (!f) continue;
+                        fseek(f, 0, SEEK_END);
+                        long sz = ftell(f);
+                        fclose(f);
+                        if (sz < 100 || sz > 500*1024*1024) {
+                                DebugStringNoPrefix(" Skipping %s bad size %ld", name, sz);
+                                continue;
+                        }
+                        if (CDFileClass(name).Is_Available()) {
+                                expand = new MFCD(name, &FastKey);
+                                ExpandMix.Add(expand);
+                                DebugStringNoPrefix(" %s", name);
+                        }
+                } catch (std::bad_alloc&) {
+                        DebugStringNoPrefix(" %s bad_alloc skipped", name);
+                } catch (...) {
+                        DebugStringNoPrefix(" %s exception skipped", name);
+                }
+#else
+                if (CDFileClass(name).Is_Available()) {
+                        expand = new MFCD(name, &FastKey);
+
+                        ExpandMix.Add(expand);
+                        DebugStringNoPrefix(" %s", name);
+                }
+#endif
+        }
+
+        for (index = 99; index >= 0; index--) {
+                sprintf(name, "ECACHE%02d.MIX", index);
+#ifdef __ANDROID__
+                // Android: ECACHE files cause malloc(18446744073709551615) crash - skip unless loose and valid
+                try {
+                        FILE* f = fopen(name, "rb");
+                        if (!f) {
+                                char lower[64];
+                                strncpy(lower, name, sizeof(lower)-1);
+                                lower[sizeof(lower)-1]=0;
+                                for(char* p=lower; *p; ++p) *p=tolower(*p);
+                                f = fopen(lower, "rb");
+                        }
+                        if (!f) continue; // Skip if not loose - CCFileClass finds embedded ones that crash
+                        fseek(f, 0, SEEK_END);
+                        long sz = ftell(f);
+                        fclose(f);
+                        if (sz < 100 || sz > 100*1024*1024) {
+                                DebugStringNoPrefix(" Skipping %s bad size %ld", name, sz);
+                                continue;
+                        }
+                        if (CCFileClass(name).Is_Available()) {
+                                expand = new MFCD(name, &FastKey);
+                                ExpandMix.Add(expand);
+                                DebugStringNoPrefix(" %s", name);
+                                try {
+                                        expand->Cache();
+                                } catch (std::bad_alloc&) {
+                                        DebugStringNoPrefix(" %s Cache bad_alloc skipped", name);
+                                } catch (...) {
+                                        DebugStringNoPrefix(" %s Cache exception skipped", name);
+                                }
+                        }
+                } catch (std::bad_alloc&) {
+                        DebugStringNoPrefix(" %s bad_alloc skipped", name);
+                } catch (...) {
+                        DebugStringNoPrefix(" %s exception skipped", name);
+                }
+#else
+                if (CCFileClass(name).Is_Available()) {
+                        expand = new MFCD(name, &FastKey);
+
+                        ExpandMix.Add(expand);
+                        DebugStringNoPrefix(" %s", name);
+                        expand->Cache();
+                }
+#endif
+        }
+}
+
+
+/// <summary>
+/// Mounts the patch mixfiles.
+/// This routine brings in the patch archives, which is how a released fix replaces files
+/// that the game already shipped with.
+/// </summary>
+static void Init_Patch_Mixfiles(void)
+{
+        MFCD * expand;
+
+        // As with the expansion archives, found loose in any of the game's folders but never
+        // inside another archive.
+#ifdef __ANDROID__
+        try {
+                FILE* f = fopen("PATCH.MIX", "rb");
+                if (!f) f = fopen("patch.mix", "rb");
+                if (f) {
+                        fclose(f);
+                        if (CDFileClass("PATCH.MIX").Is_Available()) {
+                                expand = new MFCD("PATCH.MIX", &FastKey);
+                                ExpandMix.Add(expand);
+                                DebugStringNoPrefix(" %s", "PATCH.MIX");
+                        }
+                }
+        } catch (...) {
+                DebugStringNoPrefix(" PATCH.MIX exception skipped");
+        }
+#else
+        if (CDFileClass("PATCH.MIX").Is_Available()) {
+                expand = new MFCD("PATCH.MIX", &FastKey);
+
+                ExpandMix.Add(expand);
+                DebugStringNoPrefix(" %s", "PATCH.MIX");
+        }
+#endif
+
+
+#ifdef __ANDROID__
+        try {
+                FILE* f = fopen("PCACHE.MIX", "rb");
+                if (!f) f = fopen("pcache.mix", "rb");
+                if (!f) {
+                        // Skip if not loose - embedded PCACHE crashes
+                } else {
+                        fclose(f);
+                        if (CCFileClass("PCACHE.MIX").Is_Available()) {
+                                expand = new MFCD("PCACHE.MIX", &FastKey);
+                                ExpandMix.Add(expand);
+                                DebugStringNoPrefix(" %s", "PCACHE.MIX");
+                                try { expand->Cache(); } catch (...) { DebugStringNoPrefix(" PCACHE.MIX Cache failed"); }
+                        }
+                }
+        } catch (std::bad_alloc&) {
+                DebugStringNoPrefix(" PCACHE.MIX bad_alloc skipped");
+        } catch (...) {
+                DebugStringNoPrefix(" PCACHE.MIX exception skipped");
+        }
+#else
+        if (CCFileClass("PCACHE.MIX").Is_Available()) {
+                expand = new MFCD("PCACHE.MIX", &FastKey);
+
+                ExpandMix.Add(expand);
+                DebugStringNoPrefix(" %s", "PCACHE.MIX");
+                expand->Cache();
+        }
+#endif
+
+}
+
+
+/// <summary>
+/// Reads a palette out of the mounted archives and expands it to the game's colour range.
+/// </summary>
+/// <param name="palette">The palette to fill, left unchanged if the file is not there.</param>
+/// <param name="name">The palette file to read.</param>
+static void Read_Palette(PaletteClass & palette, char const * name)
+{
+        void const * data = MFCD::Retrieve(name);
+
+#ifdef __ANDROID__
+        if (data == NULL) {
+                // Try loose file fallback via fopen
+                FILE* f = fopen(name, "rb");
+                if (!f) {
+                        char lower[512];
+                        strncpy(lower, name, sizeof(lower)-1);
+                        lower[sizeof(lower)-1]=0;
+                        for(char* p=lower; *p; ++p) *p=tolower(*p);
+                        f = fopen(lower, "rb");
+                }
+                if (f) {
+                        fseek(f, 0, SEEK_END);
+                        long sz = ftell(f);
+                        fseek(f, 0, SEEK_SET);
+                        if (sz >= 768) {
+                                static char buf[768];
+                                fread(buf, 1, 768, f);
+                                fclose(f);
+                                DebugString("  %s loaded as loose file (%ld bytes)\n", name, sz);
+                                data = buf;
+                        } else {
+                                fclose(f);
+                        }
+                }
+        }
+#endif
+
+        if (data == NULL) {
+                DebugString("%s not found; leaving that palette unchanged.\n", name);
+                return;
+        }
+
+        memmove(&palette[0], data, sizeof(palette));
+
+        for (int index = 0; index < PaletteClass::COLOR_COUNT; index++) {
+                palette[index] = RGBClass(
+                                (unsigned char)(palette[index].Get_Red()<<2),
+                                (unsigned char)(palette[index].Get_Green()<<2),
+                                (unsigned char)(palette[index].Get_Blue()<<2));
+        }
+}
+
+
+/***********************************************************************************************
+ * Init_Bootstrap_Mixfiles -- Registers and caches any mixfiles needed for bootstrapping.      *
+ *                                                                                             *
+ *    This routine will register the initial mixfiles that are required to display error       *
+ *    messages and get input from the player.                                                  *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   Be sure to call this routine before any dialogs would be displayed to the       *
+ *             player.                                                                         *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Init_Bootstrap_Mixfiles(void)
+{
+        Init_Patch_Mixfiles();
+        Init_Expand_Mixfiles();
+
+#ifndef _DEMO
+        Detect_Addons();
+#ifdef __ANDROID__
+        // Android tolerant for TIBSUN.MIX - try Is_Available then fopen, with full exception handling
+        bool cached = false;
+        try {
+                if (CCFileClass("TIBSUN.MIX").Is_Available()) {
+                        try {
+                                GameMix = new MFCD("TIBSUN.MIX", &FastKey);
+                                DebugStringNoPrefix(" TIBSUN.MIX (android early cache via Is_Available)");
+                        } catch (std::bad_alloc&) {
+                                DebugStringNoPrefix(" TIBSUN.MIX bad_alloc in constructor, skipping");
+                                GameMix = nullptr;
+                        } catch (...) {
+                                DebugStringNoPrefix(" TIBSUN.MIX exception in constructor, skipping");
+                                GameMix = nullptr;
+                        }
+                } else {
+                        FILE* f = fopen("TIBSUN.MIX", "rb");
+                        if (!f) f = fopen("tibsun.mix", "rb");
+                        if (f) {
+                                fclose(f);
+                                try {
+                                        GameMix = new MFCD("TIBSUN.MIX", &FastKey);
+                                        DebugStringNoPrefix(" TIBSUN.MIX (android early cache via fopen)");
+                                } catch (...) {
+                                        GameMix = nullptr;
+                                }
+                        } else {
+                                DebugStringNoPrefix(" TIBSUN.MIX not found even via fopen!");
+                                GameMix = nullptr;
+                        }
+                }
+        } catch (...) {
+                GameMix = nullptr;
+                DebugStringNoPrefix(" TIBSUN.MIX outer exception, skipping");
+        }
+        if (GameMix) {
+                try {
+                        if (MFCD::Cache("TIBSUN.MIX")) {
+                                cached = true;
+                                DebugStringNoPrefix(" TIBSUN.MIX cached OK via upper");
+                        }
+                } catch (std::bad_alloc&) {
+                        DebugStringNoPrefix(" TIBSUN.MIX Cache bad_alloc, skipping");
+                } catch (...) {
+                        DebugStringNoPrefix(" TIBSUN.MIX Cache exception, skipping");
+                }
+                if (!cached) {
+                        try {
+                                if (MFCD::Cache("tibsun.mix")) {
+                                        cached = true;
+                                        DebugStringNoPrefix(" TIBSUN.MIX cached OK via lower");
+                                }
+                        } catch (...) {
+                                DebugStringNoPrefix(" TIBSUN.MIX lower cache failed");
+                        }
+                }
+                if (!cached) {
+                        try {
+                                void const * test = MFCD::Retrieve("RULES.INI");
+                                if (test) {
+                                        cached = true;
+                                        DebugStringNoPrefix(" TIBSUN.MIX cached OK via Retrieve test");
+                                } else {
+                                        DebugString(" TIBSUN.MIX cache failed! Trying to force cache via CCFileClass lower");
+                                        try {
+                                                MFCD * lowerMix = new MFCD("tibsun.mix", &FastKey);
+                                                if (lowerMix) {
+                                                        try {
+                                                                if (MFCD::Cache("tibsun.mix")) {
+                                                                        cached = true;
+                                                                        DebugStringNoPrefix(" TIBSUN.MIX cached OK via lower MFCD");
+                                                                        GameMix = lowerMix;
+                                                                }
+                                                        } catch (...) {
+                                                                DebugString(" TIBSUN.MIX lower MFCD cache exception");
+                                                        }
+                                                }
+                                        } catch (...) {
+                                                DebugString(" TIBSUN.MIX lower MFCD constructor exception");
+                                        }
+                                        if (!cached) {
+                                                DebugString(" TIBSUN.MIX cache failed even with lower! Continuing without TIBSUN.MIX cache - using loose files");
+                                        }
+                                }
+                        } catch (...) {
+                                DebugString(" TIBSUN.MIX Retrieve test exception - continuing without cache");
+                        }
+                }
+        }
+        if (!cached) {
+                DebugString(" TIBSUN.MIX cache ultimately failed! Using loose files only - this is OK for Android");
+                // Don't fail bootstrap - loose INIs will be used
+                // GameMix stays but not cached, or set to null to force loose file loading
+                // We keep GameMix as is, but we won't require its cache
+                cached = true; // Treat as OK to continue
+        }
+#else
+        GameMix = new MFCD("TIBSUN.MIX", &FastKey);
+        DebugStringNoPrefix(" TIBSUN.MIX (android early cache)");
+        if (GameMix && MFCD::Cache("TIBSUN.MIX")) {
+                DebugStringNoPrefix(" TIBSUN.MIX cached");
+        }
+#endif
+#endif
+
+#ifdef __ANDROID__
+        DebugStringNoPrefix(" CACHE.MIX (android tolerant - bypass Is_Available)");
+        try {
+                if (CCFileClass("CACHE.MIX").Is_Available()) {
+                        try { CacheMix = new MFCD("CACHE.MIX", &FastKey); } catch (...) { CacheMix = nullptr; }
+                        if (CacheMix) { try { MFCD::Cache("CACHE.MIX"); DebugStringNoPrefix(" CACHE.MIX cached (via Is_Available)"); } catch (...) { DebugStringNoPrefix(" CACHE.MIX cache failed"); } }
+                } else {
+                        FILE* f = fopen("CACHE.MIX", "rb");
+                        if (!f) f = fopen("cache.mix", "rb");
+                        if (f) {
+                                fclose(f);
+                                DebugStringNoPrefix(" CACHE.MIX cached (via direct check)");
+                                try { CacheMix = new MFCD("CACHE.MIX", &FastKey); if (CacheMix) MFCD::Cache("CACHE.MIX"); } catch (...) { DebugStringNoPrefix(" CACHE.MIX cache exception"); }
+                        } else {
+                                DebugString(" CACHE.MIX not found on Android, continuing anyway");
+                                CacheMix = NULL;
+                        }
+                }
+        } catch (...) { CacheMix = NULL; }
+
+        // LOCAL.MIX
+        try {
+                if (CCFileClass("LOCAL.MIX").Is_Available()) {
+                        try { LocalMix = new MFCD("LOCAL.MIX", &FastKey); if (LocalMix) MFCD::Cache("LOCAL.MIX"); DebugStringNoPrefix(" LOCAL.MIX cached (via direct check)"); } catch (...) { DebugStringNoPrefix(" LOCAL.MIX cache failed"); LocalMix = NULL; }
+                } else {
+                        FILE* f = fopen("LOCAL.MIX", "rb");
+                        if (!f) f = fopen("local.mix", "rb");
+                        if (f) {
+                                fclose(f);
+                                try { LocalMix = new MFCD("LOCAL.MIX", &FastKey); if (LocalMix) MFCD::Cache("LOCAL.MIX"); DebugStringNoPrefix(" LOCAL.MIX cached (via direct check)"); } catch (...) { LocalMix = NULL; }
+                        } else {
+                                LocalMix = NULL;
+                                DebugString(" LOCAL.MIX not found on Android, continuing");
+                        }
+                }
+        } catch (...) { LocalMix = NULL; }
+
+        // CONQUER.MIX early - critical for fonts
+        if (ConquerMix == NULL) {
+                try {
+                        if (CCFileClass("CONQUER.MIX").Is_Available()) {
+                                ConquerMix = new MFCD("CONQUER.MIX", &FastKey);
+                        } else {
+                                FILE* f = fopen("CONQUER.MIX", "rb");
+                                if (!f) f = fopen("conquer.mix", "rb");
+                                if (f) { fclose(f); ConquerMix = new MFCD("CONQUER.MIX", &FastKey); }
+                        }
+                        if (ConquerMix) {
+                                try { MFCD::Cache("CONQUER.MIX"); DebugStringNoPrefix(" CONQUER.MIX cached early - fonts should now be available"); } catch (...) { DebugStringNoPrefix(" CONQUER.MIX cache failed but continuing"); }
+                        }
+                } catch (...) { DebugStringNoPrefix(" CONQUER.MIX exception"); }
+        }
+#else
+        DebugStringNoPrefix(" CACHE.MIX");
+        CacheMix = new MFCD("CACHE.MIX", &FastKey);
+        if (MFCD::Cache("CACHE.MIX") == false) { return(false); }
+        DebugStringNoPrefix(" CACHE.MIX");
+        LocalMix = new MFCD("LOCAL.MIX", &FastKey);
+        DebugStringNoPrefix(" LOCAL.MIX");
+#endif
+
+        return(true);
+}
+
+
+/***********************************************************************************************
+ * Init_Secondary_Mixfiles -- Register and cache secondary mixfiles.                           *
+ *                                                                                             *
+ *    This routine is used to register the mixfiles that are needed for main menu processing.  *
+ *    Call this routine before the main menu is display and processed.                         *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Init_Secondary_Mixfiles(void)
+{
+        /*
+        **      Inform the file system of the various MIX files.
+        */
+#ifdef __ANDROID__
+        try {
+                if (ConquerMix == NULL) {
+                        if (CCFileClass("CONQUER.MIX").Is_Available()) {
+                                ConquerMix = new MFCD("CONQUER.MIX", &FastKey);
+                        } else {
+                                FILE* f = fopen("CONQUER.MIX", "rb");
+                                if (!f) f = fopen("conquer.mix", "rb");
+                                if (f) { fclose(f); ConquerMix = new MFCD("CONQUER.MIX", &FastKey); }
+                        }
+                }
+        } catch (...) { DebugStringNoPrefix(" CONQUER.MIX exception in secondary, trying to continue"); }
+#else
+        if (CCFileClass("CONQUER.MIX").Is_Available()) {
+                ConquerMix = new MFCD("CONQUER.MIX", &FastKey);
+        }
+#endif
+
+        DebugStringNoPrefix(" CONQUER.MIX");
+
+#ifndef __ANDROID__
+        if (ConquerMix == NULL) {
+                return(false);
+        }
+#else
+        if (ConquerMix == NULL) {
+                DebugStringNoPrefix(" CONQUER.MIX NULL but continuing on Android - fonts already loaded via loose files");
+        }
+#endif
+
+        MFCD * mix;
+
+        {
+                // The map and multiplayer archives are not required. A deployment may keep the maps
+                // and the multiplayer content loose or in archives of its own.
+                std::vector<std::string> const maps = Search_Files("MAPS*.MIX");
+
+                for (unsigned int index = 0; index < maps.size(); index++) {
+                        char const * found = maps[index].c_str();
+                        DebugStringNoPrefix(" %s", found);
+
+                        // The first archive found is the game's own; the rest are whatever else is
+                        // installed alongside it.
+#ifdef __ANDROID__
+                        try {
+                                if (index == 0) {
+                                        MapsMix = new MFCD(found, &FastKey);
+                                        continue;
+                                }
+                                mix = new MFCD(found, &FastKey);
+                                MapsMixLocal.Add(mix);
+                        } catch (std::bad_alloc&) {
+                                DebugStringNoPrefix(" %s bad_alloc skipped", found);
+                        } catch (...) {
+                                DebugStringNoPrefix(" %s exception skipped", found);
+                        }
+#else
+                        if (index == 0) {
+                                MapsMix = new MFCD(found, &FastKey);
+                                continue;
+                        }
+
+                        mix = new MFCD(found, &FastKey);
+
+                        MapsMixLocal.Add(mix);
+#endif
+                }
+        }
+
+#ifndef _DEMO
+
+#ifdef __ANDROID__
+        try {
+                if (CCFileClass("MULTI.MIX").Is_Available()) {
+                        MultiMix = new MFCD("MULTI.MIX", &FastKey);
+                        DebugStringNoPrefix(" MULTI.MIX");
+                } else {
+                        FILE* f = fopen("MULTI.MIX", "rb");
+                        if (!f) f = fopen("multi.mix", "rb");
+                        if (f) { fclose(f); MultiMix = new MFCD("MULTI.MIX", &FastKey); DebugStringNoPrefix(" MULTI.MIX via fopen"); }
+                }
+        } catch (...) { DebugStringNoPrefix(" MULTI.MIX exception skipped"); }
+#else
+        if (CCFileClass("MULTI.MIX").Is_Available()) {
+                MultiMix = new MFCD("MULTI.MIX", &FastKey);
+
+                DebugStringNoPrefix(" MULTI.MIX");
+        }
+#endif
+
+#endif
+
+#ifdef __ANDROID__
+        try {
+                if (Addon_Installed(ADDON_FIRESTORM) == true) {
+                        if (CCFileClass("SOUNDS01.MIX").Is_Available()) {
+                                Sounds01Mix = new MFCD("SOUNDS01.MIX", &FastKey);
+                        } else {
+                                FILE* f = fopen("SOUNDS01.MIX", "rb");
+                                if (!f) f = fopen("sounds01.mix", "rb");
+                                if (f) { fclose(f); Sounds01Mix = new MFCD("SOUNDS01.MIX", &FastKey); }
+                        }
+                        DebugStringNoPrefix(" SOUNDS01.MIX");
+                }
+        } catch (...) { DebugStringNoPrefix(" SOUNDS01.MIX exception, continuing"); Sounds01Mix = NULL; }
+#else
+        if (Addon_Installed(ADDON_FIRESTORM) == true) {
+                if (CCFileClass("SOUNDS01.MIX").Is_Available()) {
+                        Sounds01Mix = new MFCD("SOUNDS01.MIX", &FastKey);
+                }
+
+                DebugStringNoPrefix(" SOUNDS01.MIX");
+
+                if (Sounds01Mix == NULL) {
+                        return(false);
+                }
+        }
+#endif
+
+        if (CCFileClass("SOUNDS.MIX").Is_Available()) {
+                try { SoundsMix = new MFCD("SOUNDS.MIX", &FastKey); } catch (...) { SoundsMix = nullptr; DebugStringNoPrefix(" SOUNDS.MIX exception"); }
+        }
+#ifdef __ANDROID__
+        else {
+                FILE* f = fopen("SOUNDS.MIX", "rb");
+                if (!f) f = fopen("sounds.mix", "rb");
+                if (f) {
+                        fclose(f);
+                        DebugStringNoPrefix(" SOUNDS.MIX found via fopen");
+                        try { SoundsMix = new MFCD("SOUNDS.MIX", &FastKey); } catch (...) { SoundsMix = nullptr; }
+                }
+        }
+#endif
+
+        DebugStringNoPrefix(" SOUNDS.MIX");
+
+#ifndef __ANDROID__
+        if (SoundsMix == NULL) {
+                return(false);
+        }
+#else
+        if (SoundsMix == NULL) {
+                DebugString("SOUNDS.MIX not found on Android, continuing without audio\n");
+        }
+#endif
+
+        /*
+        **      Register the score mixfile.
+        */
+#ifdef __ANDROID__
+        try {
+                if (CCFileClass("SCORES.MIX").Is_Available()) {
+                        ScoresMix = new MFCD("SCORES.MIX", &FastKey);
+                } else {
+                        FILE* f = fopen("SCORES.MIX", "rb");
+                        if (!f) f = fopen("scores.mix", "rb");
+                        if (f) {
+                                fclose(f);
+                                DebugStringNoPrefix(" SCORES.MIX found via fopen");
+                                ScoresMix = new MFCD("SCORES.MIX", &FastKey);
+                        }
+                }
+        } catch (...) { ScoresMix = nullptr; DebugStringNoPrefix(" SCORES.MIX exception"); }
+#else
+        if (CCFileClass("SCORES.MIX").Is_Available()) {
+                ScoresMix = new MFCD("SCORES.MIX", &FastKey);
+        }
+#endif
+
+        DebugStringNoPrefix(" SCORES.MIX");
+
+#ifndef __ANDROID__
+        if (ScoresMix == NULL) {
+                return(false);
+        }
+#else
+        if (ScoresMix == NULL) {
+                DebugString("SCORES.MIX not found on Android, continuing without scores\n");
+        }
+#endif
+
+#ifdef __ANDROID__
+        try {
+                if (CCFileClass("SCORES01.MIX").Is_Available()) {
+                        Scores01Mix = new MFCD("SCORES01.MIX", &FastKey);
+                } else {
+                        FILE* f = fopen("SCORES01.MIX", "rb");
+                        if (!f) f = fopen("scores01.mix", "rb");
+                        if (f) { fclose(f); Scores01Mix = new MFCD("SCORES01.MIX", &FastKey); }
+                }
+        } catch (...) { Scores01Mix = nullptr; }
+#else
+        if (CCFileClass("SCORES01.MIX").Is_Available()) {
+                Scores01Mix = new MFCD("SCORES01.MIX", &FastKey);
+        }
+#endif
+
+        DebugStringNoPrefix(" SCORES01.MIX");
+
+        ScoresPresent = true;
+#ifdef __ANDROID__
+        if (ScoresMix != NULL) { try { Theme.Scan(); } catch (...) { DebugString(" Theme.Scan exception on Android\n"); } } else { DebugString(" Skipping Theme.Scan on Android\n"); }
+#else
+        Theme.Scan();
+#endif
+
+                {
+                std::vector<std::string> const movies = Search_Files("MOVIES*.MIX");
+
+                for (unsigned int index = 0; index < movies.size(); index++) {
+                        char const * found = movies[index].c_str();
+                        DebugStringNoPrefix(" %s", found);
+
+#ifdef __ANDROID__
+                        try {
+                                if (index == 0) {
+                                        MoviesMix = new MFCD(found, &FastKey);
+                                        continue;
+                                }
+                                mix = new MFCD(found, &FastKey);
+                                MoviesMixLocal.Add(mix);
+                        } catch (...) { DebugStringNoPrefix(" %s exception skipped", found); }
+#else
+                        if (index == 0) {
+                                MoviesMix = new MFCD(found, &FastKey);
+                                continue;
+                        }
+
+                        mix = new MFCD(found, &FastKey);
+
+                        MoviesMixLocal.Add(mix);
+#endif
+                }
+#ifdef __ANDROID__
+                if (MoviesMix == NULL) {
+                        FILE* f = fopen("MOVIES01.MIX", "rb");
+                        if (!f) f = fopen("movies01.mix", "rb");
+                        if (f) {
+                                fclose(f);
+                                DebugStringNoPrefix(" MOVIES01.MIX found via fopen fallback");
+                                try { MoviesMix = new MFCD("MOVIES01.MIX", &FastKey); } catch (...) { MoviesMix = NULL; }
+                        }
+                }
+#endif
+        }
+
+#ifndef __ANDROID__
+        if (MoviesMix == NULL) {
+                return(false);
+        }
+#else
+        if (MoviesMix == NULL) {
+                DebugString("MOVIES*.MIX not found on Android, continuing without movies\n");
+        }
+#endif
+
+        return(true);
+}
+
+
+/***********************************************************************************************
+ * Bootstrap -- Perform the initial bootstrap procedure.                                       *
+ *                                                                                             *
+ *    This routine will load and initialize the game engine such that a dialog box could be    *
+ *    displayed. Because this is very critical, call this routine before any other game        *
+ *    initialization code.                                                                     *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Bootstrap(void)
+{
+        /*
+        **      Process the message loop until we are in focus. We need to be in focus to read pixels from
+        **      the screen.
+        */
+        do {
+                Keyboard->Check();
+        } while (!GameInFocus);
+
+        /*
+        **      Perform any special debug-only processing. This includes preparing the
+        **      monochrome screen.
+        */
+        Mono_Clear_Screen();
+
+        /*
+        **      Register and make resident all local mixfiles with particular emphasis
+        **      on the mixfiles that are necessary to display and error messages and
+        **      process further initialization.
+        */
+
+        if (!Init_Bootstrap_Mixfiles()) {
+                DebugString("Failed to initialize bootstrap mixfiles!\n");
+                return(false);
+        }
+
+        /*
+        **      Initialize the resident font pointers.
+        */
+        if (!Init_Fonts()) {
+                DebugString("Failed to initialize fonts!\n");
+                return(false);
+        }
+
+        /*
+        **      Setup the keyboard processor in preparation for the game.
+        */
+        Keyboard->Clear();
+
+        /*
+        **      Fetch the language text from the hard drive first. If it cannot be
+        **      found on the hard drive, then look for it in the mixfile.
+        */
+//      SystemStrings = (char const *)MFCD::Retrieve("CONQUER.ENG");
+//      DebugStrings = (char const *)MFCD::Retrieve("DEBUG.ENG");
+
+        /*
+         * House specific scheme palette initialization.
+         */
+        Read_Palette(SchemePalette, DeploymentConfig.SchemePaletteFile.c_str());
+
+        /*
+        **      Default palette initialization.
+        */
+        Read_Palette(GamePalette, DeploymentConfig.GamePaletteFile.c_str());
+
+        OriginalPalette = GamePalette;
+        CCPalette = GamePalette;
+        WhitePalette[0] = BlackPalette[0];
+
+                Read_Palette(WaypointPalette, "WAYPOINT.PAL");
+        DebugString(" WAYPOINT.PAL done\n");
+
+        /*
+         * Voxel system initialization.
+         */
+	CCFileClass vplfile("voxels.vpl");
+	int vplres = VoxelDrawSystem::Load_VPL_File(vplfile);
+	assert(vplres == 0);
+
+	for (int i = 0; i < ARRAY_SIZE(VoxelRGBColors); i++) {
+		VoxelPalette[i] = RGBClass(VoxelRGBColors[i].Red, VoxelRGBColors[i].Green, VoxelRGBColors[i].Blue);
+	}
+
+#ifdef __ANDROID__
+	UseVoxelCache = false;
+#else
+	UseVoxelCache = true;
+#endif
+	Set_Voxel_Camera_Angle(DefaultCameraAngle);
+	Set_Voxel_Light_Angle(DefaultLightAngle);
+	VoxelDrawSystem::Enable_Lighting();
+	VoxelDrawSystem::Disable_ZBuffer();
+
+	Init_Voxel_Matrices();
+
+                /*
+         * Drawer system initialization.
+         */
+        TerrainDrawer = new ConvertClass(GamePalette, GamePalette, *VisibleSurface, NUM_INTENSITY_LEVELS);
+
+        PaletteClass pal = BlackPalette;
+
+        Read_Palette(pal, "ANIM.PAL");
+        AnimDrawer = new ConvertClass(pal, GamePalette, *VisibleSurface, NUM_INTENSITY_LEVELS);
+
+        Read_Palette(pal, "PALETTE.PAL");
+        NormalDrawer = new ConvertClass(pal, GamePalette, *VisibleSurface, NUM_INTENSITY_LEVELS);
+
+        Read_Palette(pal, DeploymentConfig.SchemePaletteFile.c_str());
+        VoxelDrawer = new ConvertClass(pal, GamePalette, *VisibleSurface, NUM_INTENSITY_LEVELS);
+
+        Read_Palette(pal, "CAMEO.PAL");
+        CameoDrawer = new ConvertClass(pal, GamePalette, *VisibleSurface, NUM_INTENSITY_LEVELS);
+
+        Read_Palette(pal, "MOUSEPAL.PAL");
+        MouseDrawer = new ConvertClass(pal, GamePalette, *VisibleSurface);
+
+        TiberiumDrawer = VoxelDrawer;
+
+        /*
+        **      Initialize expansion files (if present). Expansion files must be located
+        **      in the current directory.
+        */
+        Init_Expansion_Files();
+        DebugString(" Bootstrap complete\n");
+
+        return(true);
+}
+
+
+
+/***********************************************************************************************
+ * Init_Mouse -- Initialize the mouse system.                                                  *
+ *                                                                                             *
+ *    This routine will ensure that a valid mouse driver is present and a working mouse        *
+ *    pointer can be displayed. The mouse is hidden when this routine exits.                   *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+void Init_Mouse(void)
+{
+#ifdef __ANDROID__
+        DebugString(" Init_Mouse - Android bypass, skipping mouse shape load\n");
+        Call_Back();
+        DebugString(" Init_Mouse - Android bypass complete\n");
+        return;
+#else
+        /*
+        **      Since there is no mouse shape currently available we need
+        **      to set one of our own.
+        */
+        //ShowCursor(false);
+
+        /// The menus run on the Windows cursor. The real game cursor is not loaded and assigned
+        /// until play begins -- see MouseClass::One_Time, where these shapes are loaded again.
+        ShapeSet const * temp_mouse_shapes = (ShapeSet const *)MFCD::Retrieve("MOUSE.SHP");
+
+        if (temp_mouse_shapes) {
+                Hide_Mouse();
+                Point2D pt = Point2D(0, 0);
+                Set_Mouse_Cursor(pt, temp_mouse_shapes, 0);
+
+                while (Get_Mouse_State() < 0) Show_Mouse();
+
+                Hide_Mouse();
+                Show_Mouse();
+        }
+
+        Map.Set_Default_Mouse(MOUSE_NORMAL, false);
+        //Show_Mouse();
+        while (Get_Mouse_State() < 0) Show_Mouse();
+        Call_Back();
+        Hide_Mouse();
+#endif
+}
+
+
+/***********************************************************************************************
+ * Init_Bulk_Data -- Initialize the time-consuming mixfile caching.                            *
+ *                                                                                             *
+ *    This routine is called to handle the time consuming process of game initialization.      *
+ *    The title page will be displayed when this routine is called.                            *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   This routine will take a very long time.                                        *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   06/03/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static bool Init_Bulk_Data(void)
+{
+        /*
+        **      Cache the main game data. This operation can take a very long time.
+        */
+#ifdef __ANDROID__
+        DebugString("Init_Bulk_Data - Android tolerant mode\n");
+        try {
+                if (ConquerMix == NULL) {
+                        DebugString(" ConquerMix NULL on Android, skipping cache (fonts already loaded loose)\n");
+                } else {
+                        if (!ConquerMix->Cache()) {
+                                DebugString(" ConquerMix Cache() returned false, continuing anyway on Android\n");
+                        } else {
+                                DebugString(" ConquerMix cached OK\n");
+                        }
+                }
+        } catch (std::bad_alloc&) {
+                DebugString(" ConquerMix Cache bad_alloc, skipping on Android\n");
+        } catch (...) {
+                DebugString(" ConquerMix Cache exception, skipping on Android\n");
+        }
+        try {
+                if (AudioEngine.Is_Available() && !Debug_Quiet) {
+                        if (SoundsMix != NULL) {
+                                if (!SoundsMix->Cache()) {
+                                        DebugString(" SoundsMix Cache failed, continuing\n");
+                                }
+                        }
+                        if (Sounds01Mix != NULL) {
+                                if (!Sounds01Mix->Cache()) {
+                                        DebugString(" Sounds01Mix Cache failed, continuing\n");
+                                }
+                        }
+                }
+        } catch (std::bad_alloc&) {
+                DebugString(" SoundsMix Cache bad_alloc, skipping\n");
+        } catch (...) {
+                DebugString(" SoundsMix Cache exception, skipping\n");
+        }
+#else
+        if (ConquerMix == NULL || !ConquerMix->Cache()) {
+                return(false);
+        }
+
+        if (AudioEngine.Is_Available() && !Debug_Quiet) {
+                if (SoundsMix != NULL && !SoundsMix->Cache()) {
+                        return(false);
+                }
+                if (Sounds01Mix != NULL && !Sounds01Mix->Cache()) {
+                        return(false);
+                }
+        }
+#endif
+
+        Call_Back();
+
+        /*
+        **      Fetch the tutorial message data.
+        */
+        INIClass ini;
+        CCFileClass file(DeploymentConfig.TutorialFile.c_str());
+#ifdef __ANDROID__
+        try { ini.Load(file); } catch (...) { DebugString(" Tutorial INI load exception, skipping\n"); }
+#else
+        ini.Load(file);
+#endif
+        TutorialText.Read_Base(ini);
+
+        /*
+        **      Perform one-time game system initializations.
+        */
+        return(Init_One_Time_Systems());
+}
+
+
+/***********************************************************************************************
+ * Init_Keys -- Initialize the cryptographic keys.                                             *
+ *                                                                                             *
+ *    This routine will initialize the fast cryptographic key. It will also initialize the     *
+ *    slow one if this is a scenario editor version of the game.                               *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  none                                                                               *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   07/08/1996 JLB : Created.                                                                 *
+ *=============================================================================================*/
+static void Init_Keys(void)
+{
+        DebugString("Init_Keys - declarations\n");
+        RAMFileClass file((void *)Keys, strlen((char *)Keys));
+        INIClass ini;
+        DebugString("Init_Keys - Load\n");
+        ini.Load(file);
+
+        DebugString("Init_Keys - Init fast key\n");
+        FastKey = ini.Get_PKey(true);
+#ifdef _DEBUG
+        DebugString("Init_Keys - Init slow key\n");
+        SlowKey = ini.Get_PKey(false);
+#endif
+}
+
+
+/***************************************************************************
+ * Save_Recording_Values -- Saves multiplayer-specific values              *
+ *                                                                         *
+ * This routine saves multiplayer values that need to be restored for a    *
+ * save game.  In addition to saving the random # seed for this scenario,  *
+ * it saves the contents of the actual random number generator; this       *
+ * ensures that the random # sequencer will pick up where it left off when *
+ * the game was saved.                                                     *
+ * This routine also saves the header for a Recording file, so it must     *
+ * save some data not needed specifically by a save-game file (ie Seed).   *
+ *                                                                         *
+ * INPUT:                                                                  *
+ *      file      file to save to                                          *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *      true = success, false = failure                                    *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *      none.                                                              *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   09/28/1995 BRR : Created.                                             *
+ *=========================================================================*/
+bool Save_Recording_Values(CCFileClass & file)
+{
+        //Session.Save(file);
+        DebugString("Saving recording values for scenario : %s\n", Scen->ScenarioName);
+        file.Write(&BuildLevel, sizeof(BuildLevel));
+#if defined(_DEBUG)
+        file.Write(&Debug_Unshroud, sizeof(Debug_Unshroud));
+#endif
+        file.Write(&Seed, sizeof(Seed));
+        file.Write(&Scen->Scenario, sizeof(Scen->Scenario));
+        file.Write(Scen->ScenarioName, sizeof(Scen->ScenarioName));
+        file.Write(&Whom, sizeof(Whom));
+        file.Write(&Special, sizeof(SpecialClass));
+        file.Write(&Options, sizeof(OptionsClass));
+        return(true);
+}
+
+
+/***************************************************************************
+ * Load_Recording_Values -- Loads multiplayer-specific values              *
+ *                                                                         *
+ * INPUT:                                                                  *
+ *      file         file to load from                                     *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *      true = success, false = failure                                    *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *      none.                                                              *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   09/28/1995 BRR : Created.                                             *
+ *=========================================================================*/
+bool Load_Recording_Values(CCFileClass & file)
+{
+        //Session.Load(file);
+        file.Read(&BuildLevel, sizeof(BuildLevel));
+#if defined(_DEBUG)
+        file.Read(&Debug_Unshroud, sizeof(Debug_Unshroud));
+#endif
+        file.Read(&Seed, sizeof(Seed));
+        file.Read(&Scen->Scenario, sizeof(Scen->Scenario));
+        file.Read(Scen->ScenarioName, sizeof(Scen->ScenarioName));
+        file.Read(&Whom, sizeof(Whom));
+        file.Read(&Special, sizeof(SpecialClass));
+        file.Read(&Options, sizeof(OptionsClass));
+        DebugString("Loaded recording values for scenario : %s\n", Scen->ScenarioName);
+        return(true);
+}
+
+
+/// <summary>
+/// Appends the code letters of the active cheats to the version string.
+/// This routine is used by the version text so that the corner of the screen betrays
+/// which cheats are switched on.
+/// </summary>
+/// <param name="string">The version string to append the cheat letters to.</param>
+/// <remarks>Be sure that the string has room enough for the extra characters.</remarks>
+void Cheat_Version_Suffix(char * string)
+{
+        for (int c = 0; c < ARRAY_SIZE(CheatEntries); c++) {
+                if (*CheatEntries[c].State == true && CheatEntries[c].VersionSuffix != NULL) {
+                        strcat(string, CheatEntries[c].VersionSuffix);
+                }
+        }
+}
+
+
+/// <summary>
+/// Turns off every cheat that is not allowed in multiplay.
+/// This routine is used before a network game begins, so that nobody can carry a single
+/// player indulgence into a game where it would be noticed.
+/// </summary>
+static void Cheat_Disable(void)
+{
+        for (int c = 0; c < ARRAY_SIZE(CheatEntries); c++) {
+                if (!CheatEntries[c].IsAllowedInMP) {
+                        *CheatEntries[c].State = false;
+                }
+        }
+}
+
+
+/// <summary>
+/// Feeds a typed character to the cheat code recognizer.
+/// This routine gathers up alphanumeric keystrokes and toggles a cheat the moment its code
+/// appears in what has been typed so far. Anything else the player types wipes the slate.
+/// </summary>
+/// <param name="chr">The character that the player just typed.</param>
+/// <returns>bool; Was a cheat toggled by this character?</returns>
+bool Cheat_Key_Process(char chr)
+{
+        static char _buffer[32] = "";
+
+        if (!isalnum((unsigned char)chr) || chr == '~') {
+                memset(_buffer, 0, sizeof(_buffer));
+                return(false);
+        }
+
+        char tmp[2];
+        tmp[0] = chr;
+        tmp[1] = 0;
+        DebugStringNoPrefix("%s", tmp);
+
+        int len = strlen(_buffer);
+
+        if (len >= ARRAY_SIZE(_buffer)-1) {
+                len = 0;
+                _buffer[0] = 0;
+        }
+
+        _buffer[len] = toupper((unsigned char)chr);
+
+        for (int c = 0; c < ARRAY_SIZE(CheatEntries); c++) {
+                if (strstr(_buffer, CheatEntries[c].CheatString) != NULL) {
+                        *CheatEntries[c].State = !(*CheatEntries[c].State);
+                        memset(_buffer, 0, sizeof(_buffer));
+                        return(true);
+                }
+        }
+
+        return(false);
+}
+
+
+/// <summary>
+/// Handles the messages for the version information dialog.
+/// This routine fills the list box with the game's title, its version numbers, the build
+/// stamp, and a description of the processor it finds itself running upon. It is the
+/// first thing to ask for when a player reports a problem.
+/// </summary>
+INT_PTR CALLBACK Version_Dialog_Proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
+{
+        HWND handle;
+        int *res;
+        char buffer[256];
+
+        INT_PTR rc = OwnerDraw::Default_Dialog_Proc(window, message, wparam, lparam);
+
+        if (rc) {
+                return(rc);
+        }
+
+        res = (int *)GetWindowLongPtr(window, DWLP_USER);
+
+        switch (message) {
+                case WM_INITDIALOG:
+                        handle = GetDlgItem(window, IDC_VERSION_INFO);
+
+                        if (Addon_Installed(ADDON_FIRESTORM) == true) {
+                                strcpy(buffer, Fetch_String(TXT_SHORT_TITLE));
+                                strcat(buffer, ": ");
+                                strcat(buffer, Get_Addon_Title(ADDON_FIRESTORM));
+                                ListBox_AddString(handle, buffer);
+                        } else {
+                                ListBox_AddString(handle, Fetch_String(TXT_SHORT_TITLE));
+                        }
+
+                        sprintf(buffer, "Version %s", Version_Name());
+                        ListBox_AddString(handle, buffer);
+
+                        sprintf(buffer, "Internal Version %s", VerNum.Version_Name());
+                        ListBox_AddString(handle, buffer);
+
+#ifdef _DEBUG
+                        sprintf(buffer, "Debug Build: %s - %s", OPENTS_BUILD_DESCRIPTION, OPENTS_COMMIT_DATE);
+#else
+                        sprintf(buffer, "Release Build: %s - %s", OPENTS_BUILD_DESCRIPTION, OPENTS_COMMIT_DATE);
+#endif
+                        ListBox_AddString(handle, buffer);
+
+                        // The braces keep the 'case' label from jumping over these initializations.
+                        {
+                                int cpu_type = 5;
+                                char vendor[32];
+                                vendor[0] = '\0';
+                                Get_CPU_Type(cpu_type, vendor, sizeof(vendor) - 1);
+
+                                sprintf(buffer, "CPU vendor: %s", vendor);
+                        ListBox_AddString(handle, buffer);
+                        }
+
+                        Get_Language_Version(buffer);
+                        ListBox_AddString(handle, buffer);
+                        break;
+
+                case WM_COMMAND:
+                        switch (LOWORD(wparam)) {
+                                case IDCANCEL:
+                                case IDOK:
+                                        *res = LOWORD(wparam);
+                                        break;
+                        }
+                        break;
+        }
+
+        return(FALSE);
+}
+
+
+/// <summary>
+/// Displays the version information dialog.
+/// This routine does not return until the player dismisses the dialog, and keeps the
+/// title screen alive behind it while it waits.
+/// </summary>
+void Version_Dialog(void)
+{
+        HWND dialog;
+        int res = 0;
+
+        dialog = OwnerDraw::Begin_Dialog(IDD_VERSION, Version_Dialog_Proc);
+
+        if (dialog != NULL) {
+                SetWindowLongPtr(dialog, DWLP_USER, (LONG_PTR)&res);
+                OwnerDraw::Display_Dialog(dialog);
+
+                while (res == 0) {
+                        if (OwnerDraw::Dialog_Message_Handler() == true) {
+                                break;
+                        }
+                        Title_Screen_Restore();
+                }
+                OwnerDraw::End_Dialog(dialog);
+        }
+}
+
+
+/***************************************************************************
+ * Main_Menu -- Menu processing                                            *
+ *                                                                         *
+ * INPUT:                                                                  *
+ *      none.                                                              *
+ *                                                                         *
+ * OUTPUT:                                                                 *
+ *      index of item selected, -1 if time out                             *
+ *                                                                         *
+ * WARNINGS:                                                               *
+ *      none.                                                              *
+ *                                                                         *
+ * HISTORY:                                                                *
+ *   05/17/1995 BRR : Created.                                             *
+ *=========================================================================*/
+int Main_Menu(unsigned int timeout)
+{
+        HWND dialog;
+        int retval = SEL_NONE;
+
+        timeout = 0;
+
+#ifdef __ANDROID__
+        DebugString(" Main_Menu - Android bypass, auto-starting campaign via QUEST_CAMPAIGN.TXT\n");
+        return(SEL_CAMPAIGN_GAME);
+#else
+        dialog = OwnerDraw::Begin_Dialog(IDD_MAIN_MENU, Main_Menu_Dialog_Proc);
+        assert(dialog != NULL);
+#endif
+
+        if (dialog != NULL) {
+                SetWindowLongPtr(dialog, DWLP_USER, (LONG_PTR)&retval);
+                char *menu = Get_New_Menu()->Background;
+                Load_Title_Screen(menu, HiddenSurface, &CCPalette);
+                Draw_Version_Text(HiddenSurface);
+                Update_Visible_Surface();
+                OwnerDraw::Move_Dialog(dialog, -1, (HiddenSurface->Get_Height() - 400) / 2 + 147);
+                OwnerDraw::Display_Dialog(dialog);
+                SetFocus(MainWindow);
+
+                do {
+                        if (OwnerDraw::Dialog_Message_Handler() == true) {
+                                retval = SEL_EXIT;
+                        }
+
+                        Title_Screen_Restore();
+
+                        if (Keyboard->Check()) {
+                                KeyNumType input = Keyboard->Get();
+
+                                switch ((unsigned int)input) {
+                                        case (KN_V | KN_CTRL_BIT):
+                                                ShowWindow(dialog, SW_HIDE);
+                                                UpdateWindow(MainWindow);
+                                                Version_Dialog();
+                                                ShowWindow(dialog, SW_SHOW);
+                                                UpdateWindow(dialog);
+                                                SetFocus(MainWindow);
+                                                break;
+
+                                        case VK_C | KN_CTRL_BIT | KN_ALT_BIT:
+                                                retval = SEL_VIEW_CREDITS;
+                                                break;
+
+                                        default:
+                                                if ((input & KN_RLSE_BIT) == 0) {
+                                                        if (Cheat_Key_Process((char)input) == true) {
+                                                                Sound_Effect(Rule->OptionsChanged);
+                                                                Title_Screen_Restore(true);
+                                                        }
+                                                }
+                                                break;
+                                }
+                        }
+                }
+                while (retval == SEL_NONE);
+
+                OwnerDraw::End_Dialog(dialog);
+
+                /*
+                 * Seed cryptographic random number generator.
+                 */
+                SYSTEMTIME t;
+                GetSystemTime(&t);
+                CryptRandom.Seed_Byte(t.wMilliseconds);
+        } else {
+                retval = SEL_EXIT;
+        }
+
+        SetFocus(MainWindow);
+        return(retval);
+}
+
+
+/// <summary>
+/// Handles the messages for the main menu dialog.
+/// This routine records the button the player pressed into the result that Main_Menu is
+/// waiting upon, and greys out the load button when there is nothing to load.
+/// </summary>
+INT_PTR CALLBACK Main_Menu_Dialog_Proc(HWND window, UINT message, WPARAM wparam, LPARAM lparam)
+{
+        int * res;
+
+        INT_PTR rc = OwnerDraw::Default_Dialog_Proc(window, message, wparam, lparam);
+        if (rc) {
+                return(rc);
+        }
+
+        res = (int *) GetWindowLongPtr(window, DWLP_USER);
+
+        switch (message) {
+                case WM_INITDIALOG: {
+                        HWND control = GetDlgItem(window, IDC_LOAD_MISSION);
+                        if (control) {
+                                if (LoadOptionsClass().Files_Present() == true) {
+                                        EnableWindow(control, TRUE);
+                                        return(FALSE);
+                                }
+                                EnableWindow(control, FALSE);
+                        }
+                }
+                break;
+
+                case WM_COMMAND: {
+                        switch (LOWORD(wparam)) {
+                                case IDC_OPTIONS:
+                                        *res = SEL_OPTIONS;
+                                        break;
+
+                                case IDC_EXIT_GAME:
+                                        *res = SEL_EXIT;
+                                        break;
+
+                                case IDC_INTRO:
+                                        *res = SEL_INTRO;
+                                        break;
+
+                                case IDC_NEWCAMPAIGN:
+                                        *res = SEL_CAMPAIGN_GAME;
+                                        break;
+
+                                case IDC_MULTIPLAYER_GAME:
+                                        *res = SEL_MULTIPLAYER_GAME;
+                                        break;
+
+                                case IDC_LOAD_MISSION:
+                                        *res = SEL_LOAD_GAME;
+                                        break;
+                        }
+                }
+                break;
+        }
+
+        return(false);
+}
+
+
+/// <summary>
+/// Redraws the title screen if the display surfaces have been lost.
+/// The menu dialogs call this routine from their message loops, so that the background
+/// comes back after the display has been taken away and handed back to the game.
+/// </summary>
+/// <param name="force">Should the title screen be redrawn even if nothing was lost?</param>
+void Title_Screen_Restore(bool force)
+{
+        if (force == true) {
+                HiddenSurface->Fill(0);
+                char *menu = Get_New_Menu()->Background;
+                Load_Title_Screen(menu, HiddenSurface, &CCPalette);
+                Draw_Version_Text(HiddenSurface);
+                Update_Visible_Surface(HiddenSurface);
+        }
+}
+
+
+/// <summary>
+/// Draws the version and copyright text onto the surface.
+/// This routine is used to stamp the bottom right corner of the title screen. It does
+/// nothing at all until the color schemes have been loaded.
+/// </summary>
+/// <param name="surface">The surface to print the version text upon.</param>
+void Draw_Version_Text(Surface * surface)
+{
+        char version[128];
+        Rect rect;
+
+        if (Fetch_Scheme_By_Name("Green") == NULL) {
+                return;
+        }
+
+        version[0] = '\0';
+        strcpy(version, Version_Name());
+
+        Cheat_Version_Suffix(version);
+
+        rect = surface->Get_Rect();
+
+        Fancy_Text_Print(
+                "V%s",
+                *surface,
+                rect,
+                Point2D(rect.X + rect.Width - 2, rect.Y + rect.Height - 20),
+                Fetch_Scheme_By_Name("Green"),
+                TBLACK,
+                (TextPrintType)(TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT),
+                version
+        );
+
+        Fancy_Text_Print(
+                Fetch_String(TXT_COPYRIGHT),
+                *surface,
+                rect,
+                Point2D(rect.X + rect.Width - 2, rect.Y + rect.Height - 10),
+                Fetch_Scheme_By_Name("Green"),
+                TBLACK,
+                (TextPrintType)(TPF_EFNT|TPF_NOSHADOW|TPF_RIGHT)
+        );
+}
+
+
+static char _cmd_buffer[128];
+
+
+static void Select_Team_Members(int team)
+{
+        for (int i = 0; i < Technos.Count(); i++) {
+                TechnoClass * obj = Technos[i];
+                if (obj && !obj->IsInLimbo && obj->Group == team - 1 && obj->House->Is_Player_Control()) {
+                        if (!obj->IsSelected) {
+                                obj->Select();
+                                AllowVoice = false;
+                        }
+                }
+        }
+}
+
+
+static void Assign_Selection_To_Team(int team)
+{
+        for (int i = 0; i < Technos.Count(); i++) {
+                TechnoClass * obj = Technos[i];
+                if (obj && !obj->IsInLimbo && obj->House->Is_Player_Control()) {
+                        if (obj->Group == team - 1) {
+                                obj->Group = -1;
+                        }
+                        if (obj->IsSelected) {
+                                obj->Group = team - 1;
+                        }
+                }
+        }
+}
+
+
+class CreateTeamCommandClass : public CommandClass
+{
+        public:
+                CreateTeamCommandClass(int team) : Team(team) {}
+
+                virtual char const * Get_Unique_Name(void) const {
+                        sprintf(_cmd_buffer, "TeamCreate_%d", Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_CREATE_TEAM), Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_TEAM)));
+                }
+                virtual char const * Get_Description(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_CREATE_TEAM_DESC), Team);
+                        return(_cmd_buffer);
+                }
+
+                virtual void Execute(void) const {
+                        Assign_Selection_To_Team(Team);
+                }
+
+        private:
+                int Team;
+};
+
+
+class SelectTeamCommandClass : public CommandClass
+{
+        public:
+                SelectTeamCommandClass(int team) : Team(team) {}
+
+                virtual char const * Get_Unique_Name(void) const {
+                        sprintf(_cmd_buffer, "TeamSelect_%d", Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_SELECT_TEAM), Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_TEAM)));
+                }
+                virtual char const * Get_Description(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_SELECT_TEAM_DESC), Team);
+                        return(_cmd_buffer);
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(0);
+                        Map.Waypoint_Mode_Control(0);
+                        Map.Repair_Mode_Control(0);
+                        Map.Sell_Mode_Control(0);
+
+                        bool already = CurrentObject.Count() > 0 && CurrentObject[0]->Is_Foot() && ((FootClass *)CurrentObject[0])->Group == (Team - 1);
+                        if (CurrentObject.Count() > 0 && !already) {
+                                Unselect_All();
+                        }
+                        Select_Team_Members(Team);
+                        AllowVoice = false;
+                        TechnoClass::Reset_Action_Line_Timer();
+
+                        // A second press within half a second brings a team that was already selected into view.
+                        int now = TickCount;
+                        bool repeat = already && LastTeam == Team && LastTick >= 0 && now - LastTick < TIMER_SECOND / 2;
+                        LastTeam = Team;
+                        LastTick = now;
+                        if (repeat && CurrentObject.Count() > 0) {
+                                Point2D pixel;
+                                if (!TacticalMap->Coord_To_Pixel(CurrentObject[0]->Center_Coord(), pixel)) {
+                                        Map.Center_Map();
+                                        Map.Flag_To_Redraw(GS_REDRAW_TACTICAL);
+                                }
+                        }
+                }
+
+        private:
+                int Team;
+
+                inline static int LastTeam = -1;
+                inline static int LastTick = -1;
+};
+
+
+class AddTeamCommandClass : public CommandClass
+{
+        public:
+                AddTeamCommandClass(int team) : Team(team) {}
+
+                virtual char const * Get_Unique_Name(void) const {
+                        sprintf(_cmd_buffer, "TeamAddSelect_%d", Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_ADD_SELECT_TEAM), Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_TEAM)));
+                }
+                virtual char const * Get_Description(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_ADD_SELECT_TEAM_DESC), Team);
+                        return(_cmd_buffer);
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(0);
+                        Map.Waypoint_Mode_Control(0);
+                        Map.Repair_Mode_Control(0);
+                        Map.Sell_Mode_Control(0);
+
+                        Select_Team_Members(Team);
+                }
+
+        private:
+                int Team;
+};
+
+
+class AddToTeamCommandClass : public CommandClass
+{
+        public:
+                AddToTeamCommandClass(int team) : Team(team) {}
+
+                virtual char const * Get_Unique_Name(void) const {
+                        sprintf(_cmd_buffer, "TeamAddTo_%d", Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_ADD_TO_TEAM), Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_TEAM)));
+                }
+                virtual char const * Get_Description(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_ADD_TO_TEAM_DESC), Team);
+                        return(_cmd_buffer);
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(0);
+                        Map.Waypoint_Mode_Control(0);
+                        Map.Repair_Mode_Control(0);
+                        Map.Sell_Mode_Control(0);
+
+                        // The team joins the selection first, or the assignment would drop its existing members.
+                        Select_Team_Members(Team);
+                        Assign_Selection_To_Team(Team);
+                }
+
+        private:
+                int Team;
+};
+
+
+class CenterTeamCommandClass : public CommandClass
+{
+        public:
+                CenterTeamCommandClass(int team) : Team(team) {}
+
+                virtual char const * Get_Unique_Name(void) const {
+                        sprintf(_cmd_buffer, "TeamCenter_%d", Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_CENTER_TEAM), Team);
+                        return(_cmd_buffer);
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_TEAM)));
+                }
+                virtual char const * Get_Description(void) const {
+                        sprintf(_cmd_buffer, Fetch_String(TXT_CENTER_TEAM_DESC), Team);
+                        return(_cmd_buffer);
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(0);
+                        Map.Waypoint_Mode_Control(0);
+                        Map.Repair_Mode_Control(0);
+                        Map.Sell_Mode_Control(0);
+
+                        if (CurrentObject.Count() && (!CurrentObject[0]->Is_Foot() || ((TechnoClass *)CurrentObject[0])->Group != Team - 1)) {
+                                Unselect_All();
+                        }
+
+                        Select_Team_Members(Team);
+
+                        Map.Center_Map();
+                        Map.Flag_To_Redraw(GS_REDRAW_TACTICAL);
+                        AllowVoice = true;
+                }
+
+        private:
+                int Team;
+};
+
+
+class PrevObjectCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("PreviousObject");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_PREV_OBJECT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_PREV_OBJECT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(0);
+                        Map.Waypoint_Mode_Control(0);
+                        Map.Repair_Mode_Control(0);
+                        Map.Sell_Mode_Control(0);
+
+                        ObjectClass * obj = Map.Prev_Object(CurrentObject.Count() ? CurrentObject[0] : NULL);
+
+                        if (obj != NULL) {
+                                Unselect_All();
+                                obj->Select();
+                                Map.Center_Map();
+                                Map.Flag_To_Redraw(GS_REDRAW_TACTICAL);
+                        }
+                }
+};
+
+
+class StopCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("StopObject");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_STOP_OBJECT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_CONTROL)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_STOP_OBJECT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() > 0) {
+                                for (int index = 0; index < CurrentObject.Count(); index++) {
+                                        ObjectClass const * tech = CurrentObject[index];
+
+                                        if (tech != NULL && (tech->Can_Player_Move() || tech->Can_Player_Fire())) {
+                                                OutList.push_back(EventClass(PlayerPtr->HeapID, EventClass::IDLE, TargetClass(tech)));
+                                        }
+                                }
+                                Sound_Effect(Rule->StopSound);
+                        }
+                }
+};
+
+
+class DeployCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("DeployObject");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_DEPLOY_OBJECT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_CONTROL)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_DEPLOY_OBJECT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() > 0) {
+                                bool done = false;
+                                AllowVoice = true;
+                                for (int index = 0; index < CurrentObject.Count(); index++) {
+                                        ObjectClass * obj = CurrentObject[index];
+                                        if (obj != NULL && (obj->Can_Player_Move() || obj->Can_Player_Fire())) {
+                                                TechnoClass * tech = dynamic_cast<TechnoClass *>(obj);
+                                                if (tech == NULL || (tech->Can_Attack_Now() && tech->Can_Deploy_Now())) {
+                                                        OutList.push_back(EventClass(PlayerPtr->HeapID, EventClass::DEPLOY, TargetClass(obj)));
+                                                        done = true;
+                                                        AllowVoice = false;
+                                                }
+                                        }
+                                }
+                                AllowVoice = true;
+                                if (done == true) {
+                                        Sound_Effect(Rule->DeploySound);
+                                }
+                        }
+                }
+};
+
+
+class GuardCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("GuardObject");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_GUARD));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_CONTROL)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_GUARD_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() > 0) {
+                                AllowVoice = true;
+                                for (int index = 0; index < CurrentObject.Count(); index++) {
+                                        TechnoClass * tech = dynamic_cast<TechnoClass *>(CurrentObject[index]);/// should be CurrentObject[index]->As_TechnoClass() but causes regswaps
+                                        if (tech == NULL || !tech->Can_Player_Move()) {
+                                                continue;
+                                        }
+
+                                        // An unarmed harvester cannot guard, so the key sends it back to work unless it is unloading.
+                                        UnitClass * unit = (tech->RTTI == RTTI_UNIT) ? static_cast<UnitClass *>(tech) : NULL;
+                                        if (unit != NULL && (unit->Class->IsToHarvest || unit->Class->IsToVeinHarvest)) {
+                                                if (unit->Get_Mission() != MISSION_UNLOAD && !unit->IsDumping) {
+                                                        unit->Player_Assign_Mission(MISSION_HARVEST);
+                                                        AllowVoice = false;
+                                                }
+                                                continue;
+                                        }
+
+                                        if (tech->Can_Player_Fire()) {
+                                                // Without an anchor cell the object guards where it stands instead of walking to its destination.
+                                                tech->Player_Assign_Mission(MISSION_GUARD_AREA);
+                                                AllowVoice = false;
+                                        }
+                                }
+                                Sound_Effect(Rule->GuardSound);
+                                AllowVoice = true;
+                        }
+                }
+};
+
+
+class ScatterCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScatterObject");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCATTER));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_CONTROL)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCATTER_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() > 0) {
+                                for (int index = 0; index < CurrentObject.Count(); index++) {
+                                        ObjectClass const * tech = CurrentObject[index];
+
+                                        if (tech != NULL && tech->Can_Player_Move()) {
+                                                OutList.push_back(EventClass(PlayerPtr->HeapID, EventClass::SCATTER, TargetClass(tech)));
+                                        }
+                                }
+                                Sound_Effect(Rule->ScatterSound);
+                        }
+                }
+};
+
+
+class CenterViewCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("CenterView");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_CENTER_VIEW));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_CENTER_VIEW_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() > 0) {
+                                Map.Center_Map();
+                                Map.Flag_To_Redraw(GS_REDRAW_TACTICAL);
+                        }
+                }
+};
+
+
+class CenterBaseCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("CenterBase");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_CENTER_BASE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_CENTER_BASE_DESC));
+                }
+
+                virtual void Execute(void) const {
+
+                        Coord conyard_coord = COORD_NONE;
+                        Coord any_building_coord = COORD_NONE;
+                        int index = 0;
+                        bool none = true;
+
+                        if (PlayerPtr->CurBuildings) {
+                                for (index = 0; index < Buildings.Count(); index++) {
+                                        none = false;
+                                        BuildingClass * building = Buildings[index];
+
+                                        if (building != NULL && !building->IsInLimbo && building->House->Is_Player_Control()) {
+                                                if (Rule->BuildConst.Is_In_List(building->Class)) {
+                                                        conyard_coord = building->Center_Coord();
+                                                        if (building->IsLeader) {
+                                                                break;
+                                                        }
+                                                } else if (any_building_coord == COORD_NONE) {
+                                                        any_building_coord = building->Center_Coord();
+                                                }
+                                        }
+                                }
+                        }
+
+                        if (!none) {
+                                if (any_building_coord == COORD_NONE && conyard_coord == COORD_NONE) {
+                                        none = true;
+                                }
+                        }
+
+                        if (none) {
+                                if (PlayerPtr->CurUnits) {
+                                        for (index = 0; index < Units.Count(); index++) {
+                                                UnitClass * unit = Units[index];
+                                                if (unit != NULL && !unit->IsInLimbo && unit->House->Is_Player_Control() && Rule->BaseUnit.Is_In_List(unit->Class)) {
+                                                        conyard_coord = unit->Center_Coord();
+                                                        break;
+                                                }
+                                        }
+                                }
+                        }
+
+                        if (conyard_coord != COORD_NONE) {
+                                TacticalMap->Set_Tactical_Position(conyard_coord);
+                        } else if (any_building_coord != COORD_NONE) {
+                                TacticalMap->Set_Tactical_Position(any_building_coord);
+                        }
+
+                        if (Map.PendingObject) {
+                                Map.Set_Cursor_Pos();
+                        }
+
+                        Map.Break_Follow_Mode();
+                        Map.Flag_To_Redraw(GS_REDRAW_TACTICAL);
+                }
+};
+
+
+class AllianceCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ToggleAlliance");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_ALLIANCE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_CONTROL)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_ALLIANCE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (Session.Type != GAME_NORMAL && !Scen->Special.IsAllianceFixed && Session.Options.AlliesAllowed) {
+                                if (CurrentObject.Count() && !PlayerPtr->IsDefeated) {
+                                        if (CurrentObject[0]->Owner_HouseClass() != PlayerPtr && CurrentObject[0]->Owner_HouseClass()->IsHuman) {
+                                                OutList.push_back(EventClass(PlayerPtr->HeapID, EventClass::ALLY, CurrentObject[0]->Owner()));
+                                        }
+                                }
+                        }
+                }
+};
+
+
+class SelectViewCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SelectView");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SELECT_VIEW));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SELECT_VIEW_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        TacticalMap->Select_These(TacticalRect);
+//                      TacticalMap->Select_These(TacticalMap->Pixel_To_Coord(TacticalRect.Top_Left()), TacticalMap->Pixel_To_Coord(TacticalRect.Bottom_Right()));
+                }
+};
+
+
+class ToggleRepairCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ToggleRepair");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_REPAIR_MODE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_REPAIR_MODE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.Repair_Mode_Control(-1);
+                }
+};
+
+
+class ToggleSellCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ToggleSell");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SELL_MODE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SELL_MODE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.Sell_Mode_Control(-1);
+                }
+};
+
+
+class TogglePowerCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("TogglePower");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_POWER_MODE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_POWER_MODE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(-1);
+                }
+};
+
+
+class CenterREventCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("CenterOnRadarEvent");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_RADAR_EVENT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_RADAR_EVENT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Cell cell = LastRadarEventCell;
+
+                        if (cell != Cell(0,0)) {
+                                Coord coord = cell;
+                                int h = (Map[coord].Height * CELL_LEPTON);
+                                coord -= Coord(h / 2, h / 2);
+                                TacticalMap->Set_Tactical_Position(coord);
+
+                                if (Map.PendingObject != NULL) {
+                                        Map.Set_Cursor_Pos();
+                                }
+                        }
+                }
+};
+
+
+class ToggleRadarCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ToggleRadar");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_RADAR_TOGGLE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_RADAR_TOGGLE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.Zoom_Mode_Control();
+                }
+};
+
+
+class SidebarUpCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SidebarUp");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_UP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_UP_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Scroll(true, -1);
+                }
+};
+
+
+class LSidebarUpCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("LeftSidebarUp");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_UP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_UP_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Scroll(true, 0);
+                }
+};
+
+
+class RSidebarUpCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RightSidebarUp");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_UP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_UP_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Scroll(true, 1);
+                }
+};
+
+
+class SidebarPageUpCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SidebarPageUp");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_PGUP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_PGUP_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Page(true, -1);
+                }
+};
+
+
+class LSidebarPageUpCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("LeftSidebarPageUp");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_PGUP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_PGUP_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Page(true, 0);
+                }
+};
+
+
+class RSidebarPageUpCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RightSidebarPageUp");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_PGUP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_PGUP_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Page(true, 1);
+                }
+};
+
+
+class SidebarDownCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SidebarDown");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_DOWN));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_DOWN_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Scroll(false, -1);
+                }
+};
+
+
+class LSidebarDownCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("LeftSidebarDown");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_DOWN));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_DOWN_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Scroll(false, 0);
+                }
+};
+
+
+class RSidebarDownCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RightSidebarDown");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_DOWN));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_DOWN_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Scroll(false, 1);
+                }
+};
+
+
+class SidebarPageDownCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SidebarPageDown");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_PGDN));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SIDEBAR_PGDN_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Page(false, -1);
+                }
+};
+
+
+class LSidebarPageDownCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("LeftSidebarPageDown");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_PGDN));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_LSIDEBAR_PGDN_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Page(false, 0);
+                }
+};
+
+
+class RSidebarPageDownCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RightSidebarPageDown");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_PGDN));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_RSIDEBAR_PGDN_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.SidebarClass::Page(false, 1);
+                }
+};
+
+
+class OptionsCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("Options");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_OPTIONS));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_OPTIONS_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Queue_Options();
+                }
+};
+
+
+class ScrollNCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollNorth");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_N));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_N_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_N, distance, true);
+                }
+};
+
+
+class ScrollSCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollSouth");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_S));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_S_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_S, distance, true);
+                }
+};
+
+
+class ScrollECommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollEast");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_E));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_E_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_E, distance, true);
+                }
+};
+
+
+class ScrollWCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollWest");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_W));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_W_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_W, distance, true);
+                }
+};
+
+
+class ScrollNECommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollNorthEast");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_NE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_NE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_NE, distance, true);
+                }
+};
+
+
+class ScrollSECommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollSouthEast");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_SE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_SE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_SE, distance, true);
+                }
+};
+
+
+class ScrollSWCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollSouthWest");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_SW));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_SW_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_SW, distance, true);
+                }
+};
+
+
+class ScrollNWCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScrollNorthWest");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCROLL_NW));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCROLL_NW_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        int distance = 34;
+                        Map.Scroll_Map(FACING_NW, distance, true);
+                }
+};
+
+
+/// <summary>
+/// Scrolls the view as far as it goes in one direction.
+/// </summary>
+static void Jump_Camera(FacingType facing)
+{
+        // The tactical position is clamped to the map, so any distance of at least the map size lands on its edge.
+        int distance = Cell_To_Lepton(std::max(Map.PlayRect.Width, Map.PlayRect.Height));
+        Map.Scroll_Map(facing, distance, true);
+}
+
+
+class JumpCameraWCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("JumpCameraWest");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_W));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_W_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Jump_Camera(FACING_W);
+                }
+};
+
+
+class JumpCameraECommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("JumpCameraEast");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_E));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_E_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Jump_Camera(FACING_E);
+                }
+};
+
+
+class JumpCameraNCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("JumpCameraNorth");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_N));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_N_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Jump_Camera(FACING_N);
+                }
+};
+
+
+class JumpCameraSCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("JumpCameraSouth");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_S));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_JUMP_CAMERA_S_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Jump_Camera(FACING_S);
+                }
+};
+
+
+class View1CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("View1");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK1));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK1_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Coord coord(Scen->Views[0]);
+                        coord.Z = Map.Get_Height_GL(coord);
+                        TacticalMap->Set_Tactical_Position(coord);
+                        if (Map.PendingObject) {
+                                Map.Set_Cursor_Pos();
+                        }
+                }
+};
+
+
+class View2CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("View2");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK2));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK2_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Coord coord(Scen->Views[1]);
+                        coord.Z = Map.Get_Height_GL(coord);
+                        TacticalMap->Set_Tactical_Position(coord);
+                        if (Map.PendingObject) {
+                                Map.Set_Cursor_Pos();
+                        }
+                }
+};
+
+
+class View3CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("View3");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK3));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK3_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Coord coord(Scen->Views[2]);
+                        coord.Z = Map.Get_Height_GL(coord);
+                        TacticalMap->Set_Tactical_Position(coord);
+                        if (Map.PendingObject) {
+                                Map.Set_Cursor_Pos();
+                        }
+                }
+};
+
+
+class View4CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("View4");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK4));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_VIEW_BOOKMARK4_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Coord coord(Scen->Views[3]);
+                        coord.Z = Map.Get_Height_GL(coord);
+                        TacticalMap->Set_Tactical_Position(coord);
+                        if (Map.PendingObject) {
+                                Map.Set_Cursor_Pos();
+                        }
+                }
+};
+
+
+class SetView1CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SetView1");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK1));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK1_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Point2D pixel = TacticalMap->Get_Relative_Tactical_Position();
+                        Scen->Views[0] = TacticalMap->Pixel_To_Cell(pixel);
+                }
+};
+
+
+class SetView2CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SetView2");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK2));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK2_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Point2D pixel = TacticalMap->Get_Relative_Tactical_Position();
+                        Scen->Views[1] = TacticalMap->Pixel_To_Cell(pixel);
+                }
+};
+
+
+class SetView3CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SetView3");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK3));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK3_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Point2D pixel = TacticalMap->Get_Relative_Tactical_Position();
+                        Scen->Views[2] = TacticalMap->Pixel_To_Cell(pixel);
+                }
+};
+
+
+class SetView4CommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SetView4");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK4));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SET_BOOKMARK4_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Point2D pixel = TacticalMap->Get_Relative_Tactical_Position();
+                        Scen->Views[3] = TacticalMap->Pixel_To_Cell(pixel);
+                }
+};
+
+
+class FollowCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("Follow");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_FOLLOW));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_FOLLOW_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() != 0 && Map.Object_To_Follow() == NULL) {
+                                Map.Set_To_Follow(CurrentObject[0]);
+                        } else {
+                                Map.Break_Follow_Mode();
+                        }
+                }
+};
+
+
+class NextObjectCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("NextObject");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_NEXT_OBJECT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_NEXT_OBJECT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Map.Power_Mode_Control(0);
+                        Map.Waypoint_Mode_Control(0);
+                        Map.Repair_Mode_Control(0);
+                        Map.Sell_Mode_Control(0);
+
+                        ObjectClass * obj = Map.Next_Object(CurrentObject.Count() ? CurrentObject[0] : NULL);
+
+                        if (obj != NULL) {
+                                Unselect_All();
+                                obj->Select();
+                                Map.Center_Map();
+                                Map.Flag_To_Redraw(GS_REDRAW_TACTICAL);
+                        }
+                }
+};
+
+/*
+ * Toggles waypoint mode
+ */
+class WaypointCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("WaypointMode");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_WAYPOINTMODE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_WAYPOINTMODE_DESC));
+                }
+                virtual void Execute(void) const {
+                        Map.Waypoint_Mode_Control(-1);
+                }
+};
+
+/*
+ * Capture the screen to SCRNnnnn.PCX file.
+ */
+class ScreenCaptureCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ScreenCapture");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SCRNCAP));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SCRNCAP_DESC));
+                }
+                virtual void Execute(void) const {
+                        {
+                                /*
+                                 * The whole frame is captured whatever size the window happens to be,
+                                 * limited only by the surface it is copied into.
+                                 */
+                                Rect dest_rect = VisibleSurface->Get_Rect();
+                                dest_rect.Width = std::min(dest_rect.Width, HiddenSurface->Get_Width());
+                                dest_rect.Height = std::min(dest_rect.Height, HiddenSurface->Get_Height());
+
+                                Hide_Mouse();
+
+                                HiddenSurface->Blit_From(Rect(0, 0, HiddenSurface->Get_Width(), HiddenSurface->Get_Height()),
+                                        *VisibleSurface, dest_rect);
+
+                                Show_Mouse();
+
+                                char fname[128];
+                                int index = -1;
+
+                                do {
+                                        index++;
+                                        sprintf(fname, "SCRN%04d.pcx", index);
+                                } while (CCFileClass(fname).Is_Available());
+
+                                CCFileClass file(fname);
+                                Write_PCX_File(file, *HiddenSurface, &GamePalette);
+                        }
+                }
+};
+
+
+/// <summary>
+/// Plays the nearest allowed track in the given direction and names it on screen.
+/// </summary>
+static void Step_Theme(int step)
+{
+        int count = Theme.Max_Themes();
+        if (count <= 0) {
+                return;
+        }
+
+        ThemeType theme = Theme.What_Is_Playing();
+        if (theme < THEME_FIRST || theme >= count) {
+                theme = (step > 0) ? ThemeType(count - 1) : THEME_FIRST;
+        }
+
+        for (int tries = 0; tries < count; tries++) {
+                theme = ThemeType((theme + step + count) % count);
+                if (!Theme.Is_Allowed(theme)) {
+                        continue;
+                }
+                // Stopping first keeps the queue from fading the current track out or refusing the request while one is pending.
+                Theme.Stop();
+                Theme.Queue_Song(theme);
+                char buffer[128];
+                snprintf(buffer, sizeof(buffer), Fetch_String(TXT_NOW_PLAYING), Theme.Full_Name(theme));
+                Session.Messages.Add_Message(NULL, 0, buffer, PlayerPtr->Scheme, TextPrintType(TPF_6PT_GRAD|TPF_USE_GRAD_PAL|TPF_FULLSHADOW), TICKS_PER_SECOND * 4);
+                return;
+        }
+}
+
+
+class PrevThemeCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("PrevTheme");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_PREV_THEME));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_PREV_THEME_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Step_Theme(-1);
+                }
+};
+
+
+class NextThemeCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("NextTheme");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_NEXT_THEME));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_NEXT_THEME_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Step_Theme(1);
+                }
+};
+
+
+class SelectSameTypeCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SelectType");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SELECT_TYPE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SELECT_TYPE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        // A second press within half a second widens the sweep from the view to the whole map.
+                        int now = TickCount;
+                        bool widen = (LastTick >= 0) && (now - LastTick < TIMER_SECOND / 2);
+                        LastTick = now;
+
+                        SoughtTypes.clear();
+                        for (int i = 0; i < CurrentObject.Count(); i++) {
+                                ObjectClass * obj = CurrentObject[i];
+                                if (!obj->Is_Techno() || !((TechnoClass *)obj)->House->Is_Player_Control()) {
+                                        continue;
+                                }
+                                SoughtTypes.insert(obj->TClass);
+                        }
+
+                        if (SoughtTypes.empty()) {
+                                return;
+                        }
+
+                        if (widen) {
+                                for (int i = 0; i < Technos.Count(); i++) {
+                                        TechnoClass * techno = Technos[i];
+                                        if (techno != NULL && techno->IsActive && techno->IsDown && Map.In_Radar(techno->Center_Coord())) {
+                                                Select_Callback(techno);
+                                        }
+                                }
+                        } else {
+                                TacticalMap->Select_These(TacticalRect, Select_Callback);
+                                }
+                        }
+
+        private:
+                /// <summary>
+                /// Selects the object if it is one of the types being hunted for.
+                /// This routine is handed to Select_These, and is called directly for the whole-map
+                /// sweep, so that every object of a sought type under the player's control joins the
+                /// selection.
+                /// </summary>
+                /// <param name="obj">The object being considered for selection.</param>
+                /// <remarks>SoughtTypes must hold the desired types before calling this routine.</remarks>
+                static void Select_Callback(ObjectClass * obj)
+                {
+                        if (obj != NULL && obj->Is_Techno() && obj->IsDown && !obj->IsSelected && SoughtTypes.contains(obj->TClass) && ((TechnoClass *)obj)->House->Is_Player_Control()) {
+                                obj->Select();
+                        }
+                }
+
+                inline static std::unordered_set<TechnoTypeClass const *> SoughtTypes;
+                inline static int LastTick = -1;
+};
+
+
+/// <summary>
+/// Narrows a mixed selection to one tier at a time. The selection the filter started from is
+/// remembered, so repeated presses cycle through its tiers and the add-lower form grows it back.
+/// </summary>
+class SelectionFilterClass
+{
+        public:
+                typedef int (*TierFunction)(TechnoClass const * techno);
+
+                SelectionFilterClass(TierFunction tier) : Tier(tier) {}
+
+                void Execute(bool add_lower);
+                void Reset(void) { LastFull.clear(); }
+
+        private:
+                typedef std::vector<TechnoClass *> TechnoList;
+
+                static bool Same_Set(TechnoList a, TechnoList b);
+                static bool Is_Union(TechnoList const & current, TechnoList const & a, TechnoList const & b);
+                TechnoList Resolve_Last_Full(void) const;
+
+                TierFunction Tier;
+                std::vector<TargetClass> LastFull;
+};
+
+
+void SelectionFilterClass::Execute(bool add_lower)
+{
+        // Nothing can be selected while a building is being placed.
+        if (Map.PendingObject != NULL) {
+                return;
+        }
+
+        TechnoList current;
+        TechnoList current_tiers[3];
+        int best = 3;
+        int worst = -1;
+        for (int index = 0; index < CurrentObject.Count(); index++) {
+                ObjectClass * obj = CurrentObject[index];
+                if (obj == NULL || !obj->Is_Techno()) {
+                        continue;
+                }
+                TechnoClass * techno = (TechnoClass *)obj;
+                if (!techno->House->Is_Player_Control()) {
+                        continue;
+                }
+                int tier = Tier(techno);
+                current.push_back(techno);
+                current_tiers[tier].push_back(techno);
+                best = std::min(best, tier);
+                worst = std::max(worst, tier);
+        }
+        if (current.empty()) {
+                return;
+        }
+
+        TechnoList last_full = Resolve_Last_Full();
+        TechnoList last_tiers[3];
+        for (TechnoClass * techno : last_full) {
+                last_tiers[Tier(techno)].push_back(techno);
+        }
+
+        bool continuing = !last_full.empty() && (Same_Set(current, last_full)
+                || Same_Set(current, last_tiers[0]) || Same_Set(current, last_tiers[1]) || Same_Set(current, last_tiers[2])
+                || Is_Union(current, last_tiers[0], last_tiers[1]) || Is_Union(current, last_tiers[0], last_tiers[2]) || Is_Union(current, last_tiers[1], last_tiers[2]));
+
+        if (!continuing) {
+                // A fresh selection starts a filter at its best tier; there is nothing to add back to yet.
+                if (add_lower || best == worst) {
+                        return;
+                }
+                LastFull.clear();
+                for (TechnoClass * techno : current) {
+                        LastFull.push_back(TargetClass(techno));
+                }
+                for (int tier = best + 1; tier < 3; tier++) {
+                        for (TechnoClass * techno : current_tiers[tier]) {
+                                techno->Unselect();
+                        }
+                }
+                for (TechnoClass * techno : current_tiers[best]) {
+                        techno->Response_Select();
+                }
+                return;
+        }
+
+        int next = worst;
+        if (best != worst) {
+                next = Same_Set(current, last_full) ? best : ((best + worst) * 2) % 3;
+        } else {
+                for (int tries = 0; tries < 3; tries++) {
+                        next = (next + 1) % 3;
+                        if (!last_tiers[next].empty()) {
+                                break;
+                        }
+                }
+        }
+        if (last_tiers[next].empty()) {
+                return;
+        }
+
+        if (!add_lower) {
+                for (TechnoClass * techno : current) {
+                        techno->Unselect();
+                }
+        }
+        for (TechnoClass * techno : last_tiers[next]) {
+                techno->Select();
+        }
+}
+
+
+bool SelectionFilterClass::Same_Set(TechnoList a, TechnoList b)
+{
+        std::sort(a.begin(), a.end());
+        std::sort(b.begin(), b.end());
+        return(a == b);
+}
+
+
+bool SelectionFilterClass::Is_Union(TechnoList const & current, TechnoList const & a, TechnoList const & b)
+{
+        if (a.empty() || b.empty() || current.size() != a.size() + b.size()) {
+                return(false);
+        }
+        TechnoList joined(a);
+        joined.insert(joined.end(), b.begin(), b.end());
+        return(Same_Set(current, joined));
+}
+
+
+SelectionFilterClass::TechnoList SelectionFilterClass::Resolve_Last_Full(void) const
+{
+        TechnoList list;
+        for (TargetClass const & target : LastFull) {
+                TechnoClass * techno = target.As_Techno();
+                if (techno != NULL && techno->IsActive && !techno->IsInLimbo && techno->House->Is_Player_Control()) {
+                        list.push_back(techno);
+                }
+        }
+        return(list);
+}
+
+
+static int Veterancy_Tier(TechnoClass const * techno)
+{
+        if (techno->Veterancy.Is_Elite()) {
+                return(0);
+        }
+        if (techno->Veterancy.Is_Veteran()) {
+                return(1);
+        }
+        return(2);
+}
+
+
+static int Health_Tier(TechnoClass const * techno)
+{
+        double ratio = techno->Get_Health_Ratio();
+        if (ratio <= Rule->ConditionRed) {
+                return(0);
+        }
+        if (ratio <= Rule->ConditionYellow) {
+                return(1);
+        }
+        return(2);
+}
+
+
+class VeterancyFilterCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("VeterancyFilter");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_VETERANCY_FILTER));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_VETERANCY_FILTER_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Filter.Execute(false);
+                }
+
+                inline static SelectionFilterClass Filter{&Veterancy_Tier};
+};
+
+
+class VeterancyFilterAddLowerCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("VeterancyFilterAddLower");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_VETERANCY_FILTER_ADD));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_VETERANCY_FILTER_ADD_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        VeterancyFilterCommandClass::Filter.Execute(true);
+                }
+};
+
+
+class HealthFilterCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("HealthFilter");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_HEALTH_FILTER));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_HEALTH_FILTER_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Filter.Execute(false);
+                }
+
+                inline static SelectionFilterClass Filter{&Health_Tier};
+};
+
+
+class HealthFilterAddLowerCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("HealthFilterAddLower");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_HEALTH_FILTER_ADD));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_HEALTH_FILTER_ADD_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        HealthFilterCommandClass::Filter.Execute(true);
+                }
+};
+
+
+class SelectOneLessCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("SelectOneLess");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_SELECT_ONE_LESS));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_SELECTION)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_SELECT_ONE_LESS_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (CurrentObject.Count() > 0) {
+                                CurrentObject[CurrentObject.Count() - 1]->Unselect();
+                        }
+                }
+};
+
+
+/// <summary>
+/// Forgets the selections the veterancy and health filters were started from.
+/// </summary>
+void Reset_Selection_Filters(void)
+{
+        VeterancyFilterCommandClass::Filter.Reset();
+        HealthFilterCommandClass::Filter.Reset();
+}
+
+
+class ManualPlaceCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ManualPlace");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_MANUAL_PLACE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_MANUAL_PLACE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        FactoryClass * factory = PlayerPtr->Fetch_Factory(RTTI_BUILDING);
+                        if (factory == NULL || !factory->Has_Completed()) {
+                                return;
+                        }
+
+                        TechnoClass * pending = factory->Get_Object();
+                        if (pending == NULL || pending->RTTI != RTTI_BUILDING) {
+                                return;
+                        }
+
+                        if (Map.PendingObjectPtr == pending) {
+                                return;
+                        }
+
+                        BuildingClass * builder = pending->Who_Can_Build_Me(false, false);
+                        if (builder == NULL) {
+                                return;
+                        }
+
+                        // Drop any superweapon cursor, so that placing the building does not return to it.
+                        Map.IsTargettingMode = SUPER_NONE;
+
+                        PlayerPtr->Manual_Place(builder, (BuildingClass *)pending);
+                }
+};
+
+
+/// <summary>
+/// Queues another of the last completed item of one kind while the sidebar still offers it.
+/// Structures do not queue, so one already under way or waiting to be placed refuses.
+/// </summary>
+static void Repeat_Last_Production(RTTIType type, int id)
+{
+        if (id < 0 || !Map.Is_On_Sidebar(type, id)) {
+                return;
+        }
+
+        if (type == RTTI_BUILDINGTYPE) {
+                FactoryClass * factory = PlayerPtr->Fetch_Factory(type);
+                if (factory != NULL && factory->Get_Object() != NULL) {
+                        if (factory->Is_Building() || factory->Has_Production_Target()) {
+                                Speak(VOX_NO_FACTORY);
+                        }
+                        return;
+                }
+        }
+
+        Speak(type == RTTI_INFANTRYTYPE ? VOX_TRAINING : VOX_BUILDING);
+        OutList.push_back(EventClass(PlayerPtr->HeapID, EventClass::PRODUCE, type, id));
+}
+
+
+class RepeatLastBuildingCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RepeatLastBuilding");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_BUILDING));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_BUILDING_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Repeat_Last_Production(RTTI_BUILDINGTYPE, PlayerPtr->JustBuiltStructure);
+                }
+};
+
+
+class RepeatLastInfantryCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RepeatLastInfantry");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_INFANTRY));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_INFANTRY_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Repeat_Last_Production(RTTI_INFANTRYTYPE, PlayerPtr->JustBuiltInfantry);
+                }
+};
+
+
+class RepeatLastUnitCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RepeatLastUnit");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_UNIT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_UNIT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Repeat_Last_Production(RTTI_UNITTYPE, PlayerPtr->JustBuiltUnit);
+                }
+};
+
+
+class RepeatLastAircraftCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("RepeatLastAircraft");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_AIRCRAFT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_REPEAT_LAST_AIRCRAFT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Repeat_Last_Production(RTTI_AIRCRAFTTYPE, PlayerPtr->JustBuiltAircraft);
+                }
+};
+
+
+/// <summary>
+/// Whether a quick save or load may run: a campaign or skirmish game in play that is not
+/// being won or lost, with the player's input unlocked.
+/// </summary>
+static bool Quick_Save_Allowed(void)
+{
+        if (!ScenarioActive || Session.Play || Scen->IsInputLocked) {
+                return(false);
+        }
+        if (Session.Type != GAME_NORMAL && Session.Type != GAME_SKIRMISH) {
+                return(false);
+        }
+        return(!PlayerPtr->IsToWin && !PlayerPtr->IsToLose && !PlayerPtr->IsToDie);
+}
+
+
+class QuickSaveCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("QuickSave");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_QUICK_SAVE));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_QUICK_SAVE_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (Quick_Save_Allowed()) {
+                                SaveManager.Request_Quick_Save();
+                        }
+                }
+};
+
+
+class QuickLoadCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("QuickLoad");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_QUICK_LOAD));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_QUICK_LOAD_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        if (!Quick_Save_Allowed()) {
+                                return;
+                        }
+
+                        AutosaveClass::KindType kind = Session.Type == GAME_NORMAL ? AutosaveClass::KindType::Campaign : AutosaveClass::KindType::Skirmish;
+                        SaveVersionInfo info;
+                        if (!Get_Savefile_Info(Quick_Save_File_Name(kind).c_str(), &info) || info.Get_Internal_Version() != ExpectedGameVersion) {
+                                SaveManager.Post_Save_Notice(TXT_NO_QUICKSAVE);
+                                return;
+                        }
+
+                        // The load has to wait until the frame is over, where the menu dialogs run.
+                        SpecialDialog = SDLG_QUICKLOAD;
+                }
+};
+
+
+class ChatToAllCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ChatToAll");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_CHAT_TO_ALL));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String(TXT_CHAT));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_CHAT_TO_ALL_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        Chat_Begin(ChatScopeType::Everyone);
+                }
+};
+
+
+class ChatToAlliesCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("ChatToAllies");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_CHAT_TO_ALLIES));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String(TXT_CHAT));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_CHAT_TO_ALLIES_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        // An observer holds no allies; its team is the other observers.
+                        Chat_Begin(PlayerPtr->IsObserver ? ChatScopeType::Observers : ChatScopeType::Allies);
+                }
+};
+
+
+class DeleteWaypointCommandClass : public CommandClass
+{
+        public:
+                virtual char const * Get_Unique_Name(void) const {
+                        return("DeleteWaypoint");
+                }
+                virtual char const * Get_Display_Name(void) const {
+                        return(Fetch_String(TXT_DEL_WAYPOINT));
+                }
+                virtual char const * Get_Category(void) const {
+                        return(Fetch_String((TXT_INTERFACE)));
+                }
+                virtual char const * Get_Description(void) const {
+                        return(Fetch_String(TXT_DEL_WAYPOINT_DESC));
+                }
+
+                virtual void Execute(void) const {
+                        WaypointClass * waypoint = Map.DraggedWaypoint;
+                        bool held = (waypoint != NULL);
+
+                        // With nothing picked up, the selected path loses its last waypoint.
+                        if (!held) {
+                                if (PlayerPtr->SelectedPath == PATH_NONE) {
+                                        return;
+                                }
+                                WaypointPathClass * path = PlayerPtr->Ensure_Path(PlayerPtr->SelectedPath);
+                                waypoint = path->Get_Waypoint(path->Waypoint_Count() - 1);
+                                if (waypoint == NULL) {
+                                        return;
+                                }
+                        }
+
+                        char waypoint_id;
+                        PathType path_type = PATH_NONE;
+                        PlayerPtr->Fetch_Waypoint_Data(waypoint, path_type, waypoint_id);
+                        PlayerPtr->Ensure_Path(path_type);
+                        PlayerPtr->Paths[path_type]->Delete_Waypoint((int)waypoint_id);
+
+                        for (int i = Feet.Count() - 1; i >= 0; i--) {
+                                FootClass *foot = Feet[i];
+                                if (foot->House == PlayerPtr && foot->CurrentPath == path_type && foot->NextWaypoint > waypoint_id) {
+                                        foot->NextWaypoint--;
+                                }
+                        }
+
+                        if (held) {
+                                Map.DraggedWaypoint = NULL;
+                                Show_Mouse();
+                        }
+                }
+};
+
+
+/// <summary>
+/// Gives a command a key when the keyboard file bound neither the command nor the key.
+/// </summary>
+static void Claim_Free_Key(KeyNumType key, CommandClass const * command)
+{
+        if (HotkeyCommands.Is_Present(key)) {
+                return;
+        }
+        for (int index = 0; index < HotkeyCommands.Count(); index++) {
+                if (HotkeyCommands.Fetch_By_Position(index) == command) {
+                        return;
+                }
+        }
+        HotkeyCommands.Add_Index(key, command);
+}
+
+
+/// <summary>
+/// Builds the list of every command the player may invoke.
+/// This routine is called once during startup to populate the command list, and then binds
+/// the hotkeys to it. The delete and escape keys are claimed afterwards, so that no
+/// keyboard file can take them away from the player; the chat keys are claimed only when
+/// the file left them free.
+/// </summary>
+static void Init_Commands(void)
+{
+        AllCommands.Add(new FollowCommandClass);
+
+        AllCommands.Add(new View1CommandClass);
+        AllCommands.Add(new View2CommandClass);
+        AllCommands.Add(new View3CommandClass);
+        AllCommands.Add(new View4CommandClass);
+
+        AllCommands.Add(new SetView1CommandClass);
+        AllCommands.Add(new SetView2CommandClass);
+        AllCommands.Add(new SetView3CommandClass);
+        AllCommands.Add(new SetView4CommandClass);
+
+        const CommandClass * optcmd = new OptionsCommandClass;
+        AllCommands.Add(optcmd);
+
+        AllCommands.Add(new ScrollNCommandClass);
+        AllCommands.Add(new ScrollSCommandClass);
+        AllCommands.Add(new ScrollECommandClass);
+        AllCommands.Add(new ScrollWCommandClass);
+
+        AllCommands.Add(new ScrollNECommandClass);
+        AllCommands.Add(new ScrollSECommandClass);
+        AllCommands.Add(new ScrollSWCommandClass);
+        AllCommands.Add(new ScrollNWCommandClass);
+
+        AllCommands.Add(new JumpCameraWCommandClass);
+        AllCommands.Add(new JumpCameraECommandClass);
+        AllCommands.Add(new JumpCameraNCommandClass);
+        AllCommands.Add(new JumpCameraSCommandClass);
+
+        AllCommands.Add(new SidebarUpCommandClass);
+        AllCommands.Add(new LSidebarUpCommandClass);
+        AllCommands.Add(new RSidebarUpCommandClass);
+
+        AllCommands.Add(new SidebarDownCommandClass);
+        AllCommands.Add(new LSidebarDownCommandClass);
+        AllCommands.Add(new RSidebarDownCommandClass);
+
+        AllCommands.Add(new SidebarPageUpCommandClass);
+        AllCommands.Add(new LSidebarPageUpCommandClass);
+        AllCommands.Add(new RSidebarPageUpCommandClass);
+
+        AllCommands.Add(new SidebarPageDownCommandClass);
+        AllCommands.Add(new LSidebarPageDownCommandClass);
+        AllCommands.Add(new RSidebarPageDownCommandClass);
+
+        AllCommands.Add(new CenterREventCommandClass);
+
+        AllCommands.Add(new ToggleRadarCommandClass);
+        AllCommands.Add(new TogglePowerCommandClass);
+        AllCommands.Add(new ToggleSellCommandClass);
+        AllCommands.Add(new ToggleRepairCommandClass);
+
+        AllCommands.Add(new SelectViewCommandClass);
+
+        AllCommands.Add(new AllianceCommandClass);
+
+        AllCommands.Add(new CenterBaseCommandClass);
+        AllCommands.Add(new CenterViewCommandClass);
+
+        AllCommands.Add(new ScatterCommandClass);
+        AllCommands.Add(new GuardCommandClass);
+        AllCommands.Add(new StopCommandClass);
+        AllCommands.Add(new DeployCommandClass);
+
+        AllCommands.Add(new PrevObjectCommandClass);
+        AllCommands.Add(new NextObjectCommandClass);
+
+        AllCommands.Add(new CreateTeamCommandClass(1));
+        AllCommands.Add(new CreateTeamCommandClass(2));
+        AllCommands.Add(new CreateTeamCommandClass(3));
+        AllCommands.Add(new CreateTeamCommandClass(4));
+        AllCommands.Add(new CreateTeamCommandClass(5));
+        AllCommands.Add(new CreateTeamCommandClass(6));
+        AllCommands.Add(new CreateTeamCommandClass(7));
+        AllCommands.Add(new CreateTeamCommandClass(8));
+        AllCommands.Add(new CreateTeamCommandClass(9));
+        AllCommands.Add(new CreateTeamCommandClass(10));
+
+        AllCommands.Add(new SelectTeamCommandClass(1));
+        AllCommands.Add(new SelectTeamCommandClass(2));
+        AllCommands.Add(new SelectTeamCommandClass(3));
+        AllCommands.Add(new SelectTeamCommandClass(4));
+        AllCommands.Add(new SelectTeamCommandClass(5));
+        AllCommands.Add(new SelectTeamCommandClass(6));
+        AllCommands.Add(new SelectTeamCommandClass(7));
+        AllCommands.Add(new SelectTeamCommandClass(8));
+        AllCommands.Add(new SelectTeamCommandClass(9));
+        AllCommands.Add(new SelectTeamCommandClass(10));
+
+        AllCommands.Add(new AddTeamCommandClass(1));
+        AllCommands.Add(new AddTeamCommandClass(2));
+        AllCommands.Add(new AddTeamCommandClass(3));
+        AllCommands.Add(new AddTeamCommandClass(4));
+        AllCommands.Add(new AddTeamCommandClass(5));
+        AllCommands.Add(new AddTeamCommandClass(6));
+        AllCommands.Add(new AddTeamCommandClass(7));
+        AllCommands.Add(new AddTeamCommandClass(8));
+        AllCommands.Add(new AddTeamCommandClass(9));
+        AllCommands.Add(new AddTeamCommandClass(10));
+
+        AllCommands.Add(new AddToTeamCommandClass(1));
+        AllCommands.Add(new AddToTeamCommandClass(2));
+        AllCommands.Add(new AddToTeamCommandClass(3));
+        AllCommands.Add(new AddToTeamCommandClass(4));
+        AllCommands.Add(new AddToTeamCommandClass(5));
+        AllCommands.Add(new AddToTeamCommandClass(6));
+        AllCommands.Add(new AddToTeamCommandClass(7));
+        AllCommands.Add(new AddToTeamCommandClass(8));
+        AllCommands.Add(new AddToTeamCommandClass(9));
+        AllCommands.Add(new AddToTeamCommandClass(10));
+
+        AllCommands.Add(new CenterTeamCommandClass(1));
+        AllCommands.Add(new CenterTeamCommandClass(2));
+        AllCommands.Add(new CenterTeamCommandClass(3));
+        AllCommands.Add(new CenterTeamCommandClass(4));
+        AllCommands.Add(new CenterTeamCommandClass(5));
+        AllCommands.Add(new CenterTeamCommandClass(6));
+        AllCommands.Add(new CenterTeamCommandClass(7));
+        AllCommands.Add(new CenterTeamCommandClass(8));
+        AllCommands.Add(new CenterTeamCommandClass(9));
+        AllCommands.Add(new CenterTeamCommandClass(10));
+
+        AllCommands.Add(new WaypointCommandClass);
+
+        AllCommands.Add(new ScreenCaptureCommandClass);
+
+        AllCommands.Add(new PrevThemeCommandClass);
+        AllCommands.Add(new NextThemeCommandClass);
+
+        AllCommands.Add(new SelectSameTypeCommandClass);
+
+        AllCommands.Add(new VeterancyFilterCommandClass);
+        AllCommands.Add(new VeterancyFilterAddLowerCommandClass);
+        AllCommands.Add(new HealthFilterCommandClass);
+        AllCommands.Add(new HealthFilterAddLowerCommandClass);
+        AllCommands.Add(new SelectOneLessCommandClass);
+
+        AllCommands.Add(new ManualPlaceCommandClass);
+
+        AllCommands.Add(new RepeatLastBuildingCommandClass);
+        AllCommands.Add(new RepeatLastInfantryCommandClass);
+        AllCommands.Add(new RepeatLastUnitCommandClass);
+        AllCommands.Add(new RepeatLastAircraftCommandClass);
+
+        AllCommands.Add(new QuickSaveCommandClass);
+        AllCommands.Add(new QuickLoadCommandClass);
+
+        const CommandClass * chatallcmd = new ChatToAllCommandClass;
+        AllCommands.Add(chatallcmd);
+
+        const CommandClass * chatteamcmd = new ChatToAlliesCommandClass;
+        AllCommands.Add(chatteamcmd);
+
+        const CommandClass * delwpcmd = new DeleteWaypointCommandClass;
+        AllCommands.Add(delwpcmd);
+
+        Init_Hotkeys();
+
+        if (HotkeyCommands.Is_Present(KN_DELETE)) {
+                HotkeyCommands.Remove_Index(KN_DELETE);
+        }
+        HotkeyCommands.Add_Index(KN_DELETE, delwpcmd);
+
+        if (HotkeyCommands.Is_Present(KN_ESC)) {
+                HotkeyCommands.Remove_Index(KN_ESC);
+        }
+        HotkeyCommands.Add_Index(KN_ESC, optcmd);
+
+        Claim_Free_Key(KN_RETURN, chatallcmd);
+        Claim_Free_Key(KN_BACKSPACE, chatteamcmd);
+}
+
+
+/// <summary>
+/// Binds the game commands to the keys named in KEYBOARD.INI.
+/// This routine throws the current key assignments away and rebuilds them from the
+/// player's keyboard file, matching each entry against a command's unique name.
+/// </summary>
+/// <returns>bool; Was the keyboard file loaded?</returns>
+/// <remarks>The command list must already be built before calling this routine.</remarks>
+bool Init_Hotkeys(void)
+{
+        CCINIClass ini;
+        CCFileClass file("KEYBOARD.INI");
+
+        if (ini.Load(file, false)) {
+
+                HotkeyCommands.Clear();
+
+                for (int index = 0; index < ini.Entry_Count("Hotkey"); index++) {
+                        const char *entry = ini.Get_Entry("Hotkey", index);
+                        int id = ini.Get_Int("Hotkey", entry, 0);
+                        const CommandClass *command = NULL;
+
+                        for (int cindex = 0; cindex < AllCommands.Count(); cindex++) {
+                                if (strcmp(AllCommands[cindex]->Get_Unique_Name(), entry) == 0) {
+                                        command = AllCommands[cindex];
+                                        break;
+                                }
+                        }
+
+                        if ((command != NULL) && (id != 0)) {
+                                HotkeyCommands.Add_Index(id, command);
+                        }
+                }
+
+                return(true);
+        }
+
+        DebugString("Unable to load KEYBOARD.INI\n");
+        return(false);
+}
+
+
+/// <summary>
+/// Executes the command that goes by the specified unique name.
+/// Use this routine where a command must be triggered by name rather than by the key it
+/// happens to be bound to. A name that matches no command is quietly ignored.
+/// </summary>
+/// <param name="name">The unique name of the command to execute.</param>
+void Execute_Command(char const * name)
+{
+        for (int command = 0; command < AllCommands.Count(); command++) {
+                if (strcmp(AllCommands[command]->Get_Unique_Name(), name) == 0) {
+                        AllCommands[command]->Execute();
+                        break;
+                }
+        }
+}
+
+
+/// <summary>
+/// Allocates the game's drawing surfaces.
+/// This routine releases whatever surfaces are already in hand and builds a fresh set to
+/// the dimensions given. A rectangle that is not valid means that surface is not wanted.
+/// The composite and tile surfaces must share the same kind of memory as each other, so
+/// both are pushed into system memory if the video card cannot hold the pair.
+/// </summary>
+/// <param name="hidden_rect">The dimensions for the hidden and alternate surfaces.</param>
+/// <param name="composite_rect">The dimensions for the composite surface.</param>
+/// <param name="tile_rect">The dimensions for the tile surface.</param>
+/// <param name="sidebar_rect">The dimensions for the sidebar surface.</param>
+/// <param name="hidden_first">Should the hidden surface get first claim on video memory?</param>
+/// <returns>bool; Were the surfaces allocated?</returns>
+bool Allocate_Surfaces(const Rect & hidden_rect, const Rect & composite_rect, const Rect & tile_rect, const Rect & sidebar_rect, bool hidden_first)
+{
+        bool success = true;
+
+        DebugString("Allocating new surfaces\n");
+
+        if (AlternateSurface != NULL) {
+                DebugString("Deleting AlternateSurface\n");
+                delete AlternateSurface;
+                AlternateSurface = NULL;
+        }
+
+        if (HiddenSurface != NULL) {
+                DebugString("Deleting HiddenSurface\n");
+                delete HiddenSurface;
+                HiddenSurface = NULL;
+        }
+
+        if (CompositeSurface != NULL) {
+                DebugString("Deleting CompositeSurface\n");
+                delete CompositeSurface;
+                CompositeSurface = NULL;
+        }
+
+        if (TileSurface != NULL) {
+                DebugString("Deleting TileSurface\n");
+                delete TileSurface;
+                TileSurface = NULL;
+        }
+
+        if (SidebarSurface != NULL) {
+                DebugString("Deleting SidebarSurface\n");
+                delete SidebarSurface;
+                SidebarSurface = NULL;
+        }
+
+        if (hidden_first && hidden_rect.Is_Valid()) {
+                HiddenSurface = new DSurface(hidden_rect.Width, hidden_rect.Height);
+                assert(HiddenSurface != NULL);
+                HiddenSurface->Fill(0);
+
+                DebugString("HiddenSurface (%dx%d)\n", hidden_rect.Width, hidden_rect.Height);
+        }
+
+        if (composite_rect.Is_Valid()) {
+                CompositeSurface = new DSurface(composite_rect.Width, composite_rect.Height);
+                CompositeSurface->Fill(0);
+
+                DebugString("CompositeSurface (%dx%d)\n", composite_rect.Width, composite_rect.Height);
+        }
+
+        if (tile_rect.Is_Valid()) {
+                TileSurface = new DSurface(tile_rect.Width, tile_rect.Height);
+                TileSurface->Fill(0);
+
+                DebugString("TileSurface (%dx%d)\n", tile_rect.Width, tile_rect.Height);
+        }
+
+        if (sidebar_rect.Is_Valid()) {
+                SidebarSurface = new DSurface(sidebar_rect.Width, sidebar_rect.Height);
+                SidebarSurface->Fill(0);
+
+                DebugString("SidebarSurface (%dx%d)\n", sidebar_rect.Width, sidebar_rect.Height);
+        }
+
+        if (!hidden_first && hidden_rect.Is_Valid()) {
+                HiddenSurface = new DSurface(hidden_rect.Width, hidden_rect.Height);
+                HiddenSurface->Fill(0);
+
+                DebugString("HiddenSurface (%dx%d)\n", hidden_rect.Width, hidden_rect.Height);
+        }
+
+        if (hidden_rect.Is_Valid()) {
+                AlternateSurface = new DSurface(hidden_rect.Width, hidden_rect.Height);
+                assert(AlternateSurface != NULL);
+                AlternateSurface->Fill(0);
+
+                DebugString("AlternateSurface (%dx%d)\n", hidden_rect.Width, hidden_rect.Height);
+        }
+
+
+        LogicalSurface = HiddenSurface;
+
+         return(success);
+}
+
+
+/// <summary>
+/// Initializes the game's threading support.
+/// There are no worker threads to start -- the game runs entirely off the main thread.
+/// </summary>
+static void Init_Threads(void)
+{
+        //nothing
+}
+
+
+/// <summary>
+/// Deletes every game object and object type in existence.
+/// This routine is used when tearing a scenario down so that the next one may start from a
+/// clean slate. Everything from bullets through houses to the tactical map itself is
+/// released, and the cell array goes with them.
+/// </summary>
+/// <remarks>The game logic must not be running -- there is nothing left for it to run
+/// upon.</remarks>
+void Delete_All_Objects(void)
+{
+        ScenarioInit++;
+
+        ObjectsToDelete.Clear();
+
+        while (TargetTracker.Count()) {
+                AbstractClass * ptr = TargetTracker.Fetch_By_Position(0);
+                delete ptr;
+        }
+        Process_Deferred_Deletion();
+        while (Bullets.Count()) {
+                delete Bullets[0];
+        }
+        Process_Deferred_Deletion();
+        while (Objects.Count()) {
+                delete Objects[0];
+        }
+        Process_Deferred_Deletion();
+        while (Tags.Count()) {
+                delete Tags[0];
+        }
+        Process_Deferred_Deletion();
+        while (Triggers.Count()) {
+                delete Triggers[0];
+        }
+        Process_Deferred_Deletion();
+        while (Tubes.Count()) {
+                delete Tubes[0];
+        }
+        Process_Deferred_Deletion();
+        while (BuildingLights.Count()) {
+                delete BuildingLights[0];
+        }
+        Process_Deferred_Deletion();
+        while (Overlays.Count()) {
+                delete Overlays[0];
+        }
+        Process_Deferred_Deletion();
+        while (ParticleSystems.Count()) {
+                delete ParticleSystems[0];
+        }
+        Process_Deferred_Deletion();
+        while (Waves.Count()) {
+                delete Waves[0];
+        }
+        Process_Deferred_Deletion();
+        while (Factories.Count()) {
+                delete Factories[0];
+        }
+        Process_Deferred_Deletion();
+        while (Sides.Count()) {
+                delete Sides[0];
+        }
+        Process_Deferred_Deletion();
+        while (Teams.Count()) {
+                delete Teams[0];
+        }
+        Process_Deferred_Deletion();
+        while (Houses.Count()) {
+                delete Houses[0];
+        }
+        Process_Deferred_Deletion();
+        while (Anims.Count()) {
+                delete Anims[0];
+        }
+        Process_Deferred_Deletion();
+        while (Scripts.Count()) {
+                delete Scripts[0];
+        }
+        Process_Deferred_Deletion();
+        while (LightSources.Count()) {
+                delete LightSources[0];
+        }
+        Process_Deferred_Deletion();
+        while (EMPulseClass::EMPulses.Count()) {
+                delete EMPulseClass::EMPulses[0];
+        }
+        Process_Deferred_Deletion();
+        while (SpotLights.Count()) {
+                delete SpotLights[0];
+        }
+        Process_Deferred_Deletion();
+        while (FoggedObjectClass::FoggyObjects.Count()) {
+                delete FoggedObjectClass::FoggyObjects[0];
+        }
+        Process_Deferred_Deletion();
+        while (AlphaShapes.Count()) {
+                delete AlphaShapes[0];
+        }
+        Process_Deferred_Deletion();
+
+        while (Terrains.Count()) {
+                delete Terrains[0];
+        }
+        Process_Deferred_Deletion();
+
+        LaserDrawClass::All_Clear();
+
+        while (AbstractTypes.Count()) {
+                delete AbstractTypes[0];
+        }
+        Process_Deferred_Deletion();
+
+        delete TacticalMap;
+        TacticalMap = NULL;
+        Map.Free_Cells();
+        Process_Deferred_Deletion();
+
+        VeinholeMonsterClass::Reset();
+        VeinholeMonsterClass::Clear_Global_Data();
+
+        ScenarioInit--;
+
+        /*
+         * Check if all deletions succeeded before leaving.
+         */
+        assert(AbstractTypes.Count() == 0);
+        assert(SpotLights.Count() == 0);
+        assert(EMPulseClass::EMPulses.Count() == 0);
+        assert(FoggedObjectClass::FoggyObjects.Count() == 0);
+        assert(LightSources.Count() == 0);
+        assert(Scripts.Count() == 0);
+        assert(TargetTracker.Count() == 0);
+        assert(Bullets.Count() == 0);
+        assert(Objects.Count() == 0);
+        assert(Tags.Count() == 0);
+        assert(Triggers.Count() == 0);
+        assert(Tubes.Count() == 0);
+        assert(BuildingLights.Count() == 0);
+        assert(Overlays.Count() == 0);
+        assert(Particles.Count() == 0);
+        assert(ParticleSystems.Count() == 0);
+        assert(Waves.Count() == 0);
+        assert(Factories.Count() == 0);
+        assert(Sides.Count() == 0);
+        assert(Teams.Count() == 0);
+        assert(Houses.Count() == 0);
+        assert(Anims.Count() == 0);
+}
+
+
+/***********************************************************************************************
+ * DisplayClass::Init_Theater -- Performs theater-specific initialization (mixfiles, etc)      *
+ *                                                                                             *
+ * INPUT:                                                                                      *
+ *      theater         new theater                                                            *
+ *                                                                                             *
+ * OUTPUT:                                                                                     *
+ *      none.                                                                                  *
+ *                                                                                             *
+ * WARNINGS:                                                                                   *
+ *      none.                                                                                  *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   03/17/1995 BRR : Created.                                                                 *
+ *   05/07/1996 JLB : Added translucent tables.                                                *
+ *=============================================================================================*/
+void Init_Theater(TheaterType theater)
+{
+        TheaterClass const & data = TheaterClass::As_Reference(theater);
+
+        char                    fullname[_MAX_PATH];
+        char                    shortname[_MAX_PATH];
+        char                    isofullname[_MAX_PATH];
+
+        /*
+        **      Unload old mixfiles, and cache the new ones
+        */
+        snprintf(fullname, sizeof(fullname), "%s.MIX", data.Root.c_str());
+        snprintf(isofullname, sizeof(isofullname), "%s.MIX", data.IsoRoot.c_str());
+        snprintf(shortname, sizeof(shortname), "%s.MIX", data.Suffix.c_str());
+
+        DebugString("Init theater %s\n", data.Name());
+
+        /*
+        **      Save the new theater value
+        */
+        Scen->Theater = theater;
+        Session.Update_Progress(8);
+
+        if (Scen->Theater != LastTheater) {
+                if (TheaterData != NULL) {
+                        delete TheaterData;
+                }
+                TheaterData = new MFCD(fullname, &FastKey);
+
+                if (TheaterDat != NULL) {
+                        delete TheaterDat;
+                }
+                TheaterDat = new MFCD(shortname, &FastKey);
+                TheaterDat->Cache();
+
+                TheaterData->Cache();
+                Session.Update_Progress(6);
+
+                if (IsometricTheaterData != NULL) {
+                        delete IsometricTheaterData;
+                }
+                IsometricTheaterData = new MFCD(isofullname, &FastKey);
+
+                Session.Update_Progress(12);
+
+                /*
+                **      Load the custom palette associated with this theater.
+                **      The fading palettes will have to be generated as well.
+                */
+                snprintf(fullname, sizeof(fullname), "%s.PAL", data.Root.c_str());
+
+				unsigned char * ptr = (unsigned char *)MFCD::Retrieve(fullname);
+				#ifdef __ANDROID__
+				unsigned char loose_palette[PaletteClass::COLOR_COUNT * 3];
+				RawFileClass loose_palette_file(fullname);
+				if (ptr == NULL && loose_palette_file.Is_Available() &&
+    			loose_palette_file.Read(loose_palette, sizeof(loose_palette)) == sizeof(loose_palette)) {
+    			ptr = loose_palette;
+    			DebugString(" Android loaded loose theater palette %s\n", fullname);
+				}
+				#endif
+				if (ptr != NULL) {
+                        for (int color = 0; color < PaletteClass::COLOR_COUNT; color++) {
+                                unsigned char r = (unsigned char)((*ptr++)<<2);
+                                unsigned char g = (unsigned char)((*ptr++)<<2);
+                                unsigned char b = (unsigned char)((*ptr++)<<2);
+                                GamePalette[color] = RGBClass(r, g, b);
+                        }
+                } else {
+                        for (int color = 0; color < PaletteClass::COLOR_COUNT; color++) {
+                                GamePalette[color] = RGBClass(color, 255 - color, ((color << 2) & 0xff));
+                        }
+                }
+
+                OriginalPalette = GamePalette;
+
+                PaletteClass * unitpal = NULL;
+
+                if (!data.Suffix.empty()) {
+                        char palname[_MAX_PATH];
+                        snprintf(palname, sizeof(palname), "UNIT%s.PAL", data.Suffix.c_str());
+                        unitpal = (PaletteClass *)MFCD::Retrieve(palname);
+                }
+
+                Call_Back();
+
+                if (unitpal != NULL) {
+                        SchemePalette = *unitpal;
+                }
+
+                for (int index = 0; index < 256; index++) {
+                        SchemePalette[index] = RGBClass(
+                                        (unsigned char)(SchemePalette[index].Get_Red()<<2),
+                                        (unsigned char)(SchemePalette[index].Get_Green()<<2),
+                                        (unsigned char)(SchemePalette[index].Get_Blue()<<2));
+                }
+
+int last_percent = 12;
+int scheme_count = ColorSchemes.Count();
+int prog_step = scheme_count > 0 ? std::max(1, scheme_count / (25 - 12)) : 1;
+
+DebugString(" Android theater palette ready; color schemes=%d\n", scheme_count);
+
+for (int s = 0; s < scheme_count; s++) {
+        ColorSchemes[s]->Build_Light_Converters(SchemePalette, GamePalette);
+
+        int percent = std::min(12 + (s / prog_step), 25);
+        if (percent != last_percent) {
+                Session.Update_Progress(percent);
+                last_percent = percent;
+        }
+
+        Call_Back();
+}
+
+DebugString(" Android theater color schemes complete\n");
+Session.Update_Progress(25);
+
+DebugString(" Android reloading sidebar\n");
+Map.Reload_Sidebar();
+
+DebugString(" Android theater initialization complete\n");
+Session.Update_Progress(28);
+        }
+}
+
+
+bool Prep_For_Side(SideType side)
+{
+        int id;
+        char name[64];
+        int index;
+
+        DebugString("Preparing Mixfiles for Side %02d.\n", side);
+
+        if (SideCMix != NULL) {
+                DebugString("     Releasing %s\n", SideCMix->Filename);
+                delete SideCMix;
+                SideCMix = NULL;
+        }
+
+        if (SideNCMix != NULL) {
+                DebugString("     Releasing %s\n", SideNCMix->Filename);
+                delete SideNCMix;
+                SideNCMix = NULL;
+        }
+
+        if (SideCDMix != NULL) {
+                DebugString("     Releasing %s\n", SideCDMix->Filename);
+                delete SideCDMix;
+                SideCDMix = NULL;
+        }
+
+        id = (int)side + 1;
+
+        while (ExpandSideMix.Count() > 0) {
+                delete ExpandSideMix[0];
+                ExpandSideMix.Delete_Index(0);
+        }
+
+        if (Addon_Enabled(ADDON_ANY) == true) {
+                for (index = 99; index >= 0; index--) {
+                        sprintf(name, "E%02dSC%02d.MIX", index, id);
+
+                        if (CCFileClass(name).Is_Available()) {
+
+                                DebugString("     Initializing %s\n", name);
+                                MFCD * mix = new MFCD(name, &FastKey);
+                                ExpandSideMix.Add(mix);
+                                mix->Cache();
+                        }
+                }
+        }
+
+        sprintf(name, "SIDEC%02d.MIX", id);
+        DebugString("     Initializing %s\n", name);
+
+        if (CCFileClass(name).Is_Available()) {
+                SideCMix = new MFCD(name, &FastKey);
+        }
+
+        if (SideCMix == NULL) {
+                DebugString("     FAILED!\n");
+                return(false);
+        }
+
+        SideCMix->Cache();
+
+        if (Addon_Enabled(ADDON_ANY) == true) {
+                for (index = 99; index >= 0; index--) {
+                        sprintf(name, "E%02dSNC%02d.MIX", index, id);
+
+                        if (CCFileClass(name).Is_Available()) {
+
+                                DebugString("     Initializing %s\n", name);
+                                MFCD *mix = new MFCD(name, &FastKey);
+                                ExpandSideMix.Add(mix);
+                        }
+                }
+        }
+
+        sprintf(name, "SIDENC%02d.MIX", id);
+        DebugString("     Initializing %s\n", name);
+
+        if (CCFileClass(name).Is_Available()) {
+                SideNCMix = new MFCD(name, &FastKey);
+        }
+
+        if (Session.Type == GAME_NORMAL) {
+
+                if (Addon_Enabled(ADDON_ANY) == false) {
+                        sprintf(name, "SIDECD%02d.MIX", id);
+                } else {
+                        sprintf(name, "E%02dSCD%02d.MIX", Get_Required_Addon(), id);
+                }
+
+                DebugString("     Initializing %s\n", name);
+                if (CCFileClass(name).Is_Available()) {
+                        SideCDMix = new MFCD(name, &FastKey);
+                }
+                if (SideCDMix == NULL) {
+                        DebugString("     FAILED!\n");
+                        return(false);
+                }
+        }
+
+        // A side archive may carry its own copy of the file.
+        UIControls.Read_INI_File(DeploymentConfig.UIFile.c_str(), true);
+
+        Map.Init_For_House();
+
+        return(true);
+}
+
+
+bool Prep_Speech_For_Side(SideType side)
+{
+        int id;
+        char name[64];
+
+        if (side == SIDE_NONE) {
+                return(false);
+        }
+
+        // A line still streaming from the old archive must be closed before it goes.
+        Stop_Speaking();
+
+        if (SpeechMix != NULL) {
+                DebugString("     Releasing %s\n", SpeechMix->Filename);
+                delete SpeechMix;
+                SpeechMix = NULL;
+        }
+
+        while (ExpandSpeechMix.Count() > 0) {
+                delete ExpandSpeechMix[0];
+                ExpandSpeechMix.Delete_Index(0);
+        }
+
+        id = (int)side + 1;
+
+        for (AddonType addon = ADDON_COUNT; addon > 0; --addon) {
+                if (Addon_Enabled(addon) == true) {
+                        sprintf(name, "E%02dVOX%02d.MIX", addon, id);
+
+                        if (CCFileClass(name).Is_Available()) {
+                                MFCD *mix = new MFCD(name, &FastKey);
+                                ExpandSpeechMix.Add(mix);
+                                DebugStringNoPrefix(" %s", name);
+                        }
+                }
+        }
+
+        sprintf(name, "SPEECH%02d.MIX", id);
+        DebugString("     Initializing %s\n", name);
+        if (CCFileClass(name).Is_Available()) {
+                SpeechMix = new MFCD(name, &FastKey);
+        }
+
+        if (SpeechMix == NULL) {
+                DebugString("     FAILED!\n");
+                return(false);
+        }
+
+        return(true);
+}
+
+SideType Prep_For_Side_Or_First(SideType side)
+{
+        if (Prep_For_Side(side)) {
+                return(side);
+        }
+        if (side != SIDE_FIRST && Prep_For_Side(SIDE_FIRST)) {
+                return(SIDE_FIRST);
+        }
+        return(SIDE_NONE);
+}
+
+
+SideType Prep_Speech_For_Side_Or_First(SideType side)
+{
+        if (Prep_Speech_For_Side(side)) {
+                return(side);
+        }
+        if (side != SIDE_FIRST && Prep_Speech_For_Side(SIDE_FIRST)) {
+                return(SIDE_FIRST);
+        }
+        return(SIDE_NONE);
+}
+
+
+/// <summary>
+/// Fetches the theme to play behind the main menu.
+/// </summary>
+/// <returns>Returns with the theme to play, favoring the expansion's own music whenever the
+/// expansion is installed.</returns>
+ThemeType Fetch_Main_Menu_Theme(void)
+{
+        if (Addon_Installed(ADDON_FIRESTORM)) {
+                ThemeType theme = Theme.From_Name("FSMENU");
+                if (theme != THEME_NONE) {
+                        return(theme);
+                }
+        }
+        return(Theme.From_Name("INTRO"));
+}
+
+ThemeType Fetch_Map_Select_Theme(void)
+{
+        if (Addon_Installed(ADDON_FIRESTORM)) {
+                ThemeType theme = Theme.From_Name("MAPS");
+                if (theme != THEME_NONE) {
+                        return(theme);
+                }
+        }
+        return(Theme.From_Name("INTRO"));
+}
+
+ObjectClass * Best_Selected_Object(void)
+{
+        ObjectClass *best_obj = NULL;
+        int best_value = -1;
+
+        if (CurrentObject.Count() > 0) {
+                for (int index = 0; index < CurrentObject.Count(); index++) {
+                        ObjectClass * obj = CurrentObject[index];
+
+                        int value = 0;
+
+                        if (obj->Is_Techno()) {
+                                value = 2;
+                                TechnoClass * tech = (TechnoClass *)obj;
+                                if (tech->Is_Immobilized()) {
+                                        value = 1;
+                                } else if (tech->Is_Weapon_Equipped()) {
+                                        value = 3;
+                                        if (tech->RTTI != RTTI_BUILDING) {
+                                                value = 4;
+                                                if (tech->Combat_Damage() > 0) {
+                                                        value = 5;
+                                                }
+                                        }
+                                }
+                        }
+
+                        if (value > best_value) {
+                                best_value = value;
+                                best_obj = obj;
+                        }
+                }
+        }
+        return(best_obj);
+}
+
+
+/// <summary>
+/// Handles one pass through the new front end menu.
+/// This routine lets NewMenuClass gather the player's choice, sets up the session for
+/// whichever flavor of multiplay was picked, and hands control back to the old menu if
+/// the player asked for it.
+/// </summary>
+/// <returns>Returns with the SEL_ selection that the game loop should act upon.</returns>
+int New_Main_Menu(void)
+{
+#ifdef __ANDROID__
+        DebugString(" New_Main_Menu - Android bypass, auto-starting campaign via QUEST_CAMPAIGN.TXT\n");
+        return(SEL_CAMPAIGN_GAME);
+#else
+        NewMenuClass * newmenu = Get_New_Menu();
+
+        Session.Type = GAME_NORMAL;
+        Session.IsWDT = false;
+
+        int selection = newmenu->Process_Game_Select();
+
+        if (selection == NSEL_OLD_MENU) {
+                return(Main_Menu(TIMER_MINUTE));
+        }
+
+        switch (selection) {
+                case NSEL_START_NEW_GAME:
+                        return(SEL_CAMPAIGN_GAME);
+
+                case NSEL_LOAD_MISSION:
+                        return(SEL_LOAD_GAME);
+
+                case NSEL_LAN:
+                        Session.Type = GAME_IPX;
+                        break;
+
+                case NSEL_SKIRMISH:
+                        Session.Type = GAME_SKIRMISH;
+                        break;
+
+                case NSEL_OPTIONS:
+                        return(SEL_OPTIONS);
+
+                case NSEL_INTRO:
+                        return(SEL_INTRO);
+
+                case NSEL_VERSION:
+                        return(SEL_VERSION);
+
+                case NSEL_VIEW_CREDITS:
+                        return(SEL_VIEW_CREDITS);
+
+                case NSEL_EXIT:
+                        return(SEL_EXIT);
+
+                default:
+                        break;
+        }
+
+        if (Session.Type != GAME_NORMAL) {
+                Session.Read_MultiPlayer_Settings();
+                Prepare_Side_Roster();
+                Session.Suspended = false;
+                Session.Read_Scenario_Descriptions();
+                return(SEL_MULTIPLAYER_GAME);
+        }
+
+        return(SEL_NONE);
+#endif
+}

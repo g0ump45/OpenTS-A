@@ -1,0 +1,2488 @@
+registered_commands:
+- id: Follow
+  route_id: follow
+  kind: registered
+  title: Follow
+  description: Toggle follow state of selected object(s).
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: FollowCommandClass
+    guard: null
+- id: View1
+  route_id: view1
+  kind: registered
+  title: View Bookmark 1
+  description: View bookmarked map position 1.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: View1CommandClass
+    guard: null
+- id: View2
+  route_id: view2
+  kind: registered
+  title: View Bookmark 2
+  description: View bookmarked map position 2.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: View2CommandClass
+    guard: null
+- id: View3
+  route_id: view3
+  kind: registered
+  title: View Bookmark 3
+  description: View bookmarked map position 3.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: View3CommandClass
+    guard: null
+- id: View4
+  route_id: view4
+  kind: registered
+  title: View Bookmark 4
+  description: View bookmarked map position 4.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: View4CommandClass
+    guard: null
+- id: SetView1
+  route_id: setview1
+  kind: registered
+  title: Set Bookmark 1
+  description: Set view bookmark map position 1.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SetView1CommandClass
+    guard: null
+- id: SetView2
+  route_id: setview2
+  kind: registered
+  title: Set Bookmark 2
+  description: Set view bookmark map position 2.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SetView2CommandClass
+    guard: null
+- id: SetView3
+  route_id: setview3
+  kind: registered
+  title: Set Bookmark 3
+  description: Set view bookmark map position 3.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SetView3CommandClass
+    guard: null
+- id: SetView4
+  route_id: setview4
+  kind: registered
+  title: Set Bookmark 4
+  description: Set view bookmark map position 4.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SetView4CommandClass
+    guard: null
+- id: Options
+  route_id: options
+  kind: registered
+  title: Options Menu
+  description: Display game options dialog.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: OptionsCommandClass
+    guard: null
+  forced_binding: Escape
+- id: ScrollNorth
+  route_id: scrollnorth
+  kind: registered
+  title: Scroll North
+  description: Scroll tactical map to the north.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollNCommandClass
+    guard: null
+- id: ScrollSouth
+  route_id: scrollsouth
+  kind: registered
+  title: Scroll South
+  description: Scroll tactical map to the south.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollSCommandClass
+    guard: null
+- id: ScrollEast
+  route_id: scrolleast
+  kind: registered
+  title: Scroll East
+  description: Scroll tactical map to the east.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollECommandClass
+    guard: null
+- id: ScrollWest
+  route_id: scrollwest
+  kind: registered
+  title: Scroll West
+  description: Scroll tactical map to the west.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollWCommandClass
+    guard: null
+- id: ScrollNorthEast
+  route_id: scrollnortheast
+  kind: registered
+  title: Scroll North-East
+  description: Scroll tactical map to the north-east.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollNECommandClass
+    guard: null
+- id: ScrollSouthEast
+  route_id: scrollsoutheast
+  kind: registered
+  title: Scroll South-East
+  description: Scroll tactical map to the south-east.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollSECommandClass
+    guard: null
+- id: ScrollSouthWest
+  route_id: scrollsouthwest
+  kind: registered
+  title: Scroll South-West
+  description: Scroll tactical map to the south-west.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollSWCommandClass
+    guard: null
+- id: ScrollNorthWest
+  route_id: scrollnorthwest
+  kind: registered
+  title: Scroll North-West
+  description: Scroll tactical map to the north-west.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScrollNWCommandClass
+    guard: null
+- id: JumpCameraWest
+  route_id: jumpcamerawest
+  kind: registered
+  title: Jump Camera West
+  description: Jump tactical map to the west edge of the map.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: JumpCameraWCommandClass
+    guard: null
+- id: JumpCameraEast
+  route_id: jumpcameraeast
+  kind: registered
+  title: Jump Camera East
+  description: Jump tactical map to the east edge of the map.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: JumpCameraECommandClass
+    guard: null
+- id: JumpCameraNorth
+  route_id: jumpcameranorth
+  kind: registered
+  title: Jump Camera North
+  description: Jump tactical map to the north edge of the map.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: JumpCameraNCommandClass
+    guard: null
+- id: JumpCameraSouth
+  route_id: jumpcamerasouth
+  kind: registered
+  title: Jump Camera South
+  description: Jump tactical map to the south edge of the map.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: JumpCameraSCommandClass
+    guard: null
+- id: SidebarUp
+  route_id: sidebarup
+  kind: registered
+  title: Sidebar Up
+  description: Scrolls sidebar selection list upward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SidebarUpCommandClass
+    guard: null
+- id: LeftSidebarUp
+  route_id: leftsidebarup
+  kind: registered
+  title: Structure List up
+  description: Scroll sidebar structure selection list upward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: LSidebarUpCommandClass
+    guard: null
+- id: RightSidebarUp
+  route_id: rightsidebarup
+  kind: registered
+  title: Unit List Up
+  description: Scroll sidebar unit selection list upward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RSidebarUpCommandClass
+    guard: null
+- id: SidebarDown
+  route_id: sidebardown
+  kind: registered
+  title: Sidebar Down
+  description: Scroll sidebar selection list downward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SidebarDownCommandClass
+    guard: null
+- id: LeftSidebarDown
+  route_id: leftsidebardown
+  kind: registered
+  title: Structure List Down
+  description: Scroll sidebar structure selection list downward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: LSidebarDownCommandClass
+    guard: null
+- id: RightSidebarDown
+  route_id: rightsidebardown
+  kind: registered
+  title: Unit List Down
+  description: Scroll sidebar unit selection list downward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RSidebarDownCommandClass
+    guard: null
+- id: SidebarPageUp
+  route_id: sidebarpageup
+  kind: registered
+  title: Sidebar PageUp
+  description: Page sidebar selection list upward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SidebarPageUpCommandClass
+    guard: null
+- id: LeftSidebarPageUp
+  route_id: leftsidebarpageup
+  kind: registered
+  title: Structure List PageUp
+  description: Page sidebar structure selection list upward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: LSidebarPageUpCommandClass
+    guard: null
+- id: RightSidebarPageUp
+  route_id: rightsidebarpageup
+  kind: registered
+  title: Unit List PageUp
+  description: Page sidebar unit selection list upward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RSidebarPageUpCommandClass
+    guard: null
+- id: SidebarPageDown
+  route_id: sidebarpagedown
+  kind: registered
+  title: Sidebar PageDown
+  description: Page sidebar selection list downward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SidebarPageDownCommandClass
+    guard: null
+- id: LeftSidebarPageDown
+  route_id: leftsidebarpagedown
+  kind: registered
+  title: Structure List PageDown
+  description: Page sidebar structure selection list downward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: LSidebarPageDownCommandClass
+    guard: null
+- id: RightSidebarPageDown
+  route_id: rightsidebarpagedown
+  kind: registered
+  title: Unit List PageDown
+  description: Page sidebar unit selection list downward.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RSidebarPageDownCommandClass
+    guard: null
+- id: CenterOnRadarEvent
+  route_id: centeronradarevent
+  kind: registered
+  title: Goto Radar Event
+  description: Center the tactical view on the last radar event.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterREventCommandClass
+    guard: null
+- id: ToggleRadar
+  route_id: toggleradar
+  kind: registered
+  title: Radar Toggle
+  description: Toggle radar display mode on / off.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ToggleRadarCommandClass
+    guard: null
+- id: TogglePower
+  route_id: togglepower
+  kind: registered
+  title: Power Mode
+  description: Toggle power mode on / off.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: TogglePowerCommandClass
+    guard: null
+- id: ToggleSell
+  route_id: togglesell
+  kind: registered
+  title: Sell Mode
+  description: Toggle sell mode on / off.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ToggleSellCommandClass
+    guard: null
+- id: ToggleRepair
+  route_id: togglerepair
+  kind: registered
+  title: Repair Mode
+  description: Toggle repair mode on / off.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ToggleRepairCommandClass
+    guard: null
+- id: SelectView
+  route_id: selectview
+  kind: registered
+  title: Select View
+  description: Select all owned objects in the current view.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectViewCommandClass
+    guard: null
+- id: ToggleAlliance
+  route_id: togglealliance
+  kind: registered
+  title: Alliance
+  description: Toggle alliance with owner of selected object.
+  category: Control
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AllianceCommandClass
+    guard: null
+- id: CenterBase
+  route_id: centerbase
+  kind: registered
+  title: Center Base
+  description: Center the view about the player's base.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterBaseCommandClass
+    guard: null
+- id: CenterView
+  route_id: centerview
+  kind: registered
+  title: Center View
+  description: Center the view about selected object(s).
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterViewCommandClass
+    guard: null
+- id: ScatterObject
+  route_id: scatterobject
+  kind: registered
+  title: Scatter
+  description: Scatter selected object(s).
+  category: Control
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScatterCommandClass
+    guard: null
+- id: GuardObject
+  route_id: guardobject
+  kind: registered
+  title: Guard
+  description: Set the selected object(s) into 'guard area' mode.
+  category: Control
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: GuardCommandClass
+    guard: null
+- id: StopObject
+  route_id: stopobject
+  kind: registered
+  title: Stop Object
+  description: Stop the selected object(s).
+  category: Control
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: StopCommandClass
+    guard: null
+- id: DeployObject
+  route_id: deployobject
+  kind: registered
+  title: Deploy Object
+  description: Deploy selected object(s).
+  category: Control
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: DeployCommandClass
+    guard: null
+- id: PreviousObject
+  route_id: previousobject
+  kind: registered
+  title: Previous Object
+  description: Select the previous object.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: PrevObjectCommandClass
+    guard: null
+- id: NextObject
+  route_id: nextobject
+  kind: registered
+  title: Next Object
+  description: Select the next object.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: NextObjectCommandClass
+    guard: null
+- id: TeamCreate_1
+  route_id: teamcreate-1
+  kind: registered
+  title: Create Team  1
+  description: Creates Team 1 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_2
+  route_id: teamcreate-2
+  kind: registered
+  title: Create Team  2
+  description: Creates Team 2 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_3
+  route_id: teamcreate-3
+  kind: registered
+  title: Create Team  3
+  description: Creates Team 3 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_4
+  route_id: teamcreate-4
+  kind: registered
+  title: Create Team  4
+  description: Creates Team 4 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_5
+  route_id: teamcreate-5
+  kind: registered
+  title: Create Team  5
+  description: Creates Team 5 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_6
+  route_id: teamcreate-6
+  kind: registered
+  title: Create Team  6
+  description: Creates Team 6 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_7
+  route_id: teamcreate-7
+  kind: registered
+  title: Create Team  7
+  description: Creates Team 7 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_8
+  route_id: teamcreate-8
+  kind: registered
+  title: Create Team  8
+  description: Creates Team 8 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_9
+  route_id: teamcreate-9
+  kind: registered
+  title: Create Team  9
+  description: Creates Team 9 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamCreate_10
+  route_id: teamcreate-10
+  kind: registered
+  title: Create Team 10
+  description: Creates Team 10 from currently selected units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CreateTeamCommandClass
+    guard: null
+- id: TeamSelect_1
+  route_id: teamselect-1
+  kind: registered
+  title: Select Team  1
+  description: Select members of team 1.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_2
+  route_id: teamselect-2
+  kind: registered
+  title: Select Team  2
+  description: Select members of team 2.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_3
+  route_id: teamselect-3
+  kind: registered
+  title: Select Team  3
+  description: Select members of team 3.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_4
+  route_id: teamselect-4
+  kind: registered
+  title: Select Team  4
+  description: Select members of team 4.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_5
+  route_id: teamselect-5
+  kind: registered
+  title: Select Team  5
+  description: Select members of team 5.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_6
+  route_id: teamselect-6
+  kind: registered
+  title: Select Team  6
+  description: Select members of team 6.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_7
+  route_id: teamselect-7
+  kind: registered
+  title: Select Team  7
+  description: Select members of team 7.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_8
+  route_id: teamselect-8
+  kind: registered
+  title: Select Team  8
+  description: Select members of team 8.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_9
+  route_id: teamselect-9
+  kind: registered
+  title: Select Team  9
+  description: Select members of team 9.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamSelect_10
+  route_id: teamselect-10
+  kind: registered
+  title: Select Team 10
+  description: Select members of team 10.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectTeamCommandClass
+    guard: null
+- id: TeamAddSelect_1
+  route_id: teamaddselect-1
+  kind: registered
+  title: Add Select Team  1
+  description: Select members of team 1 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_2
+  route_id: teamaddselect-2
+  kind: registered
+  title: Add Select Team  2
+  description: Select members of team 2 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_3
+  route_id: teamaddselect-3
+  kind: registered
+  title: Add Select Team  3
+  description: Select members of team 3 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_4
+  route_id: teamaddselect-4
+  kind: registered
+  title: Add Select Team  4
+  description: Select members of team 4 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_5
+  route_id: teamaddselect-5
+  kind: registered
+  title: Add Select Team  5
+  description: Select members of team 5 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_6
+  route_id: teamaddselect-6
+  kind: registered
+  title: Add Select Team  6
+  description: Select members of team 6 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_7
+  route_id: teamaddselect-7
+  kind: registered
+  title: Add Select Team  7
+  description: Select members of team 7 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_8
+  route_id: teamaddselect-8
+  kind: registered
+  title: Add Select Team  8
+  description: Select members of team 8 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_9
+  route_id: teamaddselect-9
+  kind: registered
+  title: Add Select Team  9
+  description: Select members of team 9 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddSelect_10
+  route_id: teamaddselect-10
+  kind: registered
+  title: Add Select Team 10
+  description: Select members of team 10 without unselecting other units.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddTeamCommandClass
+    guard: null
+- id: TeamAddTo_1
+  route_id: teamaddto-1
+  kind: registered
+  title: Add To Team  1
+  description: Adds the selected units to team 1 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_2
+  route_id: teamaddto-2
+  kind: registered
+  title: Add To Team  2
+  description: Adds the selected units to team 2 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_3
+  route_id: teamaddto-3
+  kind: registered
+  title: Add To Team  3
+  description: Adds the selected units to team 3 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_4
+  route_id: teamaddto-4
+  kind: registered
+  title: Add To Team  4
+  description: Adds the selected units to team 4 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_5
+  route_id: teamaddto-5
+  kind: registered
+  title: Add To Team  5
+  description: Adds the selected units to team 5 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_6
+  route_id: teamaddto-6
+  kind: registered
+  title: Add To Team  6
+  description: Adds the selected units to team 6 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_7
+  route_id: teamaddto-7
+  kind: registered
+  title: Add To Team  7
+  description: Adds the selected units to team 7 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_8
+  route_id: teamaddto-8
+  kind: registered
+  title: Add To Team  8
+  description: Adds the selected units to team 8 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_9
+  route_id: teamaddto-9
+  kind: registered
+  title: Add To Team  9
+  description: Adds the selected units to team 9 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamAddTo_10
+  route_id: teamaddto-10
+  kind: registered
+  title: Add To Team 10
+  description: Adds the selected units to team 10 and selects the whole team.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: AddToTeamCommandClass
+    guard: null
+- id: TeamCenter_1
+  route_id: teamcenter-1
+  kind: registered
+  title: Center Team  1
+  description: Select and center view about team 1.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_2
+  route_id: teamcenter-2
+  kind: registered
+  title: Center Team  2
+  description: Select and center view about team 2.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_3
+  route_id: teamcenter-3
+  kind: registered
+  title: Center Team  3
+  description: Select and center view about team 3.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_4
+  route_id: teamcenter-4
+  kind: registered
+  title: Center Team  4
+  description: Select and center view about team 4.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_5
+  route_id: teamcenter-5
+  kind: registered
+  title: Center Team  5
+  description: Select and center view about team 5.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_6
+  route_id: teamcenter-6
+  kind: registered
+  title: Center Team  6
+  description: Select and center view about team 6.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_7
+  route_id: teamcenter-7
+  kind: registered
+  title: Center Team  7
+  description: Select and center view about team 7.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_8
+  route_id: teamcenter-8
+  kind: registered
+  title: Center Team  8
+  description: Select and center view about team 8.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_9
+  route_id: teamcenter-9
+  kind: registered
+  title: Center Team  9
+  description: Select and center view about team 9.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: TeamCenter_10
+  route_id: teamcenter-10
+  kind: registered
+  title: Center Team 10
+  description: Select and center view about team 10.
+  category: Team
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: CenterTeamCommandClass
+    guard: null
+- id: WaypointMode
+  route_id: waypointmode
+  kind: registered
+  title: Waypoint Mode
+  description: Toggle waypoint placement mode on / off.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: WaypointCommandClass
+    guard: null
+- id: ScreenCapture
+  route_id: screencapture
+  kind: registered
+  title: Screen Capture
+  description: Take a snapshot of the game screen. (Saved as 'SCRNxxxx.PCX' file in Tiberian Sun run directory.)
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ScreenCaptureCommandClass
+    guard: null
+- id: PrevTheme
+  route_id: prevtheme
+  kind: registered
+  title: 'Music: Previous Track'
+  description: Plays the previous music track.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: PrevThemeCommandClass
+    guard: null
+- id: NextTheme
+  route_id: nexttheme
+  kind: registered
+  title: 'Music: Next Track'
+  description: Plays the next music track.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: NextThemeCommandClass
+    guard: null
+- id: SelectType
+  route_id: selecttype
+  kind: registered
+  title: Select Same Type
+  description: Selects all on-screen units of the same types as currently selected. Press twice quickly
+    to select across the whole map.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectSameTypeCommandClass
+    guard: null
+- id: VeterancyFilter
+  route_id: veterancyfilter
+  kind: registered
+  title: Veterancy Filter
+  description: Narrows a mixed selection to its highest rank, and cycles through the ranks when pressed
+    again.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: VeterancyFilterCommandClass
+    guard: null
+- id: VeterancyFilterAddLower
+  route_id: veterancyfilteraddlower
+  kind: registered
+  title: Veterancy Filter (Add Lower)
+  description: Adds the next lower rank back to a filtered selection.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: VeterancyFilterAddLowerCommandClass
+    guard: null
+- id: HealthFilter
+  route_id: healthfilter
+  kind: registered
+  title: Health Filter
+  description: Narrows a mixed selection to its most damaged units, and cycles through the health bands
+    when pressed again.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: HealthFilterCommandClass
+    guard: null
+- id: HealthFilterAddLower
+  route_id: healthfilteraddlower
+  kind: registered
+  title: Health Filter (Add Lower)
+  description: Adds the next healthier band back to a filtered selection.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: HealthFilterAddLowerCommandClass
+    guard: null
+- id: SelectOneLess
+  route_id: selectoneless
+  kind: registered
+  title: Select One Less
+  description: Removes the last unit from the selection.
+  category: Selection
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: SelectOneLessCommandClass
+    guard: null
+- id: ManualPlace
+  route_id: manualplace
+  kind: registered
+  title: Place Building
+  description: Enters placement mode for the completed building waiting on the sidebar.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ManualPlaceCommandClass
+    guard: null
+- id: RepeatLastBuilding
+  route_id: repeatlastbuilding
+  kind: registered
+  title: Repeat Last Building
+  description: Queues the last structure that was built, while it is still on the sidebar.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RepeatLastBuildingCommandClass
+    guard: null
+- id: RepeatLastInfantry
+  route_id: repeatlastinfantry
+  kind: registered
+  title: Repeat Last Infantry
+  description: Queues the last infantry that was trained, while it is still on the sidebar.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RepeatLastInfantryCommandClass
+    guard: null
+- id: RepeatLastUnit
+  route_id: repeatlastunit
+  kind: registered
+  title: Repeat Last Vehicle
+  description: Queues the last vehicle that was built, while it is still on the sidebar.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RepeatLastUnitCommandClass
+    guard: null
+- id: RepeatLastAircraft
+  route_id: repeatlastaircraft
+  kind: registered
+  title: Repeat Last Aircraft
+  description: Queues the last aircraft that was built, while it is still on the sidebar.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: RepeatLastAircraftCommandClass
+    guard: null
+- id: QuickSave
+  route_id: quicksave
+  kind: registered
+  title: Quick Save
+  description: Saves the game to the quick save file.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: QuickSaveCommandClass
+    guard: null
+- id: QuickLoad
+  route_id: quickload
+  kind: registered
+  title: Quick Load
+  description: Loads the quick save file.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: QuickLoadCommandClass
+    guard: null
+- id: ChatToAll
+  route_id: chattoall
+  kind: registered
+  title: Message to All
+  description: Starts a message to every player.
+  category: Chat
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ChatToAllCommandClass
+    guard: null
+- id: ChatToAllies
+  route_id: chattoallies
+  kind: registered
+  title: Message to Team
+  description: Starts a message to your allies, or to the other observers while you watch.
+  category: Chat
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: ChatToAlliesCommandClass
+    guard: null
+- id: DeleteWaypoint
+  route_id: deletewaypoint
+  kind: registered
+  title: Delete Waypoint
+  description: Delete selected waypoint.
+  category: Interface
+  audience: player
+  availability:
+    builds:
+    - release
+    - debug
+  _provenance:
+    source: code/init.cpp
+    class: DeleteWaypointCommandClass
+    guard: null
+  forced_binding: Delete
+fixed_controls:
+- id: fixed:options-menu
+  route_id: fixed-options-menu
+  kind: fixed
+  title: Options menu
+  description: Opens the in-game options menu when no rebindable command claims the key.
+  audience: player
+  availability: &id001
+    builds:
+    - release
+    - debug
+  bindings:
+  - Space
+  context: In-game
+  _provenance:
+    source: code/mainloop.cpp
+    guard: null
+- id: fixed:map-zoom
+  route_id: fixed-map-zoom
+  kind: fixed
+  title: Map zoom
+  description: Toggles the tactical map zoom mode.
+  audience: player
+  availability: *id001
+  bindings:
+  - Tab
+  context: In-game
+  _provenance:
+    source: code/mainloop.cpp
+    guard: null
+- id: fixed:multiplayer-message
+  route_id: fixed-multiplayer-message
+  kind: fixed
+  title: Multiplayer message recipient
+  description: Starts a private message to one connection, or a message to everyone.
+  audience: player
+  availability: *id001
+  bindings:
+  - F1 through the session player limit
+  context: Multiplayer match
+  _provenance:
+    source: code/mainloop.cpp
+    guard: null
+- id: fixed:cancel-multiplayer-message
+  route_id: fixed-cancel-multiplayer-message
+  kind: fixed
+  title: Cancel multiplayer message
+  description: Cancels the active multiplayer message edit.
+  audience: player
+  availability: *id001
+  bindings:
+  - Escape
+  context: Editing a multiplayer message
+  _provenance:
+    source: code/mainloop.cpp
+    guard: null
+- id: fixed:debug-grant-money
+  route_id: fixed-debug-grant-money
+  kind: fixed
+  title: Grant money to all houses
+  description: Adds 10,000 credits to every house.
+  audience: debug
+  availability: &id002
+    builds:
+    - debug
+  bindings:
+  - Shift+M
+  - Alt+M
+  - Ctrl+M
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/mainloop.cpp
+    guard: _DEBUG
+- id: fixed:debug-force-win
+  route_id: fixed-debug-force-win
+  kind: fixed
+  title: Force victory
+  description: Clears the local player's blockage flag and marks the player as victorious.
+  audience: debug
+  availability: *id002
+  bindings:
+  - Alt+W
+  context: In-game with Debug_Playtest enabled
+  _provenance:
+    source: code/mainloop.cpp
+    guard: _DEBUG
+- id: fixed:debug-special-dialog
+  route_id: fixed-debug-special-dialog
+  kind: fixed
+  title: Debug special dialog
+  description: Opens nothing. Outside a normal session it requests a dialog that is not compiled and hangs
+    the paused scenario; in a normal session it does nothing at all.
+  audience: debug
+  availability: *id002
+  bindings:
+  - /
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/mainloop.cpp
+    guard: _DEBUG
+- id: fixed:debug-motion-capture
+  route_id: fixed-debug-motion-capture
+  kind: fixed
+  title: Enable motion capture
+  description: Enables the debug motion-capture flag.
+  audience: debug
+  availability: *id002
+  bindings:
+  - J
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-flash-interface
+  route_id: fixed-debug-flash-interface
+  kind: fixed
+  title: Flash power and credits
+  description: Flashes the power and credit displays.
+  audience: debug
+  availability: *id002
+  bindings:
+  - I
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-spawn-orca
+  route_id: fixed-debug-spawn-orca
+  kind: fixed
+  title: Spawn ORCA
+  description: Creates an ORCA owned by the local player at the cursor cell.
+  audience: debug
+  availability: *id002
+  bindings:
+  - O
+  - B
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-map-bounds
+  route_id: fixed-debug-map-bounds
+  kind: fixed
+  title: Toggle map bounds
+  description: Switches the playable map rectangle between its scenario value and the full map grid.
+  audience: debug
+  availability: *id002
+  bindings:
+  - Alt+Z
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-monochrome
+  route_id: fixed-debug-monochrome
+  kind: fixed
+  title: Toggle monochrome output
+  description: Enables or disables the monochrome debug display.
+  audience: debug
+  availability: *id002
+  bindings:
+  - M
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-delete-object
+  route_id: fixed-debug-delete-object
+  kind: fixed
+  title: Delete selected object
+  description: Detaches and removes the first selected object; buildings use the sell-back path.
+  audience: debug
+  availability: *id002
+  bindings:
+  - Delete
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-damage-object
+  route_id: fixed-debug-damage-object
+  kind: fixed
+  title: Damage selected object
+  description: Applies 50 damage with the SA warhead to the first selected object.
+  audience: debug
+  availability: *id002
+  bindings:
+  - Shift+Delete
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-clone-object
+  route_id: fixed-debug-clone-object
+  kind: fixed
+  title: Clone selected object type
+  description: Starts placement of a new object with the first selected object's type and owner.
+  audience: debug
+  availability: *id002
+  bindings:
+  - Insert
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-previous-page
+  route_id: fixed-debug-previous-page
+  kind: fixed
+  title: Previous monochrome page
+  description: Selects the previous monochrome debug page.
+  audience: debug
+  availability: *id002
+  bindings:
+  - '['
+  - F11
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-next-page
+  route_id: fixed-debug-next-page
+  kind: fixed
+  title: Next monochrome page
+  description: Selects the next monochrome debug page.
+  audience: debug
+  availability: *id002
+  bindings:
+  - ']'
+  - F12
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-icon-overlay
+  route_id: fixed-debug-icon-overlay
+  kind: fixed
+  title: Toggle debug icon overlay
+  description: Toggles the debug icon overlay.
+  audience: debug
+  availability: *id002
+  bindings:
+  - V
+  - F3
+  context: In-game with Debug_Flag enabled
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-range-circles
+  route_id: fixed-debug-range-circles
+  kind: fixed
+  title: Draw sight and weapon ranges
+  description: Draws the selected TechnoType's sight and primary-weapon ranges once.
+  audience: debug
+  availability: *id002
+  bindings:
+  - F7
+  context: In-game with Debug_Flag enabled and a Techno selected
+  _provenance:
+    source: code/debug.cpp
+    guard: _DEBUG
+- id: fixed:debug-map-editor-options
+  route_id: fixed-debug-map-editor-options
+  kind: fixed
+  title: Map editor options
+  description: Opens the options menu from the debug map editor.
+  audience: debug
+  availability: *id002
+  bindings:
+  - Escape
+  - Space
+  context: Debug map editor
+  _provenance:
+    source: code/conquer.cpp
+    guard: _DEBUG
+- id: fixed:debug-unshroud
+  route_id: fixed-debug-unshroud
+  kind: fixed
+  title: Toggle map shroud
+  description: Toggles full-map visibility in a single-player debug or playtest session.
+  audience: debug
+  availability: *id002
+  bindings:
+  - F4
+  context: In-game with Debug_Flag or Debug_Playtest enabled
+  _provenance:
+    source: code/mainloop.cpp
+    guard: _DEBUG
+- id: fixed:preserve-selection
+  route_id: fixed-preserve-selection
+  kind: fixed
+  title: Add to box selection
+  description: Keeps the current selection when a drag-selection box is released.
+  audience: player
+  availability: *id001
+  bindings:
+  - Shift
+  context: Releasing a tactical-map drag-selection box
+  _provenance:
+    source: code/display.cpp
+    guard: null
+- id: fixed:dropship-accept
+  route_id: fixed-dropship-accept
+  kind: fixed
+  title: Accept dropship loadout
+  description: Accepts the current dropship loadout and closes the pre-mission screen.
+  audience: player
+  availability: *id001
+  bindings:
+  - Space
+  context: Dropship loadout screen
+  _provenance:
+    source: code/dropship.cpp
+    guard: null
+- id: fixed:dismiss-multiplayer-score
+  route_id: fixed-dismiss-multiplayer-score
+  kind: fixed
+  title: Dismiss multiplayer score
+  description: Closes the multiplayer score screen after its prompt appears.
+  audience: player
+  availability: *id001
+  bindings:
+  - Left mouse button
+  - Escape
+  - Space
+  context: Multiplayer score screen
+  _provenance:
+    source: code/mpscore.cpp
+    guard: null
+- id: fixed:main-menu-version
+  route_id: fixed-main-menu-version
+  kind: fixed
+  title: Open version information
+  description: Opens the version dialog from the classic main menu.
+  audience: player
+  availability: *id001
+  bindings:
+  - Ctrl+V
+  context: Classic main menu
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: fixed:main-menu-credits
+  route_id: fixed-main-menu-credits
+  kind: fixed
+  title: Open credits
+  description: Opens the credits from the classic main menu.
+  audience: player
+  availability: *id001
+  bindings:
+  - Ctrl+Alt+C
+  context: Classic main menu
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: fixed:skip-credits
+  route_id: fixed-skip-credits
+  kind: fixed
+  title: Exit credits
+  description: Stops the credits and returns to the menu.
+  audience: player
+  availability: *id001
+  bindings:
+  - Escape
+  context: Credits
+  _provenance:
+    source: code/egos.cpp
+    guard: null
+- id: fixed:dismiss-mission-restatement
+  route_id: fixed-dismiss-mission-restatement
+  kind: fixed
+  title: Dismiss mission restatement
+  description: Closes the current mission-restatement page without selecting its video button.
+  audience: player
+  availability: *id001
+  bindings:
+  - Space
+  - Escape
+  context: Mission restatement
+  _provenance:
+    source: code/restate.cpp
+    guard: null
+- id: fixed:skip-vqa
+  route_id: fixed-skip-vqa
+  kind: fixed
+  title: Skip video
+  description: Stops a VQA when the caller permits user breakout; in a game against other machines it
+    casts this machine's vote to stop it.
+  audience: player
+  availability: *id001
+  bindings:
+  - Escape
+  context: VQA playback
+  _provenance:
+    source: code/movieskip.cpp
+    guard: null
+- id: fixed:skip-campaign-presentation
+  route_id: fixed-skip-campaign-presentation
+  kind: fixed
+  title: Skip campaign presentation
+  description: Stops the current World Domination Tour map presentation.
+  audience: player
+  availability: *id001
+  bindings:
+  - Escape
+  context: World Domination Tour campaign map
+  _provenance:
+    source: code/wdtsel.cpp
+    guard: null
+launch_options:
+- id: launch:help
+  route_id: help
+  kind: launch
+  title: Command-line help
+  description: Prints the built-in command-line summary and exits startup.
+  audience: developer
+  availability: *id001
+  syntax: -?
+  _provenance:
+    source: code/init.cpp
+    guard: null
+  aliases:
+  - /?
+  - -h
+  - /h
+- id: launch:playtest
+  route_id: playtest
+  kind: launch
+  title: Playtest mode
+  description: Enables the debug playtest flag.
+  audience: debug
+  availability: *id002
+  syntax: PLAYTEST
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:from-install
+  route_id: from-install
+  kind: launch
+  title: Installer launch
+  description: Marks startup as launched by the installer.
+  audience: developer
+  availability: *id001
+  syntax: FROMINSTALL
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:check-map
+  route_id: check-map
+  kind: launch
+  title: Map checking
+  description: Runs the map check every frame; the routine it calls has no body and always reports success,
+    so no map is examined.
+  audience: debug
+  availability: *id002
+  syntax: -CHECKMAP
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:data-directory
+  route_id: data-directory
+  kind: launch
+  title: Game data directory
+  description: Reads the game's data from the directory named, which the game never writes to.
+  audience: player
+  availability: *id001
+  syntax: -DATADIR=<path>
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:user-directory
+  route_id: user-directory
+  kind: launch
+  title: User data directory
+  description: Keeps the settings, saved games and other files the game writes in the directory named,
+    creating it when it is not there.
+  audience: player
+  availability: *id001
+  syntax: -USERDIR=<path>
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:spawn
+  route_id: spawn
+  kind: launch
+  title: Client launch
+  description: Launches the game SPAWN.INI describes, in place of the startup movies and the menu.
+  audience: player
+  availability: *id001
+  syntax: -SPAWN
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:tournament-time
+  route_id: tournament-time
+  kind: launch
+  title: Tournament time limit
+  description: Sets the tournament time limit.
+  audience: developer
+  availability: *id001
+  syntax: -TIME=<minutes>
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:multiplayer-debug
+  route_id: multiplayer-debug
+  kind: launch
+  title: Internet debug display
+  description: Enables the Internet debug display.
+  audience: debug
+  availability: *id001
+  syntax: -MPDEBUG
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:stealth
+  route_id: stealth
+  kind: launch
+  title: Network stealth mode
+  description: Enables network stealth mode.
+  audience: developer
+  availability: *id001
+  syntax: -STEALTH
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:attract
+  route_id: attract
+  kind: launch
+  title: Attract mode
+  description: Enables attract mode.
+  audience: developer
+  availability: *id001
+  syntax: -ATTRACT
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:resolution
+  route_id: resolution
+  kind: launch
+  title: Resolution
+  description: Sets the initial screen width and height.
+  audience: player
+  availability: *id001
+  syntax: -<width>X<height>
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:height-480
+  route_id: height-480
+  kind: launch
+  title: 480-pixel width
+  description: Sets the initial screen width to 480 pixels and leaves the height alone; the resolution
+    branch claims the argument before the case named after it is reached.
+  audience: player
+  availability: *id001
+  syntax: '-480'
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:windowed
+  route_id: windowed
+  kind: launch
+  title: Windowed mode
+  description: Enables windowed mode.
+  audience: player
+  availability: *id001
+  syntax: -WIN
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:exception-test
+  route_id: exception-test
+  kind: launch
+  title: Exception reporting test
+  description: Raises a chosen fault on purpose so that crash reporting can be checked without waiting
+    for a real crash. Accepts av-read, av-write, stack, purecall, terminate, invalidparam, fatal, worker,
+    sectionfault, wndproc, and timer.
+  audience: developer
+  availability: *id001
+  syntax: -EXCEPTIONTEST=<fault>
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:desync-test
+  route_id: desync-test
+  kind: launch
+  title: Out-of-sync test
+  description: Corrupts this machine's own game checksum once, on the first frame at or after the one
+    given, so that the out-of-sync report can be checked without waiting for a real divergence. The corruption
+    waits for the checksum comparison to start, so a frame inside the first 256 fires as soon as it does.
+  audience: developer
+  availability: *id001
+  syntax: -DESYNCTEST=<frame>
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:seed
+  route_id: seed
+  kind: launch
+  title: Random seed
+  description: Selects a custom random seed; the current parser does not advance past the option name
+    and resolves the suffix to zero.
+  audience: debug
+  availability: *id002
+  syntax: -SEED<number>
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:monochrome
+  route_id: monochrome
+  kind: launch
+  title: Monochrome debug display
+  description: Enables the monochrome debug display.
+  audience: debug
+  availability: *id002
+  syntax: -XM
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:inert
+  route_id: inert
+  kind: launch
+  title: Inert weapons
+  description: Enables inert weapons so units take no damage.
+  audience: debug
+  availability: *id002
+  syntax: -XI
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:speed-build
+  route_id: speed-build
+  kind: launch
+  title: Accelerated timers
+  description: Enables accelerated recharge and construction timers.
+  audience: debug
+  availability: *id002
+  syntax: -XH
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:record
+  route_id: record
+  kind: launch
+  title: Multiplayer recording
+  description: Enables multiplayer recording.
+  audience: debug
+  availability: *id002
+  syntax: -XX
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:playback
+  route_id: playback
+  kind: launch
+  title: Recording playback
+  description: Enables multiplayer recording playback.
+  audience: debug
+  availability: *id002
+  syntax: -XY
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:console-debug
+  route_id: console-debug
+  kind: launch
+  title: Console debug output
+  description: Opens the debug output console. Debug builds always open it; this option opens it in release
+    builds.
+  audience: developer
+  availability: *id001
+  syntax: -XC
+  _provenance:
+    source: code/init.cpp
+    guard: null
+- id: launch:event-debug
+  route_id: event-debug
+  kind: launch
+  title: Event and packet debug
+  description: Enables event and packet debug output.
+  audience: debug
+  availability: *id002
+  syntax: -XP
+  _provenance:
+    source: code/init.cpp
+    guard: _DEBUG
+- id: launch:quiet
+  route_id: quiet
+  kind: launch
+  title: Quiet mode
+  description: Enables quiet mode.
+  audience: developer
+  availability: *id001
+  syntax: -XQ
+  _provenance:
+    source: code/init.cpp
+    guard: null

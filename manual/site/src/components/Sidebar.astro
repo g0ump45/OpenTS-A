@@ -1,0 +1,429 @@
+---
+import { getCollection } from 'astro:content';
+import MobileMenuFooter from '@astrojs/starlight/components/MobileMenuFooter.astro';
+import SidebarPersister from '@astrojs/starlight/components/SidebarPersister.astro';
+import SidebarSublist from '@astrojs/starlight/components/SidebarSublist.astro';
+import { Icon } from '@astrojs/starlight/components';
+import type { StarlightRouteData } from '@astrojs/starlight/route-data';
+import { UI } from '../i18n/en.mjs';
+import { releases } from '../lib/data';
+import { withBase } from '../lib/paths';
+import { SYSTEM_CATEGORIES, SYSTEM_GROUPS } from '../lib/taxonomy';
+
+const { sidebar } = (Astro.locals as typeof Astro.locals & { starlightRoute: StarlightRouteData }).starlightRoute;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const pathname = base && Astro.url.pathname.startsWith(base)
+	? Astro.url.pathname.slice(base.length) || '/'
+	: Astro.url.pathname;
+
+interface ManualView {
+	id: string;
+	label: string;
+	href: string;
+	icon: 'rocket' | 'document' | 'setting' | 'open-book' | 'list-format' | 'puzzle' | 'clock';
+	paths: string[];
+}
+const viewBands: Array<{ label: string | undefined; views: ManualView[] }> = [
+	{
+		label: undefined,
+		views: [
+			{
+				id: 'start',
+				label: UI.navigation.start,
+				href: '/',
+				icon: 'rocket',
+				paths: [],
+			},
+		],
+	},
+	{
+		label: UI.navigation.bandModding,
+		views: [
+			{
+				id: 'using',
+				label: UI.navigation.using,
+				href: '/using/',
+				icon: 'document',
+				paths: ['/using/'],
+			},
+			{
+				id: 'systems',
+				label: UI.navigation.systems,
+				href: '/systems/',
+				icon: 'setting',
+				paths: ['/systems/'],
+			},
+			{
+				id: 'reference',
+				label: UI.navigation.reference,
+				href: '/reference/',
+				icon: 'document',
+				paths: ['/reference/', '/keys/'],
+			},
+			{
+				id: 'guides',
+				label: UI.navigation.guides,
+				href: '/guides/',
+				icon: 'open-book',
+				paths: ['/guides/'],
+			},
+			{
+				id: 'mapping',
+				label: UI.navigation.mapping,
+				href: '/mapping/',
+				icon: 'list-format',
+				paths: ['/mapping/'],
+			},
+			{
+				id: 'commands',
+				label: UI.navigation.commands,
+				href: '/commands/',
+				icon: 'setting',
+				paths: ['/commands/'],
+			},
+			{
+				id: 'formats',
+				label: UI.navigation.formats,
+				href: '/formats/',
+				icon: 'list-format',
+				paths: ['/formats/'],
+			},
+		],
+	},
+	{
+		label: UI.navigation.bandDevelopment,
+		views: [
+			{
+				id: 'internals',
+				label: UI.navigation.internals,
+				href: '/internals/',
+				icon: 'puzzle',
+				paths: ['/internals/'],
+			},
+		],
+	},
+	{
+		label: undefined,
+		views: [
+			{
+				id: 'changes',
+				label: UI.navigation.changes,
+				href: '/changes/',
+				icon: 'clock',
+				paths: ['/changes/'],
+			},
+		],
+	},
+];
+const views = viewBands.flatMap((band) => band.views);
+
+const activeView = views.find((view) => view.paths.some((path: string) => pathname.startsWith(path)));
+const activeViewId = activeView?.id ?? 'start';
+const localGroupLabel = activeView?.label ?? UI.navigation.start;
+const localGroup = sidebar.find((entry) => entry.type === 'group' && entry.label === localGroupLabel);
+const localSidebar = localGroup?.type === 'group' ? localGroup.entries : [];
+
+type SidebarEntry = StarlightRouteData['sidebar'][number];
+type SidebarLink = Extract<SidebarEntry, { type: 'link' }>;
+
+/* Detail routes that neither appear in the sidebar nor nest under the entry
+   that lists them. A key page belongs to every family it is read in, so the
+   complete key listing is the only entry that owns all of them. */
+const SECTION_ALIASES: Array<[string, string]> = [['/keys/', '/reference/all/']];
+
+const logicalHref = (href: string) =>
+	base && href.startsWith(base) ? href.slice(base.length) || '/' : href;
+const sidebarLinks = (entries: SidebarEntry[]): SidebarLink[] =>
+	entries.flatMap((entry) => (entry.type === 'link' ? [entry] : sidebarLinks(entry.entries)));
+
+/* Starlight opens and marks the entry for a page the sidebar lists. Generated
+   detail pages are not listed, so mark the entry that contains them instead. */
+const currentSection = (() => {
+	if (sidebarLinks(localSidebar).some((entry) => entry.isCurrent)) return undefined;
+	const here = pathname.endsWith('/') ? pathname : `${pathname}/`;
+	const alias = SECTION_ALIASES.find(([prefix]) => here.startsWith(prefix));
+	if (alias) return alias[1];
+	return sidebarLinks(localSidebar)
+		.map((entry) => logicalHref(entry.href))
+		.filter((href) => href.endsWith('/') && here !== href && here.startsWith(href))
+		.sort((left, right) => right.length - left.length)[0];
+})();
+
+function markSection(
+	entries: SidebarEntry[],
+	section: string,
+): { entries: SidebarEntry[]; found: boolean } {
+	let found = false;
+	const marked: SidebarEntry[] = entries.map((entry) => {
+		if (entry.type === 'link') {
+			if (logicalHref(entry.href) !== section) return entry;
+			found = true;
+			return { ...entry, attrs: { ...entry.attrs, 'aria-current': 'location' as const } };
+		}
+		const inner = markSection(entry.entries, section);
+		if (!inner.found) return entry;
+		found = true;
+		return { ...entry, collapsed: false, entries: inner.entries };
+	});
+	return { entries: marked, found };
+}
+
+const viewSidebar = currentSection
+	? markSection(localSidebar, currentSection).entries
+	: localSidebar;
+const systems = activeView?.id === 'systems'
+	? (await getCollection('systems')).sort((left, right) =>
+		left.data.title.localeCompare(right.data.title) || left.id.localeCompare(right.id))
+	: [];
+const systemCategoriesById = new Map(SYSTEM_CATEGORIES.map((category) => [category.id, category]));
+const systemNavigation = activeView?.id === 'systems' ? SYSTEM_GROUPS.map((group) => ({
+	...group,
+	categories: group.categories.map((categoryId) => {
+		const category = systemCategoriesById.get(categoryId);
+		if (!category) throw new Error(`System group ${group.id} names unknown category ${categoryId}`);
+		return {
+			...category,
+			entries: systems.filter((system) => system.data.category === category.id),
+		};
+	}).filter((category) => category.entries.length > 0),
+})) : [];
+const classifiedSystemIds = new Set(systemNavigation.flatMap((group) =>
+	group.categories.flatMap((category) => category.entries.map((entry) => entry.id))));
+const unclassifiedSystem = systems.find((system) => !classifiedSystemIds.has(system.id));
+if (unclassifiedSystem) {
+	throw new Error(`System ${unclassifiedSystem.id} is not assigned to a Features & systems sidebar category`);
+}
+const systemsIndexCurrent = pathname === '/systems' || pathname === '/systems/';
+const changesIndexCurrent = pathname === '/changes' || pathname === '/changes/';
+const releaseNav = releases();
+---
+
+<SidebarPersister>
+	<nav
+		class="manual-view-selector"
+		aria-label={UI.navigation.manualViews}
+		data-manual-view-selector
+		data-active-view={activeViewId}
+	>
+		{
+			viewBands.map((band) => (
+				<>
+					{band.label && <p class="manual-view-band">{band.label}</p>}
+					{band.views.map((view) => (
+						<a
+							href={withBase(view.href)}
+							class:list={{ active: activeViewId === view.id }}
+							aria-current={activeViewId === view.id ? 'true' : undefined}
+						>
+							<Icon name={view.icon} size="1.15rem" />
+							<span>{view.label}</span>
+						</a>
+					))}
+				</>
+			))
+		}
+	</nav>
+
+	<nav
+		class="manual-view-nav"
+		aria-label={UI.navigation.inThisView}
+		data-manual-view-nav={activeViewId}
+	>
+		{activeView?.id === 'changes' ? (
+			<div class="manual-release-nav">
+				<ul>
+					<li>
+						<a
+							href={withBase('/changes/')}
+							aria-current={changesIndexCurrent ? 'page' : undefined}
+						><span>{UI.navigation.browseChanges}</span></a>
+					</li>
+				</ul>
+				<p>{UI.navigation.versions}</p>
+				<ul>
+					{releaseNav.map((release) => (
+						<li>
+							<a href={withBase('/changes/') + '#release-' + release.version}>
+								<span>{release.version}</span>
+								<small>{release.status === 'development' ? UI.navigation.development : release.date}</small>
+							</a>
+							<ul>
+								<li>
+									<a
+										href={withBase(`/changes/${release.version}/`)}
+										aria-current={pathname === `/changes/${release.version}` || pathname === `/changes/${release.version}/` ? 'page' : undefined}
+									><span>{UI.navigation.upgradeGuide}</span></a>
+								</li>
+							</ul>
+						</li>
+					))}
+				</ul>
+			</div>
+		) : activeView?.id === 'systems' ? (
+			<ul class="manual-systems-tree" data-system-navigation>
+				<li>
+					<a
+						href={withBase('/systems/')}
+						aria-current={systemsIndexCurrent ? 'page' : undefined}
+						data-system-nav-kind="overview"
+						data-system-nav-id="overview"
+					>{UI.navigation.overview}</a>
+				</li>
+				{systemNavigation.map((group) => (
+					<li>
+						<a
+							href={withBase(`/systems/#${group.id}`)}
+							data-system-nav-kind="group"
+							data-system-nav-id={group.id}
+						>{group.title}</a>
+						{group.categories.length > 0 && (
+							<ul>
+								{group.categories.map((category) => (
+									<li>
+										<a
+											href={withBase(`/systems/#category-${category.id}`)}
+											data-system-nav-kind="category"
+											data-system-nav-id={category.id}
+										>{category.title}</a>
+										<ul>
+											{category.entries.map((entry) => (
+												<li>
+													<a
+														href={withBase(`/systems/${entry.id}/`)}
+														aria-current={pathname === `/systems/${entry.id}` || pathname === `/systems/${entry.id}/` ? 'page' : undefined}
+														data-system-nav-kind="system"
+														data-system-nav-id={entry.id}
+													>{entry.data.title}</a>
+												</li>
+											))}
+										</ul>
+									</li>
+								))}
+							</ul>
+						)}
+					</li>
+				))}
+			</ul>
+		) : (
+			<SidebarSublist sublist={viewSidebar} nested />
+		)}
+	</nav>
+</SidebarPersister>
+
+<div class="md:sl-hidden">
+	<MobileMenuFooter />
+</div>
+
+<style>
+	@layer starlight.core {
+		.manual-view-selector {
+			display: grid;
+			gap: 0.2rem;
+			margin-block-end: 1.35rem;
+			border: 1px solid var(--sl-color-hairline);
+			border-radius: 0.85rem;
+			background: var(--sl-color-bg-nav);
+			padding: 0.35rem;
+		}
+
+		.manual-view-selector a {
+			display: flex;
+			align-items: center;
+			gap: 0.7rem;
+			min-height: 2.45rem;
+			border: 1px solid transparent;
+			border-radius: 0.55rem;
+			padding: 0.45rem 0.65rem;
+			color: var(--sl-color-gray-2);
+			font-weight: 600;
+			line-height: 1.2;
+			text-decoration: none;
+		}
+
+		.manual-view-selector a:hover,
+		.manual-view-selector a:focus-visible {
+			color: var(--sl-color-white);
+			background: var(--sl-color-gray-6);
+		}
+
+		.manual-view-selector a.active {
+			border-color: var(--sl-color-hairline-light);
+			color: var(--sl-color-white);
+			background: var(--sl-color-gray-6);
+		}
+
+		.manual-view-selector a.active :global(svg) {
+			color: var(--sl-color-text-accent);
+		}
+
+		.manual-view-band {
+			margin: 0.5rem 0 0.1rem 0.65rem;
+			color: var(--sl-color-gray-3);
+			font-size: 0.68rem;
+			font-weight: 700;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+		}
+
+
+		.manual-systems-tree,
+		.manual-systems-tree ul {
+			margin: 0;
+			padding: 0;
+			list-style: none;
+		}
+
+		.manual-systems-tree li {
+			overflow-wrap: anywhere;
+		}
+
+		.manual-systems-tree > li + li {
+			margin-top: 0.5rem;
+		}
+
+		.manual-systems-tree ul {
+			margin-inline-start: 0.5rem;
+			border-inline-start: 1px solid var(--sl-color-hairline-light);
+			padding-inline-start: 0.5rem;
+		}
+
+		.manual-systems-tree a {
+			display: block;
+			border-radius: 0.25rem;
+			padding: 0.3em 0.5rem;
+			color: var(--sl-color-gray-2);
+			font-size: var(--sl-text-sm);
+			line-height: 1.4;
+			text-decoration: none;
+		}
+
+		.manual-systems-tree a[data-system-nav-kind='group'],
+		.manual-systems-tree a[data-system-nav-kind='category'] {
+			color: var(--sl-color-white);
+			font-weight: 600;
+		}
+
+		.manual-systems-tree a:hover,
+		.manual-systems-tree a:focus {
+			color: var(--sl-color-white);
+		}
+
+		.manual-systems-tree a[aria-current='page'] {
+			color: var(--sl-color-text-invert);
+			background-color: var(--sl-color-text-accent);
+			font-weight: 600;
+		}
+		.manual-view-nav {
+			padding-inline: 0.15rem;
+		}
+
+		/* The entry that contains the open page, marked when the page itself is
+		   not a sidebar entry. It is not the current page and is not styled as
+		   one. */
+		.manual-view-nav :global(a[aria-current='location']) {
+			color: var(--sl-color-text-accent);
+			font-weight: 600;
+		}
+
+	}
+</style>

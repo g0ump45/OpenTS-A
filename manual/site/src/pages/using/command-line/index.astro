@@ -1,0 +1,26 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import CommandIndex from '../../../components/CommandIndex.astro';
+import Feedback from '../../../components/Feedback.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { allCommands } from '../../../lib/commands';
+
+const records = allCommands().filter((record) => record.kind === 'launch');
+---
+
+<StarlightPage frontmatter={{ title: 'Command line options', description: 'Options accepted on the OpenTS command line.', tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.using, href: '/using/' },
+		{ label: UI.navigation.commandLine },
+	]} />
+	<p class="ots-lede">Options accepted on the command line.</p>
+	<CommandIndex
+		records={records}
+		noun="options"
+		subjectHeader="Option"
+		invocationHeader="Syntax"
+		searchPlaceholder="Option, switch, description…"
+	/>
+	<Feedback title="Command line options" path="/using/command-line/" />
+</StarlightPage>

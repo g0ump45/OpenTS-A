@@ -1,0 +1,107 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/command-adapters.schema.json",
+  "title": "OpenTS direct-control and launch-option adapters",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["fixed_controls", "fixed_exclusions", "launch_options", "launch_exclusions"],
+  "properties": {
+    "fixed_controls": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/fixedControl" }
+    },
+    "fixed_exclusions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/exclusion" }
+    },
+    "launch_options": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/launchOption" }
+    },
+    "launch_exclusions": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/exclusion" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "builds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "enum": ["release", "debug"] }
+    },
+    "site": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "function", "expression"],
+      "properties": {
+        "file": { "type": "string", "pattern": "^code/[^/].*\\.(?:c|cc|cpp|cxx|h|hh|hpp|hxx|inl)$" },
+        "function": { "$ref": "#/$defs/nonEmptyString" },
+        "expression": { "$ref": "#/$defs/nonEmptyString" },
+        "guard": { "type": ["string", "null"] }
+      }
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["builds"],
+      "properties": {
+        "builds": { "$ref": "#/$defs/builds" }
+      }
+    },
+    "fixedControl": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "description", "audience", "bindings", "context", "availability", "sites"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^fixed:[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "audience": { "enum": ["player", "developer", "debug"] },
+        "bindings": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "context": { "$ref": "#/$defs/nonEmptyString" },
+        "availability": { "$ref": "#/$defs/availability" },
+        "sites": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/site" } }
+      }
+    },
+    "launchOption": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "title", "syntax", "description", "audience", "availability", "sites"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^launch:[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "syntax": { "$ref": "#/$defs/nonEmptyString" },
+        "aliases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "description": { "$ref": "#/$defs/nonEmptyString" },
+        "audience": { "enum": ["player", "developer", "debug"] },
+        "availability": { "$ref": "#/$defs/availability" },
+        "sites": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/site" } }
+      }
+    },
+    "exclusion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason"],
+      "oneOf": [
+        { "required": ["site"] },
+        { "required": ["sites"] }
+      ],
+      "properties": {
+        "site": { "$ref": "#/$defs/site" },
+        "sites": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/site" } },
+        "reason": { "$ref": "#/$defs/nonEmptyString" }
+      }
+    }
+  }
+}

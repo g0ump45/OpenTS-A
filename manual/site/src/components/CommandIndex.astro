@@ -1,0 +1,112 @@
+---
+import { UI } from '../i18n/en.mjs';
+import type { CommandAudience, CommandRecord } from '../lib/commands';
+import { commandRoute } from '../lib/commands';
+import { withBase } from '../lib/paths';
+
+interface Props {
+	records: CommandRecord[];
+	/** Plural noun for the filter label and empty state ("commands", "controls", "options"). */
+	noun?: string;
+	subjectHeader?: string;
+	audiences?: CommandAudience[];
+	invocationHeader?: string;
+	searchPlaceholder?: string;
+}
+const {
+	records,
+	noun = 'commands',
+	subjectHeader = UI.commands.subject,
+	audiences = ['player', 'developer', 'debug'],
+	invocationHeader = 'Binding or syntax',
+	searchPlaceholder = UI.commands.placeholder,
+} = Astro.props;
+const rows = [...records].sort((left, right) =>
+	left.title.localeCompare(right.title) || left.id.localeCompare(right.id));
+
+const invocation = (record: CommandRecord) => {
+	if (record.kind === 'registered') return record.forced_binding ?? 'KEYBOARD.INI';
+	if (record.kind === 'fixed') return record.bindings.join(', ');
+	return record.syntax;
+};
+---
+
+<div class="ots-reference ots-filter-table" data-command-index>
+	<div class="ots-reference-controls">
+		<label>
+			<span>{UI.commands.filter(noun)}</span>
+			<input type="search" data-command-query placeholder={searchPlaceholder} autocomplete="off" />
+		</label>
+		<label>
+			<span>{UI.commands.audience}</span>
+			<select data-command-audience>
+				<option value="">{UI.commands.allAudiences}</option>
+				{audiences.map((audience) => <option value={audience}>{UI.commandAudiences[audience]}</option>)}
+			</select>
+		</label>
+		<p class="ots-result-count" aria-live="polite"><strong data-command-count>{rows.length}</strong> {UI.commands.of} {rows.length}</p>
+	</div>
+	<div class="ots-tablewrap">
+		<table>
+			<thead><tr><th>{subjectHeader}</th><th>{invocationHeader}</th><th>{UI.commands.description}</th><th>{UI.commands.debugOnly}</th></tr></thead>
+			<tbody>
+				{rows.map((record) => (
+					<tr
+						data-row
+						data-audience={record.audience}
+						data-search={`${record.kind === 'registered' ? `${record.id} ` : ''}${record.title} ${record.description} ${invocation(record)}`.toLowerCase()}
+					>
+						<td data-label={subjectHeader}><div class="ots-reference-key"><a href={withBase(commandRoute(record))}>{record.title}</a>{record.kind === 'registered' && <small><code>{record.id}</code></small>}</div></td>
+						<td data-label={invocationHeader}><code>{invocation(record)}</code></td>
+						<td data-label={UI.commands.description}>{record.description || UI.commands.noDescription}</td>
+						<td data-label={UI.commands.debugOnly}>{record.availability.builds.includes('release') ? '' : 'Yes'}</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+	<p class="ots-empty" data-command-empty hidden>{UI.commands.noMatches(noun)}</p>
+</div>
+
+<script>
+	import { cleanParam } from '../lib/filter-params.mjs';
+
+	function initializeCommandIndexes() {
+		for (const root of document.querySelectorAll('[data-command-index]')) {
+			if (root.hasAttribute('data-ready')) continue;
+			root.setAttribute('data-ready', '');
+			const query = root.querySelector('[data-command-query]');
+			const audience = root.querySelector('[data-command-audience]');
+			const count = root.querySelector('[data-command-count]');
+			const empty = root.querySelector('[data-command-empty]');
+			const rows = [...root.querySelectorAll('[data-row]')];
+			const params = new URLSearchParams(location.search);
+			if (query instanceof HTMLInputElement) query.value = params.get('q') ?? '';
+			if (audience instanceof HTMLSelectElement) audience.value = cleanParam(params, 'audience');
+
+			const apply = () => {
+				const queryValue = query instanceof HTMLInputElement ? query.value.trim().toLowerCase() : '';
+				const audienceValue = audience instanceof HTMLSelectElement ? audience.value : '';
+				let visible = 0;
+				for (const row of rows) {
+					const show = (!queryValue || row.getAttribute('data-search')?.includes(queryValue))
+						&& (!audienceValue || row.getAttribute('data-audience') === audienceValue);
+					row.toggleAttribute('hidden', !show);
+					if (show) visible++;
+				}
+				if (count) count.textContent = String(visible);
+				if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+				const next = new URLSearchParams(location.search);
+				for (const [name, value] of [['q', queryValue], ['audience', audienceValue]]) {
+					value ? next.set(name, value) : next.delete(name);
+				}
+				history.replaceState(null, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
+			};
+			query?.addEventListener('input', apply);
+			audience?.addEventListener('change', apply);
+			apply();
+		}
+	}
+	document.addEventListener('astro:page-load', initializeCommandIndexes);
+	initializeCommandIndexes();
+</script>

@@ -1,0 +1,27 @@
+- type: key
+  id: OldExample
+  route: /keys/oldexample/
+  search_aliases:
+    - OldExample
+  replacement:
+    type: key
+    id: AARatio
+  summary: Synthetic removed-key record used only by the fixture build.
+- type: system
+  id: OldSystem
+  route: /systems/old-system/
+  search_aliases:
+    - OldSystem
+  replacement:
+    type: system
+    id: drop-pods
+  summary: Synthetic removed-system record used only by the fixture build.
+- type: command
+  id: OldCommand
+  route: /commands/old-command/
+  search_aliases:
+    - OldCommand
+  replacement:
+    type: command
+    id: Follow
+  summary: Synthetic removed-command record used only by the fixture build.

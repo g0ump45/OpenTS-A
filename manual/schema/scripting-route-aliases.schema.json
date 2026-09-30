@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/scripting-route-aliases.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["actions", "events", "missions"],
+  "properties": {
+    "actions": { "$ref": "#/$defs/actionAliases" },
+    "events": { "$ref": "#/$defs/eventAliases" },
+    "missions": { "$ref": "#/$defs/missionAliases" }
+  },
+  "$defs": {
+    "actionAliases": {
+      "type": "object",
+      "propertyNames": { "pattern": "^(0|[1-9][0-9]*)$" },
+      "additionalProperties": { "type": "string", "pattern": "^TACTION_[A-Z0-9_]+$" }
+    },
+    "eventAliases": {
+      "type": "object",
+      "propertyNames": { "pattern": "^(0|[1-9][0-9]*)$" },
+      "additionalProperties": { "type": "string", "pattern": "^TEVENT_[A-Z0-9_]+$" }
+    },
+    "missionAliases": {
+      "type": "object",
+      "propertyNames": { "pattern": "^(0|[1-9][0-9]*)$" },
+      "additionalProperties": { "type": "string", "pattern": "^TMISSION_[A-Z0-9_]+$" }
+    }
+  }
+}

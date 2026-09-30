@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import KeyDetail from '../../components/KeyDetail.astro';
+import TombstoneDetail from '../../components/TombstoneDetail.astro';
+import {
+	allKeys,
+	tombstones,
+	validateProse,
+	type KeyRecord,
+	type TombstoneRecord,
+} from '../../lib/data';
+import { requireRouteTail } from '../../lib/paths';
+
+export async function getStaticPaths() {
+	const [prose, guides, systems] = await Promise.all([
+		getCollection('keyprose'),
+		getCollection('guides'),
+		getCollection('systems'),
+	]);
+	validateProse(prose, {
+		guides: new Set(guides.map((entry) => entry.id)),
+		systems: new Set(systems.map((entry) => entry.id)),
+	});
+	return [
+		...[...allKeys().values()].map((record) => ({
+			params: { slug: record.route_id },
+			props: { kind: 'active' as const, record },
+		})),
+		...tombstones().filter((record) => record.type === 'key').map((record) => ({
+			params: { slug: requireRouteTail(record.route, `Key tombstone ${record.id}`) },
+			props: { kind: 'removed' as const, record },
+		})),
+	];
+}
+
+type Props =
+	| { kind: 'active'; record: KeyRecord }
+	| { kind: 'removed'; record: TombstoneRecord };
+const props = Astro.props as Props;
+---
+
+{props.kind === 'active'
+	? <KeyDetail record={props.record} />
+	: <TombstoneDetail record={props.record} />}

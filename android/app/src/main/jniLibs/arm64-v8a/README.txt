@@ -1,0 +1,1 @@
+Copy libGame.so and libLanguage.so from build-android/lib/ here

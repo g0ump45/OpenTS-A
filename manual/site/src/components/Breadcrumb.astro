@@ -1,0 +1,27 @@
+---
+import { withBase } from '../lib/paths';
+
+export interface Crumb {
+	label: string;
+	/** Omit for a plain, non-linked crumb (a category or the current page). */
+	href?: string;
+	/** Render the label in code style (IDs, filenames). */
+	code?: boolean;
+}
+interface Props {
+	crumbs: Crumb[];
+	class?: string;
+}
+const { crumbs, class: className } = Astro.props;
+---
+
+<p class:list={['ots-breadcrumb', className]}>
+	{crumbs.map((crumb, index) => (
+		<>
+			{index > 0 && <span class="ots-crumb-separator" aria-hidden="true">·</span>}
+			{crumb.href
+				? <a href={withBase(crumb.href)}>{crumb.code ? <code>{crumb.label}</code> : crumb.label}</a>
+				: (crumb.code ? <code>{crumb.label}</code> : crumb.label)}
+		</>
+	))}
+</p>

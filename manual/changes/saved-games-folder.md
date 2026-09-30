@@ -1,0 +1,21 @@
+---
+title: Keep saved games in a folder of their own
+category: feature
+release: 0.2.0
+targets:
+- type: format
+  id: save-games
+  effect: changed
+credit: [ZivDero, Rampastring]
+---
+
+Saved games now live in a `Saved Games` folder, beside the game or inside the user data
+directory when one is named. Every save, load, listing and deletion names that folder, and
+the settings the random map generator saves keep to it too.
+
+Saves made by earlier builds sit beside the game, or in the user data directory when one is
+named, and are no longer listed; moving the files into `Saved Games` restores them.
+
+After a load, the campaign difficulty now comes from the save rather than the menu setting.
+
+Rampastring is credited for the ts-patches patch of the same name.

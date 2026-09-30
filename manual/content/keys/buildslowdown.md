@@ -1,0 +1,10 @@
+---
+key: BuildSlowdown
+summary: Parsed flag that the engine never uses.
+no_effect: true
+see_also: ["system:production"]
+when_omitted:
+  kind: value
+  value: "no"
+  note: The difficulty block is re-read from fixed defaults whenever its section is present, so a later file that carries the section without this key restores no rather than keeping the earlier value.
+---

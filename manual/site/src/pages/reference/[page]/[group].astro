@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Feedback from '../../../components/Feedback.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import { UI } from '../../../i18n/en.mjs';
+import {
+	exceptionSummary,
+	REFERENCE_PAGES,
+	referenceSections,
+} from '../../../lib/data';
+import { referenceTableRows } from '../../../lib/reference-rows';
+import { sectionSelectorLabel } from '../../../lib/section-selector.mjs';
+
+export async function getStaticPaths() {
+	const pages = Object.keys(REFERENCE_PAGES) as Array<keyof typeof REFERENCE_PAGES>;
+	return pages.flatMap((page) =>
+		referenceSections(page).map((group) => ({ params: { page, group: group.slug }, props: { group } })),
+	);
+}
+
+const requestedPage = Astro.params.page;
+if (!requestedPage || !(requestedPage in REFERENCE_PAGES)) {
+	throw new Error(`Unknown reference family: ${requestedPage ?? '<missing>'}`);
+}
+const page = requestedPage as keyof typeof REFERENCE_PAGES;
+const { group } = Astro.props;
+const meta = REFERENCE_PAGES[page];
+const title = group.displayTitle ?? group.title;
+const firstRow = group.rows[0];
+if (!firstRow) throw new Error(`Reference group ${page}/${group.slug} has no rows`);
+const sectionLabel = sectionSelectorLabel(firstRow.scope.section);
+const breadcrumbLabel = page === 'other' ? sectionLabel : (group.displayTitle ?? group.title);
+const prose = await getCollection('keyprose');
+const rows = referenceTableRows(group.rows, prose, {
+	context: `Reference group ${page}/${group.slug}`,
+	detail: (row) => row.except?.length ? exceptionSummary(row.except) : undefined,
+	searchContext: (row) => `${row.scope.applies_to.join(' ')} ${sectionSelectorLabel(row.scope.section)}`,
+});
+---
+
+<StarlightPage frontmatter={{ title, description: `${meta.title} INI settings grouped under ${title}. Section ${sectionLabel}.`, tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: meta.title, href: `/reference/${page}/` },
+		...(group.fileLabel ? [{ label: group.fileLabel, code: true }] : []),
+		{ label: breadcrumbLabel },
+	]} />
+	<p class="ots-lede">Settings read from <code>{sectionLabel}</code>.</p>
+	<ReferenceTable rows={rows} showImageFilter={page === 'art'} />
+	<Feedback title={`${meta.title}: ${title}`} path={`/reference/${page}/${group.slug}/`} />
+</StarlightPage>

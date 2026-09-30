@@ -1,0 +1,77 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import EnumValueTable from '../../../components/EnumValueTable.astro';
+import Feedback from '../../../components/Feedback.astro';
+import LifecycleHistory from '../../../components/LifecycleHistory.astro';
+import RelatedResources from '../../../components/RelatedResources.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { allKeys, triggersByKind } from '../../../lib/data';
+import { historyHeading } from '../../../lib/lifecycle';
+import { withBase } from '../../../lib/paths';
+import { relatedResourcesFor } from '../../../lib/related';
+import { siteConfig, sourceFileUrl } from '../../../lib/site-config.mjs';
+
+export async function getStaticPaths() {
+	return (await getCollection('enums')).map((entry) => ({
+		params: { slug: entry.data.slug },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const keyTypes = new Set(entry.data.bindings.key_value_types);
+const parameterTypes = new Set(entry.data.bindings.scripting_parameter_types);
+const keyUses = [...allKeys().values()].filter((record) => record.scopes.some((scope) => keyTypes.has(scope.value_type)));
+const scriptingUses = ['actions', 'events', 'missions'].flatMap((kind) =>
+	triggersByKind(kind)
+		.filter((record) => record.parameters.some((parameter) => parameterTypes.has(parameter.type)))
+		.map((record) => ({ record, href: `/mapping/${record.kind}/${record.route_id}/` })),
+);
+const revision = siteConfig.revision;
+const related = await relatedResourcesFor(
+	{ type: 'enum', id: entry.data.enum_id },
+	[],
+	`Enum ${entry.data.enum_id}`,
+);
+const pageHeadings = [
+	...headings,
+	{ depth: 2, slug: 'values', text: 'Values' },
+	{ depth: 2, slug: 'used-by', text: 'Used by' },
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+	{ depth: 2, slug: 'source-files', text: 'Source files' },
+	...historyHeading(await getCollection('changes'), { type: 'enum', id: entry.data.enum_id }),
+];
+---
+
+<StarlightPage frontmatter={{ title: entry.data.title, description: entry.data.summary }} headings={pageHeadings}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: UI.navigation.enums, href: '/reference/enums/' },
+		{ label: entry.data.enum_id, code: true },
+	]} />
+	<LifecycleHistory reference={{ type: 'enum', id: entry.data.enum_id }} showHistory={false} />
+	<p class="ots-lede">{entry.data.summary}</p>
+	<dl class="ots-inline-contract">
+		<dt>Engine enum</dt><dd><code>{entry.data.enum_id}</code></dd>
+		<dt>Input form</dt><dd>{entry.data.representation === 'token' ? 'Named token' : 'Integer'}</dd>
+	</dl>
+	<Content />
+	<h2 id="values">Values</h2>
+	<EnumValueTable values={entry.data.values} />
+	<h2 id="used-by">Used by</h2>
+	{keyUses.length + scriptingUses.length > 0 ? (
+		<ul class="ots-enum-uses">
+			{keyUses.map((record) => <li><a href={withBase(`/keys/${record.route_id}/`)}><code>{record.key}</code></a> INI key</li>)}
+			{scriptingUses.map(({ record, href }) => <li><a href={withBase(href)}>{record.editor_name}</a> <code>{record.id}</code></li>)}
+		</ul>
+	) : <p>No current public key or scripting parameter binds to this enum.</p>}
+	<RelatedResources resources={related} />
+	<h2 id="source-files">Source files</h2>
+	<p class="ots-source-revision">Linked at revision <code data-pagefind-ignore>{revision.slice(0, 12)}</code>.</p>
+	<ul class="ots-source-files">{entry.data.source_files.map((path) => <li><a href={sourceFileUrl(path)}><code>{path}</code></a></li>)}</ul>
+	<LifecycleHistory reference={{ type: 'enum', id: entry.data.enum_id }} showBadges={false} />
+	<Feedback title={entry.data.title} path={`/reference/enums/${entry.data.slug}/`} />
+</StarlightPage>

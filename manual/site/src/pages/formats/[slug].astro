@@ -1,0 +1,27 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import FormatPage from '../../components/FormatPage.astro';
+import TombstoneDetail from '../../components/TombstoneDetail.astro';
+import { allFormats } from '../../lib/formats';
+import { requireRouteTail } from '../../lib/paths';
+import { tombstones, type TombstoneRecord } from '../../lib/data';
+
+export async function getStaticPaths() {
+	const entries = await getCollection('formats');
+	const active = entries.flatMap((entry) => {
+		const format = allFormats().get(entry.data.format_id);
+		if (!format || !format.route.startsWith('/formats/')) return [];
+		return [{ params: { slug: requireRouteTail(format.route, `Format ${format.format_id}`) }, props: { entry } }];
+	});
+	const removed = tombstones().filter((record) => record.type === 'format' && record.route.startsWith('/formats/')).map((record) => ({
+		params: { slug: requireRouteTail(record.route, `Format tombstone ${record.id}`) },
+		props: { removed: record },
+	}));
+	return [...active, ...removed];
+}
+
+const { entry, removed } = Astro.props as { entry?: CollectionEntry<'formats'>; removed?: TombstoneRecord };
+if (!entry && !removed) throw new Error('Format route is missing an active record or tombstone');
+---
+
+{removed ? <TombstoneDetail record={removed} /> : entry ? <FormatPage entry={entry} /> : null}

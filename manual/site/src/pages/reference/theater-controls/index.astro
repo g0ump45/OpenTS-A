@@ -1,0 +1,36 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Feedback from '../../../components/Feedback.astro';
+import FileReferenceTable from '../../../components/FileReferenceTable.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { referenceRowsForFile } from '../../../lib/data';
+import { sectionSelectorKey } from '../../../lib/section-selector.mjs';
+
+const rows = referenceRowsForFile('theater control file');
+const general = rows.filter((row) => sectionSelectorKey(row.scope.section) === 'literal:General');
+const tileSets = rows.filter((row) => sectionSelectorKey(row.scope.section) === 'identifier:tile-set');
+if (rows.length !== 81 || general.length !== 66 || tileSets.length !== 15) {
+	throw new Error(
+		`Theater control reference expected 81 scopes (66 General, 15 TileSet); found ${rows.length} (${general.length} General, ${tileSets.length} TileSet)`,
+	);
+}
+---
+
+<StarlightPage frontmatter={{ title: 'Theater controls', description: 'Theater-control settings for global tile indexes and individual TileSet definitions.', tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: UI.navigation.theaterControls },
+	]} />
+	<p class="ots-lede">Settings read from the active theater's control INI file.</p>
+
+	<h2 id="general"><code>[General]</code></h2>
+	<p>Global indexes identify theater tile sets used for terrain transitions, roads, cliffs, bridges, tunnels, and related map structures.</p>
+	<FileReferenceTable file="theater control file" section="literal:General" />
+
+	<h2 id="tile-set-id"><code>{'[<TileSet ID>]'}</code></h2>
+	<p>Each TileSet section defines its file stem, tile range, placement flags, and theater transitions.</p>
+	<FileReferenceTable file="theater control file" section="identifier:tile-set" />
+
+	<Feedback title="Theater controls" path="/reference/theater-controls/" />
+</StarlightPage>

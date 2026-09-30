@@ -1,0 +1,78 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Badge } from '@astrojs/starlight/components';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Feedback from '../../../components/Feedback.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { entityHref, entityLabel, releases } from '../../../lib/data';
+import { withBase } from '../../../lib/paths';
+
+export async function getStaticPaths() {
+	const fragments = await getCollection('changes');
+	return releases().map((release) => ({
+		params: { release: release.version },
+		props: {
+			release,
+			items: fragments
+				.filter((entry) => entry.data.release === release.version)
+				.sort((left, right) => left.data.title.localeCompare(right.data.title)),
+		},
+	}));
+}
+
+const { release, items } = Astro.props;
+const breaking = items.filter((entry) => entry.data.breaking);
+const allChangesHref = withBase(`/changes/#release-${release.version}`);
+---
+
+<StarlightPage
+	frontmatter={{
+		title: `Upgrade to ${release.version}`,
+		description: `Migration steps for breaking OpenTS changes in ${release.version}.`,
+		tableOfContents: false,
+	}}
+>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.changes, href: '/changes/' },
+		{ label: release.version },
+	]} />
+	<p>
+		{release.status === 'development'
+			? <Badge text="In development" variant="caution" size="small" />
+			: <Badge text="Released" variant="success" size="small" />}
+		{release.date && <> <time datetime={release.date}>{release.date}</time></>}
+	</p>
+
+	{breaking.length === 0 ? (
+		<p>This version has no recorded migration steps.</p>
+	) : (
+		<>
+			<p>
+				{breaking.length} {breaking.length === 1 ? 'change requires' : 'changes require'}{' '}
+				migration before existing content is used with this version.
+			</p>
+			{breaking.map((entry) => (
+				<section>
+					<h2><a href={withBase(`/changes/${entry.id}/`)}>{entry.data.title}</a></h2>
+					<ol>
+						{entry.data.migration.map((step) => <li>{step}</li>)}
+					</ol>
+					{entry.data.targets.length > 0 && (
+						<p>
+							Affected: {entry.data.targets.map((target, index) => {
+								const href = entityHref(target);
+								return <>{index > 0 && ', '}{href
+									? <a href={withBase(href)}><code>{entityLabel(target)}</code></a>
+									: <code>{entityLabel(target)}</code>}</>;
+							})}
+						</p>
+					)}
+				</section>
+			))}
+		</>
+	)}
+
+	<p><a href={allChangesHref}>View all changes for {release.version}</a></p>
+	<Feedback title={`Upgrade to ${release.version}`} path={`/changes/${release.version}/`} />
+</StarlightPage>

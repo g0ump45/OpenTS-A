@@ -1,0 +1,10 @@
+---
+key: ChainReaction
+summary: Whether damage to the overlay's cell can set off the Tiberium standing there.
+see_also: ["system:tiberium", "Tiberium", "Power"]
+when_omitted:
+  kind: value
+  value: "no"
+---
+
+The detonation is drawn from the Tiberium in the cell rather than from the overlay itself, and it runs only when that cell holds Tiberium at the second growth stage or higher: see [Damage](/systems/tiberium/#damage). For a [`Tiberium=yes`](/keys/tiberium/#scope-overlaytype) overlay the triggering warhead must also declare [`Tiberium=yes`](/keys/tiberium/#scope-warheadtype) — though a sonic wave sets the reaction off with no warhead check at all. A chain-reactive overlay that is not Tiberium does not detonate by carrying the flag alone; the reaction needs Tiberium in the cell. A Tiberium cell also loses one growth stage for every ten points of damage that reached it, whether or not the detonation itself went off.

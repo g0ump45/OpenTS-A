@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import Feedback from '../../components/Feedback.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import { UI } from '../../i18n/en.mjs';
+import { allKeys, applicabilitySummary, effectForKey, referenceFamily, summarizeWhenOmitted } from '../../lib/data';
+import { sectionSelectorLabel } from '../../lib/section-selector.mjs';
+import { withBase } from '../../lib/paths';
+
+const prose = await getCollection('keyprose');
+const summaries = new Map<string, string>(
+	prose.flatMap((entry) => !entry.data.scope && entry.data.summary
+		? [[entry.data.key, entry.data.summary] as [string, string]]
+		: []),
+);
+const rows = [...allKeys().values()].map((record) => {
+	const families = [...new Set(record.scopes.map(referenceFamily))];
+	return {
+		key: record.key,
+		href: withBase(`/keys/${record.route_id}/`),
+		summary: summaries.get(record.key),
+		value: [...new Set(record.scopes.map((item) => item.value_type))].join(' / '),
+		whenOmitted: summarizeWhenOmitted(prose, record),
+		effect: effectForKey(prose, record),
+		facet: families.length === 1 ? families[0] : 'multiple',
+		context: applicabilitySummary(
+			record.scopes.flatMap((item) => item.applies_to),
+			record.scopes.length === 1 ? record.scopes[0].level : '',
+		),
+		searchContext: record.scopes.flatMap((item) => [
+			...item.applies_to,
+			sectionSelectorLabel(item.section),
+		]).join(' '),
+	};
+});
+---
+
+<StarlightPage frontmatter={{ title: 'All INI keys', description: 'Search OpenTS INI settings by key, description, value type, section, or file family.', tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: UI.navigation.allKeys },
+	]} />
+	<p class="ots-lede">Every accepted INI key, searchable by name, description, value type, section, and file family.</p>
+	<ReferenceTable rows={rows} facetLabel="Family" />
+	<Feedback title="All INI keys" path="/reference/all/" />
+</StarlightPage>

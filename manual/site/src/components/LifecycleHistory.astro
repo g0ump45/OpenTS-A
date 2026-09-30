@@ -1,0 +1,71 @@
+---
+import { getCollection } from 'astro:content';
+import {
+	releaseByVersion,
+	type EntityReference,
+} from '../lib/data';
+import {
+	effectLabels,
+	introductionFor,
+	latestStateFor,
+	lifecycleFor,
+} from '../lib/lifecycle';
+import { withBase } from '../lib/paths';
+
+interface Props {
+	reference: EntityReference;
+	showBadges?: boolean;
+	showHistory?: boolean;
+}
+
+const { reference, showBadges = true, showHistory = true } = Astro.props;
+const events = lifecycleFor(await getCollection('changes'), reference);
+const introduction = introductionFor(events);
+const latestState = latestStateFor(events);
+const statusBadge = latestState?.effect === 'removed'
+	? 'ots-badge-removed'
+	: latestState?.effect === 'deprecated'
+		? 'ots-badge-deprecated'
+		: 'ots-badge-change';
+---
+
+{showBadges && (introduction || latestState) && (
+	<div class="ots-badges" aria-label="Version history">
+		{introduction && (
+			<span class="ots-badge ots-badge-change">Added in {introduction.release}</span>
+		)}
+		{latestState && (
+			<span class={`ots-badge ${statusBadge}`}>
+				{effectLabels[latestState.effect]} in {latestState.release}
+			</span>
+		)}
+	</div>
+)}
+
+{showHistory && events.length > 0 && (
+	<section class="ots-history" aria-labelledby="entity-history">
+		<h2 id="entity-history">History</h2>
+		<ol>
+			{events.map((event) => {
+				const release = releaseByVersion(event.release);
+				return (
+					<li>
+						<div>
+							<span class={`ots-badge ots-badge-${event.effect === 'removed' ? 'removed' : event.effect === 'deprecated' ? 'deprecated' : 'change'}`}>
+								{effectLabels[event.effect]}
+							</span>
+							<strong>{event.release}</strong>
+							{release?.status === 'development' && <small>In development</small>}
+							{release?.date && <time datetime={release.date}>{release.date}</time>}
+						</div>
+						<p>
+							<a href={withBase(`/changes/${event.change.id}/`)}>{event.change.data.title}</a>
+							{event.target.scope && <>{' — '}<code>{event.target.scope}</code></>}
+						</p>
+					</li>
+				);
+			})}
+		</ol>
+	</section>
+)}
+

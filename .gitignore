@@ -1,0 +1,89 @@
+# Compiled output
+[Dd]ebug/
+[Rr]elease/
+/Run/*
+!/Run/place_steam_build_here
+*.obj
+*.exe
+*.dll
+*.lib
+*.res
+*.ilk
+*.map
+*.exp
+
+# MSVC intermediate files
+*.aps
+*.pdb
+*.idb
+*.pch
+
+# CMake and Visual Studio 2022
+[Bb]uild/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+*.sln
+*.suo
+*.user
+*.vcxproj
+*.vcxproj.*
+.vs/
+
+# Editors and language servers
+*~
+*.bak
+*.swp
+*.code-workspace
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/settings.json
+!.vscode/c_cpp_properties.clang.example.json
+.history/
+/.cache/
+/.clangd
+/compile_commands.json
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Manual tooling temp snapshots (interrupted manage.py runs)
+manual/data/.manual-check-*/
+manual/data/.manual-generate-*/
+
+
+# Android build output
+build-android/
+android/app/build/
+android/.gradle/
+android/build/
+*.apk
+*.aab
+
+# Temporary Android/OpenTS diagnostics
+build.log
+errors.log
+tail.txt
+anim_error.txt
+code2.txt
+
+android.txt
+
+# Temporary Android repair/backup files
+code/android_stubs.cpp.bak2
+disable_srfcache_assert.py
+fix_srfcache.py
+fix_srfcache_final.py
+fix_srfcache_v2.py
+fix_static.py
+
+
+# Local Android configuration and debug logs
+android/local.properties
+android/fullcrash.txt
+
+android/Install

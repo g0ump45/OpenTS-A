@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/authored-scripting.schema.json",
+  "title": "Authored scripting frontmatter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "id", "title", "summary"],
+  "properties": {
+    "type": { "enum": ["action", "event", "mission"] },
+    "id": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]+$" },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "valid_values": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "caveats": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "related": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/reference" }
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "enum": ["key", "action", "event", "mission", "format", "enum", "system", "command", "guide", "using", "internal"] },
+        "id": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "not": { "const": "key" } } } },
+          "then": { "not": { "required": ["scope"] } }
+        }
+      ]
+    }
+  }
+}

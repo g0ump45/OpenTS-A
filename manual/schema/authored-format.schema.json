@@ -1,0 +1,492 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/authored-format.schema.json",
+  "title": "Authored format frontmatter",
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "applies_to"
+      ],
+      "properties": {
+        "kind": {
+          "const": "syntax"
+        },
+        "applies_to": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "filenames"
+      ],
+      "properties": {
+        "kind": {
+          "const": "file"
+        },
+        "filenames": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "files",
+        "registrations"
+      ],
+      "properties": {
+        "kind": {
+          "const": "registry"
+        },
+        "files": {
+          "$ref": "#/$defs/files"
+        },
+        "registrations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/registration"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "files",
+        "section",
+        "syntax",
+        "fields"
+      ],
+      "properties": {
+        "kind": {
+          "const": "record"
+        },
+        "files": {
+          "$ref": "#/$defs/files"
+        },
+        "section": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "syntax": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "registration": {
+          "$ref": "#/$defs/registration"
+        },
+        "enable_section": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "kind",
+        "extensions",
+        "role"
+      ],
+      "properties": {
+        "kind": {
+          "const": "binary"
+        },
+        "extensions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^\\.[A-Za-z0-9]+$"
+          }
+        },
+        "role": {
+          "enum": [
+            "archive",
+            "image",
+            "model",
+            "audio",
+            "video",
+            "persistence"
+          ]
+        },
+        "companion_formats": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/formatId"
+          },
+          "default": []
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "formatId": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[-_][a-z0-9]+)*$"
+    },
+    "route": {
+      "enum": [
+        "/mapping/team-types/",
+        "/mapping/task-forces/",
+        "/mapping/scripts/",
+        "/mapping/ai-triggers/"
+      ]
+    },
+    "sourcePath": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+    },
+    "sectionSelector": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "name"
+          ],
+          "properties": {
+            "kind": {
+              "const": "literal"
+            },
+            "name": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "source"
+          ],
+          "properties": {
+            "kind": {
+              "const": "identifier"
+            },
+            "source": {
+              "enum": [
+                "object-type",
+                "house",
+                "difficulty",
+                "campaign",
+                "theme",
+                "sound",
+                "tile-set",
+                "land-type",
+                "mission",
+                "multiplayer-map"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "fallback"
+          ],
+          "properties": {
+            "kind": {
+              "const": "image"
+            },
+            "fallback": {
+              "const": "object-type"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "const": "image"
+            }
+          }
+        }
+      ]
+    },
+    "keyScope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "section": {
+          "$ref": "#/$defs/sectionSelector"
+        },
+        "applies_to": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "minProperties": 1
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "id"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "key",
+            "action",
+            "event",
+            "mission",
+            "format",
+            "enum",
+            "system",
+            "command",
+            "guide",
+            "using",
+            "internal"
+          ]
+        },
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scope": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "dependentSchemas": {
+        "scope": {
+          "properties": {
+            "type": {
+              "const": "key"
+            }
+          }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      }
+    },
+    "registration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section",
+        "id_from"
+      ],
+      "properties": {
+        "section": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "id_from": {
+          "enum": [
+            "key",
+            "value",
+            "entry-name"
+          ]
+        },
+        "entry_section": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "value": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "entry_section"
+          ],
+          "properties": {
+            "entry_section": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        },
+        {
+          "required": [
+            "value"
+          ],
+          "properties": {
+            "value": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        }
+      ]
+    },
+    "field": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "position",
+        "label",
+        "value",
+        "required"
+      ],
+      "properties": {
+        "position": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "label": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "value": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "note": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    }
+  },
+  "type": "object",
+  "required": [
+    "format_id",
+    "title",
+    "summary",
+    "source_files"
+  ],
+  "properties": {
+    "format_id": {
+      "$ref": "#/$defs/formatId"
+    },
+    "title": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "summary": {
+      "$ref": "#/$defs/nonEmptyString"
+    },
+    "route": {
+      "$ref": "#/$defs/route"
+    },
+    "source_files": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/sourcePath"
+      }
+    },
+    "related": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/reference"
+      },
+      "default": []
+    },
+    "key_scopes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/keyScope"
+      },
+      "default": []
+    }
+  },
+  "dependentSchemas": {
+    "route": {
+      "oneOf": [
+        {
+          "properties": {
+            "format_id": {
+              "const": "teamtypes"
+            },
+            "route": {
+              "const": "/mapping/team-types/"
+            }
+          },
+          "required": [
+            "format_id",
+            "route"
+          ]
+        },
+        {
+          "properties": {
+            "format_id": {
+              "const": "taskforces"
+            },
+            "route": {
+              "const": "/mapping/task-forces/"
+            }
+          },
+          "required": [
+            "format_id",
+            "route"
+          ]
+        },
+        {
+          "properties": {
+            "format_id": {
+              "const": "scripts"
+            },
+            "route": {
+              "const": "/mapping/scripts/"
+            }
+          },
+          "required": [
+            "format_id",
+            "route"
+          ]
+        },
+        {
+          "properties": {
+            "format_id": {
+              "const": "ai_triggers"
+            },
+            "route": {
+              "const": "/mapping/ai-triggers/"
+            }
+          },
+          "required": [
+            "format_id",
+            "route"
+          ]
+        }
+      ]
+    }
+  },
+  "unevaluatedProperties": false
+}

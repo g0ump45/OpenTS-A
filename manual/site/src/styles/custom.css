@@ -1,0 +1,1071 @@
+/*
+ * OpenTS Manual theme -- a warm industrial palette mapped onto
+ * Starlight, plus the manual's own component vocabulary (spec blocks,
+ * badges, asides, key tables). Both themes are first-class.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Palette                                                             */
+/* ------------------------------------------------------------------ */
+
+:root {
+	/* warm pastel-gray light palette */
+	--ots-ground: #f1f0ed;
+	--ots-surface: #f8f7f4;
+	--ots-surface-2: #e8e6e1;
+	--ots-ink: #302e2b;
+	--ots-ink-strong: #1b1a18;
+	--ots-muted: #6f6b64;
+	--ots-line: #d0ccc5;
+	--ots-line-soft: #e0ddd7;
+	--ots-accent: #9a4f24;
+	--ots-accent-soft: #f1ded1;
+	--ots-gen: #6f6256;
+	--ots-gen-soft: #ece7e1;
+	--ots-warn: #89591a;
+	--ots-warn-soft: #f4e5cd;
+	--ots-danger: #8f3030;
+	--ots-danger-soft: #f9e8e8;
+}
+
+:root[data-theme='dark'] {
+	--ots-ground: #171716;
+	--ots-surface: #1f1f1d;
+	--ots-surface-2: #292825;
+	--ots-ink: #e3dfd8;
+	--ots-ink-strong: #f4f1eb;
+	--ots-muted: #aaa39a;
+	--ots-line: #3b3935;
+	--ots-line-soft: #2f2e2a;
+	--ots-accent: #d58a52;
+	--ots-accent-soft: #3b291e;
+	--ots-gen: #c4b29f;
+	--ots-gen-soft: #2e2924;
+	--ots-warn: #d7a457;
+	--ots-warn-soft: #33291c;
+	--ots-danger: #e08585;
+	--ots-danger-soft: #331d1d;
+}
+
+/*
+ * Widen the content pane (Starlight defaults to a prose-sized 45rem, which
+ * cramps the reference tables) and keep PROSE at a readable measure inside
+ * it -- tables, spec blocks and code get the full width.
+ */
+:root {
+	--sl-content-width: 67.5rem;
+	--sl-text-h3: 1.375rem;
+}
+
+@media (min-width: 50em) {
+	:root {
+		--sl-text-h3: 1.625rem;
+	}
+}
+
+.sl-markdown-content .sl-heading-wrapper.level-h3 > h3 {
+	color: var(--ots-ink);
+}
+
+.sl-markdown-content > p,
+.sl-markdown-content > ul,
+.sl-markdown-content > ol,
+.sl-markdown-content > blockquote {
+	max-width: 65ch;
+}
+
+/* Map the palette onto Starlight's own variables. */
+:root {
+	--sl-color-accent-low: var(--ots-accent-soft);
+	--sl-color-accent: var(--ots-accent);
+	--sl-color-accent-high: var(--ots-accent);
+	--sl-color-white: var(--ots-ink-strong);
+	--sl-color-gray-1: var(--ots-ink);
+	--sl-color-gray-2: var(--ots-ink);
+	--sl-color-gray-3: var(--ots-muted);
+	--sl-color-gray-4: var(--ots-muted);
+	--sl-color-gray-5: var(--ots-line);
+	--sl-color-gray-6: var(--ots-surface-2);
+	--sl-color-black: var(--ots-ground);
+	--sl-color-bg: var(--ots-ground);
+	--sl-color-bg-nav: var(--ots-surface);
+	--sl-color-bg-sidebar: var(--ots-ground);
+	--sl-color-hairline: var(--ots-line);
+	--sl-color-hairline-light: var(--ots-line-soft);
+	--sl-color-hairline-shade: var(--ots-line-soft);
+}
+
+/* ------------------------------------------------------------------ */
+/* Key page anatomy                                                    */
+/* ------------------------------------------------------------------ */
+
+.ots-keytitle,
+h1.ots-keytitle {
+	font-family: var(--__sl-font-mono, ui-monospace, 'Cascadia Mono', Consolas, monospace);
+	letter-spacing: -0.01em;
+}
+
+.ots-lede {
+	font-size: 1.125rem;
+	line-height: 1.6;
+	margin: 0 0 1.75rem;
+	max-width: 62ch;
+}
+
+.ots-lede.ots-compact {
+	margin-bottom: 1rem;
+}
+
+/* Site-level note. Quiet by design: it qualifies the manual, not any one page. */
+.ots-site-note {
+	margin: 3rem 0 0;
+	padding-top: 1rem;
+	border-top: 1px solid var(--ots-line-soft);
+	font-size: 0.85rem;
+	color: var(--ots-muted);
+	max-width: 62ch;
+}
+
+.ots-system-breadcrumb + .sl-heading-wrapper.level-h2 {
+	margin-top: 1.25rem;
+}
+
+/* ---------- badges ---------- */
+
+.ots-badges {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0.75rem 0 1rem;
+}
+
+.ots-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	padding: 0.2rem 0.5rem;
+	border-radius: 3px;
+	border: 1px solid transparent;
+	line-height: 1.4;
+}
+
+.ots-badge-deprecated {
+	background: var(--ots-warn-soft);
+	color: var(--ots-warn);
+	border-color: var(--ots-warn);
+}
+.ots-badge-removed,
+.ots-badge-breaking {
+	background: var(--ots-danger-soft);
+	color: var(--ots-danger);
+	border-color: var(--ots-danger);
+}
+.ots-badge-change {
+	background: var(--ots-gen-soft);
+	color: var(--ots-gen);
+	border-color: var(--ots-gen);
+}
+.ots-badge-release {
+	background: var(--ots-accent-soft);
+	color: var(--ots-accent);
+	border-color: var(--ots-line);
+}
+/* A property of the setting, not a warning: neutral ink, never the danger hue. */
+.ots-badge-noeffect {
+	background: var(--ots-gen-soft);
+	color: var(--ots-gen);
+	border-color: var(--ots-line);
+	letter-spacing: 0;
+}
+
+/* ---------- generated spec block ---------- */
+
+.ots-spec {
+	border: 1px solid var(--ots-line);
+	border-radius: 6px;
+	background: var(--ots-surface);
+	margin: 0 0 1.5rem;
+	overflow: hidden;
+}
+
+.ots-spec-head {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.45rem 1rem;
+	background: var(--ots-surface-2);
+	border-bottom: 1px solid var(--ots-line);
+	font-size: 0.75rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ots-muted);
+	font-weight: 600;
+}
+
+.ots-spec-head .ots-scopename {
+	font-family: var(--__sl-font-mono, ui-monospace, Consolas, monospace);
+	text-transform: none;
+	letter-spacing: 0;
+	color: var(--ots-gen);
+}
+
+.ots-spec dl {
+	display: grid;
+	grid-template-columns: 9rem 1fr;
+	gap: 0;
+	margin: 0;
+}
+
+.ots-spec dt,
+.ots-spec dd {
+	margin: 0;
+	padding: 0.5rem 1rem;
+	border-bottom: 1px solid var(--ots-line-soft);
+	font-size: 0.875rem;
+}
+
+.ots-spec dt {
+	color: var(--ots-muted);
+	font-weight: 600;
+}
+
+.ots-spec dd {
+	color: var(--ots-ink);
+}
+
+.ots-spec dl > :nth-last-child(1),
+.ots-spec dl > :nth-last-child(2) {
+	border-bottom: none;
+}
+
+.ots-spec dd code {
+	background: var(--ots-surface-2);
+	padding: 0.1rem 0.3rem;
+	border-radius: 3px;
+}
+.ots-spec dd > small {
+	display: block;
+	margin-top: 0.3rem;
+	color: var(--ots-muted);
+}
+
+.ots-parameter-list {
+	display: grid;
+	gap: 0.35rem;
+	margin: 0;
+	padding-inline-start: 1.25rem;
+}
+
+.ots-parameter-list li {
+	padding-inline-start: 0.2rem;
+}
+
+.ots-parameter-list strong {
+	display: inline-block;
+	min-width: 8rem;
+	margin-inline-end: 0.5rem;
+}
+
+.ots-typelist {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.3rem;
+}
+
+.ots-typelist span {
+	font-size: 0.75rem;
+	padding: 0.1rem 0.4rem;
+	background: var(--ots-surface-2);
+	border: 1px solid var(--ots-line-soft);
+	border-radius: 3px;
+	color: var(--ots-muted);
+}
+
+@media (max-width: 640px) {
+	.ots-spec dl {
+		grid-template-columns: 1fr;
+	}
+	.ots-spec dt {
+		padding-bottom: 0;
+		border-bottom: none;
+	}
+}
+
+/* ---------- asides ---------- */
+
+.ots-aside {
+	margin: 0 0 1.5rem;
+	padding: 0.75rem 1rem;
+	border-radius: 5px;
+	border-left: 3px solid var(--ots-line);
+	background: var(--ots-surface);
+	max-width: 65ch;
+	font-size: 0.9375rem;
+}
+
+.ots-aside > :first-child {
+	margin-top: 0;
+}
+.ots-aside > :last-child {
+	margin-bottom: 0;
+}
+
+.ots-aside-title {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 650;
+	font-size: 0.875rem;
+	margin: 0;
+}
+
+.ots-aside > .ots-aside-title + * {
+	margin-top: 0.5rem;
+}
+
+.ots-aside-warn {
+	border-left-color: var(--ots-warn);
+	background: var(--ots-warn-soft);
+}
+.ots-aside-warn .ots-aside-title {
+	color: var(--ots-warn);
+}
+
+.ots-aside-danger {
+	border-left-color: var(--ots-danger);
+	background: var(--ots-danger-soft);
+}
+.ots-aside-danger .ots-aside-title {
+	color: var(--ots-danger);
+}
+
+.ots-aside-note {
+	border-left-color: var(--ots-gen);
+	background: var(--ots-gen-soft);
+}
+.ots-aside-note .ots-aside-title {
+	color: var(--ots-gen);
+}
+
+/* ---------- key tables (section indexes, scripting tables) ---------- */
+
+.ots-tablewrap {
+	overflow-x: auto;
+	margin-bottom: 1.5rem;
+}
+
+.ots-tablewrap table {
+	width: 100%;
+}
+
+.ots-tablewrap :is(th, td):first-child {
+	padding-inline-start: 1rem;
+}
+
+.ots-tablewrap :is(th, td):last-child {
+	padding-inline-end: 1rem;
+}
+
+.ots-tablewrap thead th {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: var(--ots-surface-2);
+}
+
+.ots-tablewrap td small {
+	display: block;
+	margin-top: 0.25rem;
+	color: var(--ots-muted);
+}
+
+.ots-tablewrap td.num {
+	font-variant-numeric: tabular-nums;
+}
+
+/*
+ * Authored Markdown tables scroll horizontally on narrow viewports
+ * instead of squeezing prose columns into unreadable slivers.
+ */
+@media (max-width: 50em) {
+	.sl-markdown-content table:not(:where(.not-content *, .ots-tablewrap *, .ots-reference *)) :is(th, td) {
+		min-width: 8rem;
+	}
+}
+
+/* ---------- Starlight asides in the manual palette ---------- */
+
+.starlight-aside {
+	border-radius: 5px;
+	border-inline-start-width: 3px;
+}
+
+.starlight-aside--caution {
+	border-color: var(--ots-warn);
+	background: var(--ots-warn-soft);
+	color: var(--ots-ink);
+}
+.starlight-aside--caution .starlight-aside__title {
+	color: var(--ots-warn);
+}
+
+.starlight-aside--danger {
+	border-color: var(--ots-danger);
+	background: var(--ots-danger-soft);
+	color: var(--ots-ink);
+}
+.starlight-aside--danger .starlight-aside__title {
+	color: var(--ots-danger);
+}
+
+.starlight-aside--note {
+	border-color: var(--ots-gen);
+	background: var(--ots-gen-soft);
+	color: var(--ots-ink);
+}
+.starlight-aside--note .starlight-aside__title {
+	color: var(--ots-gen);
+}
+
+/* ---------- see also ---------- */
+
+.ots-seealso {
+	margin-top: 2rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--ots-line-soft);
+	font-size: 0.875rem;
+	color: var(--ots-muted);
+}
+
+.ots-seealso strong {
+	color: var(--ots-ink-strong);
+	font-weight: 650;
+}
+
+/* ------------------------------------------------------------------ */
+/* Navigation and indexes                                              */
+/* ------------------------------------------------------------------ */
+
+.ots-feedback-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.55rem 0.8rem;
+	border-radius: 5px;
+	background: var(--ots-accent);
+	color: var(--ots-ground);
+	font-weight: 650;
+	text-decoration: none;
+}
+
+.ots-breadcrumb {
+	font-size: 0.85rem;
+	color: var(--ots-muted);
+}
+
+/* Separator spacing lives in CSS: HTML compression strips whitespace-only
+   text nodes between breadcrumb elements. */
+.ots-crumb-separator {
+	margin-inline: 0.45em;
+}
+
+.ots-breadcrumb + .ots-lede {
+	margin-top: 0.5rem;
+}
+
+.ots-lede + .ots-reference-primary-action {
+	margin-top: -0.25rem;
+}
+
+.sl-markdown-content .ots-reference-primary-action > .sl-link-button {
+	margin-block: 0;
+}
+
+.sl-markdown-content > .ots-authoritative-files {
+	margin-top: 2.5rem;
+}
+
+.ots-compact { font-size: 0.95rem; color: var(--ots-muted); }
+.ots-hub-section + .ots-hub-section { margin-top: 2.25rem; }
+
+.ots-category-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+	gap: 1rem;
+	margin-top: 1rem;
+}
+
+/* Starlight's content styles give every non-first sibling a top margin;
+   grid items don't collapse it, so the first card sat higher than the rest. */
+.ots-category-grid > .ots-category-card {
+	margin-top: 0;
+}
+
+.ots-category-card {
+	min-width: 0;
+	border: 1px solid var(--ots-line);
+	border-radius: 6px;
+	background: var(--ots-surface);
+	padding: 1rem;
+}
+
+.ots-category-card h3,
+.ots-category-card > p {
+	margin-top: 0;
+}
+
+.ots-category-card > h3 + p {
+	margin-top: 0.5rem;
+}
+
+.ots-category-card > p {
+	color: var(--ots-muted);
+	font-size: 0.875rem;
+}
+
+.ots-category-card ul {
+	display: grid;
+	gap: 0.75rem;
+	margin: 1rem 0 0;
+	padding: 1rem 0 0;
+	border-top: 1px solid var(--ots-line-soft);
+	list-style: none;
+}
+
+.ots-category-card li,
+.ots-category-card li span {
+	display: block;
+}
+
+.ots-category-card li a {
+	font-weight: 650;
+}
+
+.ots-category-card li span {
+	margin-top: 0.15rem;
+	color: var(--ots-muted);
+	font-size: 0.8rem;
+	line-height: 1.4;
+}
+
+.ots-related-resources {
+	margin-top: 2rem;
+}
+
+.ots-related-resources > h2 + ul {
+	margin-top: 1rem;
+}
+
+.ots-related-resources ul {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+	gap: 0.5rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ots-related-resources li {
+	display: grid;
+	gap: 0.15rem;
+	border: 1px solid var(--ots-line-soft);
+	border-radius: 5px;
+	background: var(--ots-surface);
+	padding: 0.65rem 0.75rem;
+}
+
+.ots-related-resources small {
+	/* Card rows own their spacing; drop the inherited prose sibling margin. */
+	margin: 0;
+	color: var(--ots-muted);
+}
+.manual-release-nav > p {
+	margin: 0 0 0.35rem 0.55rem;
+	color: var(--sl-color-gray-3);
+	font-size: 0.68rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+}
+
+.manual-release-nav ul {
+	display: grid;
+	gap: 0.15rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.manual-release-nav a {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 0.5rem;
+	align-items: baseline;
+	border-radius: 0.35rem;
+	padding: 0.4rem 0.55rem;
+	color: var(--sl-color-gray-2);
+	text-decoration: none;
+}
+
+.manual-release-nav a:hover,
+.manual-release-nav a:focus-visible {
+	color: var(--sl-color-white);
+	background: var(--sl-color-gray-6);
+}
+
+.manual-release-nav small {
+	color: var(--sl-color-gray-3);
+	font-size: 0.68rem;
+}
+
+.manual-release-nav li > ul {
+	margin-inline-start: 0.85rem;
+}
+
+.manual-release-nav ul + p {
+	margin-top: 0.75rem;
+}
+
+.manual-release-nav a[aria-current='page'] {
+	color: var(--sl-color-white);
+	background: var(--sl-color-gray-6);
+}
+
+/* ------------------------------------------------------------------ */
+/* Filterable reference tables                                         */
+/* ------------------------------------------------------------------ */
+
+.ots-reference {
+	container: ots-reference / inline-size;
+}
+
+.ots-reference-controls {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: end;
+	gap: 0.75rem 1rem;
+	padding: 0.75rem;
+	border: 1px solid var(--ots-line);
+	border-bottom: 0;
+	border-radius: 6px 6px 0 0;
+	background: var(--ots-surface-2);
+}
+
+.ots-filter-table > .ots-reference-controls + .ots-tablewrap {
+	margin-top: 0;
+}
+
+.ots-reference-controls label:not(.ots-checkbox) {
+	display: grid;
+	gap: 0.25rem;
+	min-width: min(100%, 15rem);
+	font-size: 0.75rem;
+	font-weight: 650;
+	color: var(--ots-muted);
+}
+
+.ots-reference-controls input[type='search'],
+.ots-reference-controls select {
+	min-height: 2.35rem;
+	padding: 0.4rem 0.55rem;
+	border: 1px solid var(--ots-line);
+	border-radius: 4px;
+	background: var(--ots-surface);
+	color: var(--ots-ink);
+}
+
+.ots-checkbox {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	min-height: 2.35rem;
+	font-size: 0.85rem;
+}
+
+.ots-result-count {
+	margin: 0 0 0 auto;
+	font-size: 0.8rem;
+	color: var(--ots-muted);
+}
+
+.ots-reference .ots-tablewrap {
+	border: 1px solid var(--ots-line);
+	border-radius: 0 0 6px 6px;
+}
+
+.ots-reference table {
+	display: table;
+	overflow: visible;
+	margin: 0;
+}
+.ots-reference tr[hidden] { display: none; }
+.ots-reference-key {
+	display: grid;
+	gap: 0.25rem;
+	min-width: 0;
+}
+.ots-reference-key a,
+.ots-reference-key code {
+	overflow-wrap: anywhere;
+}
+.ots-reference-key small { margin-top: 0; }
+.ots-reference-key .ots-badge-noeffect { justify-self: start; }
+.ots-unknown { color: var(--ots-muted); font-style: italic; }
+.ots-empty { padding: 1rem; border: 1px solid var(--ots-line); color: var(--ots-muted); }
+
+/* ------------------------------------------------------------------ */
+/* Detail-page affordances                                             */
+/* ------------------------------------------------------------------ */
+
+.ots-key-scope > h2 {
+	margin-bottom: 0.75rem;
+}
+
+.ots-key-scope + .ots-key-scope {
+	margin-top: 2.5rem;
+}
+
+.ots-scripting-caveats {
+	margin-top: 1.5rem;
+	margin-bottom: 2rem;
+}
+
+.ots-detail-nav {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 1rem;
+	align-items: center;
+	margin: 2rem 0;
+	padding-top: 1rem;
+	border-top: 1px solid var(--ots-line);
+	font-size: 0.85rem;
+}
+.ots-detail-nav > :last-child { text-align: right; }
+
+.ots-feedback {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	gap: 0.4rem 1rem;
+	align-items: center;
+	margin-top: 3rem;
+	padding: 1rem;
+	border: 1px solid var(--ots-line);
+	border-radius: 6px;
+	background: var(--ots-surface-2);
+}
+.ots-feedback p { margin: 0.2rem 0 0; color: var(--ots-muted); font-size: 0.85rem; }
+.ots-feedback small { grid-column: 1 / -1; color: var(--ots-muted); }
+
+.ots-credit { color: var(--ots-muted); font-size: 0.875rem; }
+
+.ots-flow {
+	display: grid;
+	grid-template-columns: repeat(5, minmax(0, 1fr));
+	gap: 0.65rem;
+	margin: 1.5rem 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: flow-step;
+}
+.ots-flow li {
+	position: relative;
+	min-width: 0;
+	padding: 0.75rem;
+	border: 1px solid var(--ots-line);
+	border-radius: 6px;
+	background: var(--ots-surface);
+	counter-increment: flow-step;
+}
+.ots-flow li::before {
+	content: counter(flow-step);
+	display: inline-grid;
+	place-items: center;
+	width: 1.5rem;
+	height: 1.5rem;
+	margin-bottom: 0.55rem;
+	border-radius: 50%;
+	background: var(--ots-accent);
+	color: white;
+	font-size: 0.75rem;
+	font-weight: 700;
+}
+.ots-flow strong, .ots-flow span { display: block; }
+.ots-flow strong { font-size: 0.85rem; }
+.ots-flow span { margin-top: 0.25rem; color: var(--ots-muted); font-size: 0.75rem; line-height: 1.35; }
+
+.ots-change-release {
+	scroll-margin-top: 1.5rem;
+}
+
+.ots-change-list {
+	margin: 0.4rem 0 0;
+	padding: 0;
+	list-style: none;
+	border-top: 1px solid var(--ots-line);
+}
+
+.ots-change-list:empty {
+	display: none;
+}
+
+.ots-change-list li {
+	display: grid;
+	grid-template-columns: 5.5rem minmax(0, 1fr) minmax(7.5rem, 12rem);
+	gap: 0.75rem;
+	align-items: baseline;
+	padding: 0.42rem 0.15rem;
+	border-bottom: 1px solid var(--ots-line-soft);
+}
+
+.ots-change-kind {
+	color: var(--ots-muted);
+	font-size: 0.68rem;
+	font-weight: 750;
+	letter-spacing: 0.045em;
+	text-transform: uppercase;
+}
+
+.ots-change-kind[data-category='feature'],
+.ots-change-kind[data-category='fix'] {
+	color: var(--ots-accent);
+}
+
+.ots-change-summary {
+	min-width: 0;
+	margin: 0;
+	line-height: 1.35;
+}
+
+.ots-change-title {
+	font-weight: 650;
+}
+
+.ots-change-targets-inline {
+	margin-inline-start: 0.45rem;
+	color: var(--ots-muted);
+	font-size: 0.78rem;
+}
+
+.ots-change-targets-inline code {
+	padding-inline: 0.2rem;
+	font-size: 0.72rem;
+	white-space: normal;
+}
+
+.ots-change-credit {
+	color: var(--ots-muted);
+	font-size: 0.75rem;
+	line-height: 1.35;
+	text-align: end;
+}
+:where(a, button, input, select, summary):focus-visible {
+	outline: 3px solid color-mix(in srgb, var(--ots-accent) 55%, white);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
+}
+
+@media (max-width: 640px) {
+	.ots-result-count { margin-left: 0; width: 100%; }
+	.ots-detail-nav { grid-template-columns: 1fr; }
+	.ots-detail-nav > :last-child { text-align: left; }
+	.ots-feedback { grid-template-columns: 1fr; }
+	.ots-feedback small { grid-column: 1; }
+	.ots-flow { grid-template-columns: 1fr; }
+	.ots-change-list li { grid-template-columns: 4.65rem minmax(0, 1fr); gap: 0.12rem 0.55rem; padding: 0.48rem 0; }
+	.ots-change-targets-inline { display: block; margin: 0.12rem 0 0; }
+	.ots-change-credit { grid-column: 2; text-align: start; }
+
+}
+
+@container ots-reference (max-width: 50rem) {
+	.ots-filter-table > .ots-reference-controls {
+		border-bottom: 1px solid var(--ots-line);
+		border-radius: 6px;
+	}
+	.ots-filter-table > .ots-reference-controls + .ots-tablewrap { margin-top: 1rem; }
+	.ots-reference .ots-tablewrap { overflow: visible; border: 0; }
+	.ots-reference table { display: block; }
+	.ots-reference tbody { display: grid; gap: 0.75rem; }
+	.ots-reference thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+	.ots-reference tr[data-row] { display: grid; gap: 0.35rem; margin: 0; padding: 0.75rem; border: 1px solid var(--ots-line); border-radius: 6px; background: var(--ots-surface); }
+	.ots-reference tr[data-row][hidden] { display: none; }
+	.ots-reference td { display: grid; grid-template-columns: minmax(6.5rem, 35%) minmax(0, 1fr); padding: 0.15rem 0; border: 0; }
+	.ots-reference td:first-child { padding-inline-start: 0; }
+	.ots-reference td:last-child { padding-inline-end: 0; }
+	.ots-reference td:empty { display: none; }
+	.ots-reference td::before { content: attr(data-label); color: var(--ots-muted); font-size: 0.75rem; font-weight: 650; }
+	.ots-reference td > code,
+	.ots-reference td > .ots-unknown { justify-self: start; }
+}
+/* ---------- concise INI examples and file-first reference ---------- */
+
+.ots-ini-example pre {
+	margin: 0;
+	padding: 0.9rem 1rem;
+	border: 0;
+	border-radius: 0;
+	overflow-x: auto;
+}
+
+.ots-file-reference + .ots-file-reference {
+	margin-top: 2.5rem;
+}
+
+.ots-file-reference > h2 + .ots-lede {
+	margin-top: 0.5rem;
+}
+
+.ots-file-reference h2 code {
+	font-size: 0.9em;
+}
+
+.ots-file-loading {
+	margin-top: -0.35rem;
+	color: var(--ots-muted);
+	font-size: 0.9rem;
+}
+/* ---------- structured release and lifecycle history ---------- */
+
+.ots-release-badge {
+	margin-inline-start: 0.65rem;
+}
+
+.ots-release-count {
+	margin-inline-start: 0.6rem;
+	color: var(--ots-muted);
+	font-size: 0.72rem;
+	font-weight: 500;
+}
+
+.ots-release-date {
+	margin-top: 0.35rem;
+	color: var(--ots-muted);
+	font-size: 0.85rem;
+}
+
+.ots-history {
+	max-width: 65ch;
+	margin: 2rem 0;
+}
+
+.ots-history > h2 + ol {
+	margin-top: 1rem;
+}
+
+.ots-history ol {
+	display: grid;
+	gap: 0;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border-left: 2px solid var(--ots-line);
+}
+
+.ots-history li {
+	position: relative;
+	padding: 0.2rem 0 1rem 1rem;
+}
+
+.ots-history li:last-child {
+	padding-bottom: 0;
+}
+
+.ots-history li::before {
+	content: '';
+	position: absolute;
+	top: 0.55rem;
+	left: -0.38rem;
+	width: 0.65rem;
+	height: 0.65rem;
+	border-radius: 50%;
+	background: var(--ots-accent);
+	border: 2px solid var(--ots-ground);
+}
+
+.ots-history li > div {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.ots-history li p {
+	margin: 0.35rem 0 0;
+}
+
+.ots-history li small,
+.ots-history li time {
+	color: var(--ots-muted);
+	font-size: 0.75rem;
+}
+
+.ots-change-targets ul {
+	display: grid;
+	gap: 0.5rem;
+	padding: 0;
+	list-style: none;
+}
+
+.ots-change-targets li {
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.ots-type-coverage summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+
+.ots-type-coverage[open] summary {
+	margin-bottom: 0.65rem;
+}
+
+.ots-type-coverage .ots-typelist {
+	padding-inline-start: 0.15rem;
+}
+.ots-source-revision {
+	color: var(--ots-muted);
+	font-size: 0.85rem;
+}
+
+.ots-source-files {
+	display: grid;
+	gap: 0.35rem;
+}
+.ots-inline-contract {
+	display: grid;
+	grid-template-columns: max-content minmax(0, 1fr);
+	gap: 0.35rem 1rem;
+	margin-block: 1.25rem 2rem;
+}
+
+.ots-inline-contract dt {
+	color: var(--ots-muted);
+	font-weight: 600;
+}
+
+.ots-inline-contract dd {
+	margin: 0;
+}
+
+.ots-enum-table td small {
+	display: block;
+	margin-top: 0.25rem;
+	color: var(--ots-muted);
+}
+
+.ots-enum-uses {
+	display: grid;
+	gap: 0.35rem;
+}
+
+#starlight__search .pagefind-ui__drawer {
+	row-gap: 0;
+}

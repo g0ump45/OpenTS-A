@@ -1,0 +1,86 @@
+---
+import { withBase } from '../lib/paths';
+import { allFormats, formatKindLabel, type FormatRecord, type FormatRegistration } from '../lib/formats';
+
+interface Props {
+	format: FormatRecord;
+}
+
+const { format } = Astro.props;
+const idFromLabel = (registration: FormatRegistration) => ({
+	key: 'Key',
+	value: 'Value',
+	'entry-name': 'Entry name',
+} as const)[registration.id_from];
+const section = (name: string) => `[${name}]`;
+const roleLabel = format.kind === 'binary'
+	? ({ archive: 'Archive', image: 'Image', model: 'Model', audio: 'Audio', video: 'Video', persistence: 'Persistence' } as const)[format.role]
+	: '';
+---
+
+<div class="ots-spec">
+	<div class="ots-spec-head">Format</div>
+	<dl>
+		<dt>Kind</dt><dd>{formatKindLabel(format.kind)}</dd>
+		{format.kind === 'syntax' && <><dt>Applies to</dt><dd>{format.applies_to.join(', ')}</dd></>}
+		{format.kind === 'file' && <><dt>Filename</dt><dd>{format.filenames.map((name, index) => <>{index > 0 && ', '}<code>{name}</code></>)}</dd></>}
+		{format.kind === 'registry' && <><dt>File</dt><dd>{format.files.map((name, index) => <>{index > 0 && ', '}<code>{name}</code></>)}</dd></>}
+		{format.kind === 'record' && (
+			<>
+				<dt>File</dt><dd>{format.files.map((name, index) => <>{index > 0 && ', '}<code>{name}</code></>)}</dd>
+				{format.registration && <><dt>Registered in</dt><dd><code>{section(format.registration.section)}</code></dd></>}
+				<dt>Section</dt><dd><code>{section(format.registration?.entry_section ?? format.section)}</code></dd>
+				<dt>Record form</dt><dd><code>{format.syntax}</code></dd>
+				{format.enable_section && <><dt>Enable section</dt><dd><code>{section(format.enable_section)}</code></dd></>}
+			</>
+		)}
+		{format.kind === 'binary' && (
+			<>
+				<dt>Extension</dt><dd>{format.extensions.map((extension, index) => <>{index > 0 && ', '}<code>{extension}</code></>)}</dd>
+				<dt>Role</dt><dd>{roleLabel}</dd>
+				{format.companion_formats.length > 0 && <><dt>Companion</dt><dd>{format.companion_formats.map((id, index) => {
+					const companion = allFormats().get(id);
+					if (!companion) throw new Error(`Format ${format.format_id}: unknown companion format ${id}`);
+					return <>{index > 0 && ', '}<a href={withBase(companion.route)}>{companion.title}</a></>;
+				})}</dd></>}
+			</>
+		)}
+	</dl>
+</div>
+
+{format.kind === 'registry' && (
+	<>
+		<h2 id="registration-sections">Registration sections</h2>
+		<div class="ots-tablewrap">
+			<table>
+				<thead><tr><th>Section</th><th>ID from</th><th>Definition</th></tr></thead>
+				<tbody>{format.registrations.map((registration) => (
+					<tr>
+						<td><code>{section(registration.section)}</code></td>
+						<td>{idFromLabel(registration)}</td>
+						<td><code>{registration.entry_section ? section(registration.entry_section) : registration.value}</code></td>
+					</tr>
+				))}</tbody>
+			</table>
+		</div>
+	</>
+)}
+
+{format.kind === 'record' && (
+	<>
+		<h2 id="fields">Fields</h2>
+		<div class="ots-tablewrap">
+			<table>
+				<thead><tr><th>#</th><th>Field</th><th>Accepted value</th><th>Required</th></tr></thead>
+				<tbody>{format.fields.map((field) => (
+					<tr>
+						<td class="num">{field.position}</td>
+						<td>{field.label}</td>
+						<td>{field.value}{field.note && <small>{field.note}</small>}</td>
+						<td>{field.required ? 'Yes' : 'No'}</td>
+					</tr>
+				))}</tbody>
+			</table>
+		</div>
+	</>
+)}

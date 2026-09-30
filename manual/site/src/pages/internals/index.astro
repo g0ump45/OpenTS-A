@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { withBase } from '../../lib/paths';
+import { INTERNAL_CATEGORIES } from '../../lib/taxonomy';
+
+const pages = (await getCollection('internals')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+const populated = INTERNAL_CATEGORIES
+	.map((category) => ({ ...category, pages: pages.filter((page) => page.data.category === category.id) }))
+	.filter((category) => category.pages.length > 0);
+---
+
+<StarlightPage frontmatter={{ title: 'Engine internals', description: 'Source-level descriptions of OpenTS structures, subsystems, and compatibility boundaries.', tableOfContents: false }}>
+	<p class="ots-lede">Source-level descriptions of engine structures, subsystems, and compatibility boundaries.</p>
+	{populated.map((category) => (
+		<section class="ots-hub-section">
+			<h2 id={category.id}>{category.title}</h2>
+			<p class="ots-compact">{category.description}</p>
+			<CardGrid>
+				{category.pages.map((page) => (
+					<LinkCard title={page.data.title} description={page.data.summary} href={withBase(`/internals/${page.id}/`)} />
+				))}
+			</CardGrid>
+		</section>
+	))}
+</StarlightPage>

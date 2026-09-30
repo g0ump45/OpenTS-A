@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import ReferenceTable from './ReferenceTable.astro';
+import {
+	allKeys,
+	displayWhenOmitted,
+	effectForScope,
+	referenceRowsForFile,
+} from '../lib/data';
+import { withBase } from '../lib/paths';
+import { sectionSelectorKey } from '../lib/section-selector.mjs';
+
+interface Props {
+	file: string;
+	section?: string;
+	levelLabels?: Record<string, string>;
+}
+
+const { file, section, levelLabels = {} } = Astro.props;
+const prose = await getCollection('keyprose');
+const summaries = new Map<string, string>(prose.flatMap((entry) =>
+	!entry.data.scope && entry.data.summary ? [[entry.data.key, entry.data.summary]] : [],
+));
+const selected = referenceRowsForFile(file).filter((row) =>
+	!section || sectionSelectorKey(row.scope.section) === section,
+);
+const occurrences = new Map<string, number>();
+for (const row of selected) occurrences.set(row.key, (occurrences.get(row.key) ?? 0) + 1);
+const rows = selected.map((row) => {
+	const record = allKeys().get(row.key);
+	if (!record) throw new Error(`File reference ${file}: missing key ${row.key}`);
+	return {
+		key: row.key,
+		href: withBase(`/keys/${row.keyRoute}/#scope-${row.scope.route_id}`),
+		summary: summaries.get(row.key),
+		value: row.scope.value_type,
+		whenOmitted: displayWhenOmitted(prose, record, row.scope),
+		effect: effectForScope(prose, record, row.scope),
+		context: (occurrences.get(row.key) ?? 0) > 1 ? levelLabels[row.scope.level] : undefined,
+		searchContext: [
+			row.scope.level,
+			...row.scope.applies_to,
+		].join(' '),
+	};
+});
+---
+
+<ReferenceTable rows={rows} />

@@ -1,0 +1,386 @@
+# Curated adjudications for multi-meaning INI keys (hand-owned; the extractor
+# merges this file into its output, so verdicts survive regeneration).
+#
+# A key whose scopes have DIFFERENT backing members is mechanically flagged
+# needs_review: the extractor cannot know whether the scopes are genuinely
+# different settings that share a name, or one setting it failed to unify.
+# This file records the human answer, scope by scope.
+#
+# Format:
+#   <Key>:
+#     "<DeclaringClass>::<member>":   # the scope's stable identity, from _provenance
+#       verdict: distinct             # a separate setting that shares the name
+#       absorbs: ["<Class>::<member>"]  # scopes that are really the SAME read
+#                                       # (a staging local, a copy-paste double
+#                                       # read) -- folded into this scope
+#       specializes: "<Class>::<member>" # this derived same-file/same-section
+#                                       # meaning replaces the broader scope for
+#                                       # its narrower applicability
+#       note: ...                     # parse-level fact worth publishing
+#
+# Every scope of a flagged key must be listed for the key to clear review;
+# a scope left unlisted stays needs_review, so a NEW collision introduced by
+# a later extraction surfaces here on its own. The extractor warns on entries
+# that no longer match the extraction (stale adjudications must be looked at,
+# never silently dropped).
+#
+# Notes are data, not prose: they state what the engine PARSES (double reads,
+# fallback order, an unusual default source). What a setting DOES belongs in
+# the authored page.
+
+Acceleration:
+  "BulletTypeClass::Acceleration": {verdict: distinct}
+  "RulesClass::JumpjetAcceleration": {verdict: distinct}
+
+Action:
+  "SuperWeaponTypeClass::Action": {verdict: distinct}
+  "ScenarioClass::ActionMovie": {verdict: distinct}
+
+Allies:
+  "HouseClass::owners":
+    verdict: distinct
+    absorbs: ["HouseClass::None"]
+    note: >-
+      read from a house record in a campaign and, outside a campaign, from the
+      spawn house section of the house holding that start position; both feed
+      the same alliance state
+
+Armor:
+  "ObjectTypeClass::Armor": {verdict: distinct}
+  "HouseTypeClass::ArmorBias": {verdict: distinct}
+
+AutoCrush:
+  "TechnoTypeClass::IsAutoCrush": {verdict: distinct}
+  "RulesClass::IQCrush": {verdict: distinct}
+
+BehavesLike:
+  "ParticleTypeClass::buffer": {verdict: distinct}
+  "ParticleSystemTypeClass::buffer": {verdict: distinct}
+
+BounceAnim:
+  "AnimTypeClass::BounceAnim": {verdict: distinct}
+  "VoxelAnimTypeClass::BounceAnim": {verdict: distinct}
+
+BounceSound:
+  "AnimTypeClass::BounceSound": {verdict: distinct}
+  "VoxelAnimTypeClass::BounceSound": {verdict: distinct}
+
+Bright:
+  "WeaponTypeClass::IsBright": {verdict: distinct}
+  "WarheadTypeClass::IsBright": {verdict: distinct}
+
+Color:
+  "BulletTypeClass::Color": {verdict: distinct}
+  "HouseTypeClass::Scheme": {verdict: distinct}
+  "TiberiumClass::Color": {verdict: distinct}
+  "HouseClass::Scheme":
+    verdict: distinct
+    note: >-
+      a per-scenario override of the house's color, read from the house's
+      own section in the map file
+  "SessionClass::PrefColor": {verdict: distinct}
+
+Cost:
+  "TechnoTypeClass::Cost": {verdict: distinct}
+  "HouseTypeClass::CostBias": {verdict: distinct}
+
+Crater:
+  "AnimTypeClass::IsCraterForming": {verdict: distinct}
+  "SmudgeTypeClass::IsCrater": {verdict: distinct}
+
+Damage:
+  "AnimTypeClass::Damage": {verdict: distinct}
+  "ParticleTypeClass::Damage": {verdict: distinct}
+  "VoxelAnimTypeClass::Damage": {verdict: distinct}
+  "WeaponTypeClass::Attack": {verdict: distinct}
+
+DamageRadius:
+  "AnimTypeClass::DamageRadius": {verdict: distinct}
+  "VoxelAnimTypeClass::DamageRadius": {verdict: distinct}
+
+DemandLoad:
+  "BuildingTypeClass::IsDemandLoad": {verdict: distinct}
+  "AnimTypeClass::IsDemandLoad": {verdict: distinct}
+  "OverlayTypeClass::DemandLoad": {verdict: distinct}
+
+DeploySound:
+  "BuildingTypeClass::AuxSound1": {verdict: distinct}
+  "RulesClass::DeploySound": {verdict: distinct}
+
+DetailLevel:
+  "AnimTypeClass::DetailLevel": {verdict: distinct}
+  "OptionsClass::DetailLevel": {verdict: distinct}
+
+Elasticity:
+  "AnimTypeClass::Elasticity": {verdict: distinct}
+  "BulletTypeClass::Elasticity": {verdict: distinct}
+  "VoxelAnimTypeClass::Elasticity": {verdict: distinct}
+
+Engineer:
+  "InfantryTypeClass::IsEngineer": {verdict: distinct}
+  "RulesClass::Engineer": {verdict: distinct}
+
+EngineerCaptureLevel:
+  "RulesClass::EngineerCaptureLevel": {verdict: distinct}
+
+EngineerDamage:
+  "RulesClass::EngineerDamage": {verdict: distinct}
+
+ExpireAnim:
+  "AnimTypeClass::ExpireAnim": {verdict: distinct}
+  "VoxelAnimTypeClass::ExpireAnim": {verdict: distinct}
+
+ExpireSound:
+  "AnimTypeClass::ExpireSound": {verdict: distinct}
+  "VoxelAnimTypeClass::ExpireSound": {verdict: distinct}
+
+Explodes:
+  "TechnoTypeClass::IsExploding": {verdict: distinct}
+  "OverlayTypeClass::IsExplosive": {verdict: distinct}
+
+Flat:
+  "BuildingTypeClass::IsFlat": {verdict: distinct}
+  "AnimTypeClass::IsFlat": {verdict: distinct}
+
+FlightLevel:
+  "TechnoTypeClass::FlightLevel": {verdict: distinct}
+  "RulesClass::FlightLevel": {verdict: distinct}
+
+Foundation:
+  "BuildingTypeClass::Size":
+    verdict: distinct
+    absorbs: ["BuildingTypeClass::size"]
+    note: >-
+      read first from the Image= art entry, then from the building's own art
+      entry; the second read overrides only when it resolves to something
+      other than 1x1, so a 1x1 or an unrecognized value there cannot
+      replace the footprint the image entry gave
+  "TerrainTypeClass::Foundation": {verdict: distinct}
+
+Group:
+  "TeamTypeClass::Group": {verdict: distinct}
+  "TaskForceClass::Group": {verdict: distinct}
+
+Harvester:
+  "UnitTypeClass::IsToHarvest": {verdict: distinct}
+  "RulesClass::IQHarvester": {verdict: distinct}
+
+Height:
+  "BuildingTypeClass::ZHeight": {verdict: distinct}
+  "SmudgeTypeClass::Height": {verdict: distinct}
+  "MapSeedClass::Height": {verdict: distinct}
+
+High:
+  "BulletTypeClass::IsHigh": {verdict: distinct}
+  "OverlayTypeClass::IsHigh": {verdict: distinct}
+
+Image:
+  "ObjectTypeClass::GraphicName": {verdict: distinct}
+  "TiberiumClass::None":
+    verdict: distinct
+    note: >-
+      on Tiberium definitions this integer selects the overlay variant
+  "BuildingTypeClass::None": {verdict: distinct}
+
+IsBaseDefense:
+  "BuildingTypeClass::IsBaseDefense": {verdict: distinct}
+  "TeamTypeClass::IsBaseDefense": {verdict: distinct}
+
+IsCoreDefender:
+  "BuildingTypeClass::IsCoreDefender": {verdict: distinct}
+  "UnitTypeClass::IsCoreDefender": {verdict: distinct}
+
+IsMeteor:
+  "AnimTypeClass::IsMeteor": {verdict: distinct}
+  "VoxelAnimTypeClass::IsMeteor": {verdict: distinct}
+
+IsTiberium:
+  "AnimTypeClass::IsTiberium": {verdict: distinct}
+  "VoxelAnimTypeClass::IsTiberium": {verdict: distinct}
+
+IsVeins:
+  "AnimTypeClass::IsVeins": {verdict: distinct}
+  "OverlayTypeClass::IsVeins": {verdict: distinct}
+
+LargeVisceroid:
+  "UnitTypeClass::IsLargeVisceroid": {verdict: distinct}
+  "RulesClass::LargeVisceroid": {verdict: distinct}
+
+MaxXYVel:
+  "AnimTypeClass::MaxXYVel": {verdict: distinct}
+  "VoxelAnimTypeClass::MaxXYVel": {verdict: distinct}
+
+MinPlayers:
+  "MultiMission::MinPlayers": {verdict: distinct}
+
+MinZVel:
+  "AnimTypeClass::MinZVel": {verdict: distinct}
+  "VoxelAnimTypeClass::MinZVel": {verdict: distinct}
+
+Name:
+  "AbstractTypeClass::GivenName": {verdict: distinct}
+  "ScenarioClass::None": {verdict: distinct}
+  "SessionClass::None":
+    verdict: distinct
+    note: >-
+      the same [Basic] display name, read again when the multiplayer map list
+      is built
+  "ThemeControl::None": {verdict: distinct}
+
+Normalized:
+  "TechnoTypeClass::IsRegulated": {verdict: distinct}
+  "AnimTypeClass::IsNormalized": {verdict: distinct}
+  "ParticleTypeClass::IsNormalized": {verdict: distinct}
+  "VoxelAnimTypeClass::IsNormalized": {verdict: distinct}
+
+Power:
+  "BuildingTypeClass::Power": {verdict: distinct}
+  "TiberiumClass::Power": {verdict: distinct}
+
+Priority:
+  "TeamTypeClass::RecruitPriority": {verdict: distinct}
+  "VocClass::priority": {verdict: distinct}
+
+ROF:
+  "HouseTypeClass::ROFBias": {verdict: distinct}
+  "WeaponTypeClass::ROF": {verdict: distinct}
+
+ROT:
+  "TechnoTypeClass::ROT": {verdict: distinct}
+  "BulletTypeClass::ROT": {verdict: distinct}
+
+Rate:
+  "AnimTypeClass::delay": {verdict: distinct, note: "Read as frames per minute; -1, the read default, is treated as absent, positive values store TICKS_PER_MINUTE / value as the frame delay, and zero or below stores no delay."}
+  "MissionControlClass::Rate": {verdict: distinct, note: "AARate in the same section falls back to this value when absent or zero."}
+
+Report:
+  "AnimTypeClass::Sound": {verdict: distinct}
+  "WeaponTypeClass::Sound": {verdict: distinct}
+
+Scenario:
+  "CampaignClass::ScenarioName": {verdict: distinct}
+  "ThemeControl::Scenario": {verdict: distinct}
+
+Side:
+  "HouseTypeClass::Side": {verdict: distinct}
+  "SessionClass::House": {verdict: distinct}
+  "ThemeControl::Owner": {verdict: distinct}
+
+SmallVisceroid:
+  "UnitTypeClass::IsSmallVisceroid": {verdict: distinct}
+  "RulesClass::SmallVisceroid": {verdict: distinct}
+
+Smoke:
+  "RulesClass::Smoke1":
+    verdict: distinct
+    absorbs: ["RulesClass::Smoke2"]
+    note: >-
+      the engine reads this key twice into two internal slots; both receive
+      the same animation
+
+SpawnCount:
+  "AnimTypeClass::SpawnCount": {verdict: distinct}
+  "VoxelAnimTypeClass::SpawnCount": {verdict: distinct}
+
+Spawns:
+  "AnimTypeClass::Spawns": {verdict: distinct}
+  "ParticleSystemTypeClass::Spawns": {verdict: distinct}
+  "VoxelAnimTypeClass::Spawns": {verdict: distinct}
+
+Speed:
+  "TechnoTypeClass::maxspeed": {verdict: distinct}
+  "WeaponTypeClass::MaxSpeed": {verdict: distinct}
+  "RulesClass::JumpjetSpeed": {verdict: distinct}
+
+Spread:
+  "WarheadTypeClass::SpreadFactor": {verdict: distinct}
+  "TiberiumClass::SpreadDelay": {verdict: distinct}
+
+StartSound:
+  "AnimTypeClass::StartSound": {verdict: distinct}
+  "VoxelAnimTypeClass::StartSound": {verdict: distinct}
+
+Strength:
+  "ObjectTypeClass::MaxStrength": {verdict: distinct}
+  "OverlayTypeClass::DamagePoints":
+    verdict: distinct
+    specializes: "ObjectTypeClass::MaxStrength"
+
+TechLevel:
+  "TechnoTypeClass::Level": {verdict: distinct}
+  "TeamTypeClass::TechLevel": {verdict: distinct}
+  "RulesClass::MPBuildLevel": {verdict: distinct}
+  "HouseClass::Control":
+    verdict: distinct
+    note: >-
+      when the key is absent, the house's tech level defaults to the
+      scenario's own number
+
+Theater:
+  "ObjectTypeClass::IsTheater": {verdict: distinct}
+  "AnimTypeClass::IsTheater": {verdict: distinct}
+  "ScenarioClass::Theater":
+    verdict: distinct
+    absorbs: ["DisplayClass::Theater"]
+    note: >-
+      read twice from the same [Map] entry into the same scenario member, once
+      as the scenario is set up and once as the map is read
+
+Tiberium:
+  "OverlayTypeClass::IsTiberium": {verdict: distinct}
+  "WarheadTypeClass::IsTiberiumDestroyer": {verdict: distinct}
+
+TiberiumExplosive:
+  "RulesClass::IsExplosiveHarvester": {verdict: distinct}
+  "SpecialClass::IsTExplode": {verdict: distinct}
+
+TiberiumGrows:
+  "RulesClass::IsMPTiberiumGrow": {verdict: distinct}
+  "SpecialClass::IsTGrowth": {verdict: distinct}
+
+TiberiumHeal:
+  "TechnoTypeClass::IsTiberiumHeal": {verdict: distinct}
+  "RulesClass::TiberiumHeal": {verdict: distinct}
+
+TrailerAnim:
+  "AnimTypeClass::TrailerAnim": {verdict: distinct}
+  "VoxelAnimTypeClass::TrailerAnim": {verdict: distinct}
+
+Translucency:
+  "AnimTypeClass::Translucency": {verdict: distinct}
+  "ParticleTypeClass::Translucency": {verdict: distinct}
+
+Translucent:
+  "AnimTypeClass::IsTranslucent": {verdict: distinct}
+  "VoxelAnimTypeClass::IsTranslucent": {verdict: distinct}
+
+TurboBoost:
+  "WeaponTypeClass::IsTurboBoosted": {verdict: distinct}
+  "RulesClass::TurboBoost": {verdict: distinct}
+
+Type:
+  "SuperWeaponTypeClass::buffer": {verdict: distinct}
+  "SessionClass::None": {verdict: distinct}
+
+Wall:
+  "BuildingTypeClass::IsWall": {verdict: distinct}
+  "OverlayTypeClass::IsWall": {verdict: distinct}
+  "WarheadTypeClass::IsWallDestroyer": {verdict: distinct}
+
+Warhead:
+  "AnimTypeClass::Warhead": {verdict: distinct}
+  "ParticleTypeClass::Warhead": {verdict: distinct}
+  "VoxelAnimTypeClass::Warhead": {verdict: distinct}
+  "WeaponTypeClass::WarheadPtr": {verdict: distinct}
+
+WaterBound:
+  "BuildingTypeClass::Speed":
+    verdict: distinct
+    note: >-
+      when the key is absent the building stays land-bound -- the effective
+      default is no
+  "TerrainTypeClass::IsWaterBased": {verdict: distinct}
+
+Weeder:
+  "BuildingTypeClass::IsWeeder": {verdict: distinct}
+  "UnitTypeClass::IsToVeinHarvest": {verdict: distinct}

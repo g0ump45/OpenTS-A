@@ -1,0 +1,35 @@
+---
+import { publicPageUrl } from '../lib/paths';
+import { UI } from '../i18n/en.mjs';
+import { siteConfig } from '../lib/site-config.mjs';
+
+interface Props {
+	title: string;
+	path?: string;
+}
+
+const { title, path = Astro.url.pathname } = Astro.props;
+const deployedBase = import.meta.env.BASE_URL.replace(/\/$/, '');
+const logicalPath = deployedBase && (path === deployedBase || path.startsWith(`${deployedBase}/`))
+	? path.slice(deployedBase.length) || '/'
+	: path;
+const pageUrl = publicPageUrl(logicalPath);
+const revision = siteConfig.revision;
+const issue = new URL(`${siteConfig.repositoryUrl}/issues/new`);
+issue.searchParams.set('template', 'documentation_feedback.md');
+issue.searchParams.set('title', `[Docs] ${title}`);
+issue.searchParams.set(
+	'body',
+	`## Page\n\n${pageUrl}\n\n## Revision\n\n\`${revision}\`\n\n## What is wrong or unclear?\n\n\n\n## Suggested correction\n\n\n\n## Supporting evidence\n\n`,
+);
+---
+
+<aside class="ots-feedback" aria-label={UI.feedback.aria}>
+	<div>
+		<strong>{UI.feedback.title}</strong>
+		<p>{UI.feedback.body}</p>
+	</div>
+	<a class="ots-feedback-link" href={issue.toString()}>{UI.feedback.link}</a>
+	{/* Pagefind splits a hash into letter and digit runs, so indexing it would put tokens such as "6" on every page and flatten the ranking for numeric identifiers. */}
+	<small>{UI.feedback.revision} <code data-pagefind-ignore>{revision.slice(0, 12)}</code></small>
+</aside>

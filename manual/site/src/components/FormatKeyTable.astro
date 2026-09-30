@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import ReferenceTable from './ReferenceTable.astro';
+import { allKeys, displayWhenOmitted, effectForScope } from '../lib/data';
+import { formatKeyMatches, type FormatRecord } from '../lib/formats';
+import { withBase } from '../lib/paths';
+import { sectionSelectorLabel } from '../lib/section-selector.mjs';
+
+interface Props {
+	format: FormatRecord;
+}
+
+const { format } = Astro.props;
+const prose = await getCollection('keyprose');
+const summaries = new Map<string, string>();
+for (const entry of prose) {
+	if (!entry.data.summary) continue;
+	const identity = `${entry.data.key}\u0000${entry.data.scope ?? ''}`;
+	summaries.set(identity, entry.data.summary);
+}
+const rows = formatKeyMatches(format, allKeys()).map(({ record, scope }) => ({
+	key: record.key,
+	href: withBase(`/keys/${record.route_id}/${record.scopes.length > 1 ? `#scope-${scope.route_id}` : ''}`),
+	summary: summaries.get(`${record.key}\u0000${scope.route_id}`) ?? summaries.get(`${record.key}\u0000`) ?? '',
+	value: scope.value_type,
+	whenOmitted: displayWhenOmitted(prose, record, scope),
+	effect: effectForScope(prose, record, scope),
+	facet: sectionSelectorLabel(scope.section),
+	context: sectionSelectorLabel(scope.section),
+	searchContext: `${scope.file} ${scope.applies_to.join(' ')}`,
+}));
+---
+
+{rows.length > 0 && (
+	<>
+		<h2 id="accepted-settings">Accepted settings</h2>
+		<ReferenceTable rows={rows} searchLabel="Filter settings" facetLabel="Section" />
+	</>
+)}

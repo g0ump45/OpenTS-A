@@ -1,0 +1,54 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import CommandPage from '../../components/CommandPage.astro';
+import TombstoneDetail from '../../components/TombstoneDetail.astro';
+import { allCommands, requireCommand, type CommandRecord } from '../../lib/commands';
+import { tombstones, type TombstoneRecord } from '../../lib/data';
+import { requireRouteTail } from '../../lib/paths';
+
+export async function getStaticPaths() {
+	const overlays = await getCollection('commands');
+	const byCommand = new Map<string, typeof overlays[number]>();
+	for (const overlay of overlays) {
+		const record = requireCommand(overlay.data.command_id, `Command overlay ${overlay.id}`);
+		if (overlay.id !== record.route_id) {
+			throw new Error(`Command overlay ${overlay.id}: filename must be ${record.route_id}.md`);
+		}
+		if (byCommand.has(record.id)) throw new Error(`Duplicate command overlay for ${record.id}`);
+		byCommand.set(record.id, overlay);
+	}
+	const active = allCommands()
+		.filter((record) => record.kind !== 'launch')
+		.map((record) => ({
+			params: { id: record.route_id },
+			props: { kind: 'active' as const, record, overlay: byCommand.get(record.id) },
+		}));
+	const removed = tombstones()
+		.filter((record) => record.type === 'command' && record.route.startsWith('/commands/'))
+		.map((record) => ({
+			params: { id: requireRouteTail(record.route, `Command tombstone ${record.id}`) },
+			props: { kind: 'removed' as const, record },
+		}));
+	return [...active, ...removed];
+}
+
+type Props =
+	| { kind: 'active'; record: CommandRecord; overlay?: CollectionEntry<'commands'> }
+	| { kind: 'removed'; record: TombstoneRecord };
+const props = Astro.props as Props;
+---
+
+{props.kind === 'removed' ? (
+	<TombstoneDetail record={props.record} />
+) : (
+	<CommandPage
+		record={props.record}
+		overlay={props.overlay}
+		crumbs={props.record.kind === 'fixed'
+			? [
+				{ href: '/commands/', label: 'Commands' },
+				{ href: '/commands/fixed-controls/', label: 'Fixed controls' },
+			]
+			: [{ href: '/commands/', label: 'Commands' }]}
+	/>
+)}

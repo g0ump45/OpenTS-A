@@ -1,0 +1,39 @@
+/*******************************************************************************
+ *                                O P E N  T S
+ *******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2026 OpenTS contributors
+ *
+ * See LICENSE.md for applicable additional terms and warranty disclaimers.
+ ******************************************************************************/
+
+#include "resource.h"
+
+#include <winres.h>
+
+// The other scripts inherit this from the MFC resource header, which this one does not use.
+#ifndef IDC_STATIC
+#define IDC_STATIC (-1)
+#endif
+
+// The exception report dialog lives in the executable rather than in the language resources,
+// because a crash can happen before those are loaded. It uses only the classes USER32 itself
+// provides, so it needs no common control library version to render.
+
+IDD_EXCEPTION DIALOGEX 0, 0, 350, 320
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOPMOST
+CAPTION "OpenTS - fatal error"
+FONT 9, "Segoe UI", 400, 0, 0x0
+BEGIN
+    LTEXT           "The game has crashed and cannot continue. A report was saved to:",
+                    IDC_STATIC, 7, 7, 336, 9
+    LTEXT           "", IDC_EXCEPTION_FOLDER, 7, 19, 336, 9
+    LTEXT           "Please include that whole folder when reporting the crash.",
+                    IDC_STATIC, 7, 31, 336, 9
+    EDITTEXT        IDC_EXCEPTION_DETAILS, 7, 45, 336, 250,
+                    ES_MULTILINE | ES_READONLY | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON      "Save full dump", IDC_EXCEPTION_FULLDUMP, 177, 299, 55, 14
+    PUSHBUTTON      "Debug", IDC_EXCEPTION_DEBUG, 236, 299, 50, 14
+    DEFPUSHBUTTON   "Quit", IDC_EXCEPTION_QUIT, 290, 299, 53, 14
+END

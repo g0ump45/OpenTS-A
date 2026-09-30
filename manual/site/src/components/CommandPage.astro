@@ -1,0 +1,46 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import CommandDetail from './CommandDetail.astro';
+import Feedback from './Feedback.astro';
+import LifecycleHistory from './LifecycleHistory.astro';
+import RelatedResources from './RelatedResources.astro';
+import { getCollection } from 'astro:content';
+import { UI } from '../i18n/en.mjs';
+import { commandKindLabel, commandRoute, type CommandRecord } from '../lib/commands';
+import { historyHeading } from '../lib/lifecycle';
+import { relatedResourcesFor } from '../lib/related';
+
+interface Props {
+	record: CommandRecord;
+	overlay?: CollectionEntry<'commands'>;
+	crumbs: Array<{ href: string; label: string }>;
+}
+const { record, overlay, crumbs } = Astro.props;
+const rendered = overlay ? await render(overlay) : undefined;
+const Content = rendered?.Content;
+const description = record.description
+	|| UI.commands.pageDescription(record.title, commandKindLabel(record.kind));
+const related = await relatedResourcesFor(
+	{ type: 'command', id: record.id },
+	[],
+	`Command ${record.id}`,
+);
+const pageHeadings = [
+	...(rendered?.headings ?? []),
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+	...historyHeading(await getCollection('changes'), { type: 'command', id: record.id }),
+];
+---
+
+<StarlightPage frontmatter={{ title: record.title, description, tableOfContents: pageHeadings.length > 0 ? undefined : false }} headings={pageHeadings}>
+	<Breadcrumb crumbs={crumbs} />
+	<LifecycleHistory reference={{ type: 'command', id: record.id }} showHistory={false} />
+	<p class="ots-lede ots-compact">{description}</p>
+	<CommandDetail record={record} />
+	{Content && <Content />}
+	<RelatedResources resources={related} />
+	<LifecycleHistory reference={{ type: 'command', id: record.id }} showBadges={false} />
+	<Feedback title={record.title} path={commandRoute(record)} />
+</StarlightPage>

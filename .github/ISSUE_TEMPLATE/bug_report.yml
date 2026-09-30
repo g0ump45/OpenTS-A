@@ -1,0 +1,28 @@
+name: Bug report
+description: Report an OpenTS source, build, or engine defect
+title: "[Bug] "
+body:
+  - type: input
+    id: revision
+    attributes:
+      label: OpenTS version
+      description: The version as the game displays it, or a commit SHA or branch.
+      placeholder: 0.1.0 (ab12cd3)
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you did, what happened, and what you expected instead. Include logs or screenshots, but never game assets or original executables.
+      placeholder: |
+        1. Start from...
+        2. Run or configure...
+        3. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Operating system, build configuration, and any mods or custom content, when relevant.

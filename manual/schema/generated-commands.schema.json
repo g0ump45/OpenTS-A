@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/generated-commands.schema.json",
+  "title": "Generated OpenTS command catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["registered_commands", "fixed_controls", "launch_options"],
+  "properties": {
+    "registered_commands": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/registeredCommand" }
+    },
+    "fixed_controls": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/fixedControl" }
+    },
+    "launch_options": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/launchOption" }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "build": { "enum": ["release", "debug"] },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["builds"],
+      "properties": {
+        "builds": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/build" }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source"],
+      "properties": {
+        "source": { "$ref": "#/$defs/nonEmptyString" },
+        "class": { "$ref": "#/$defs/nonEmptyString" },
+        "guard": { "type": ["string", "null"] }
+      }
+    },
+    "common": {
+      "type": "object",
+      "required": ["id", "route_id", "kind", "title", "description", "audience", "availability", "_provenance"],
+      "properties": {
+        "id": { "$ref": "#/$defs/nonEmptyString" },
+        "route_id": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "kind": { "enum": ["registered", "fixed", "launch"] },
+        "title": { "$ref": "#/$defs/nonEmptyString" },
+        "description": { "type": "string" },
+        "audience": { "enum": ["player", "developer", "debug"] },
+        "availability": { "$ref": "#/$defs/availability" },
+        "_provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "registeredCommand": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "route_id", "kind", "title", "description", "audience", "availability", "category", "_provenance"],
+          "properties": {
+            "id": true,
+            "route_id": true,
+            "kind": { "const": "registered" },
+            "title": true,
+            "description": true,
+            "audience": true,
+            "availability": true,
+            "category": { "$ref": "#/$defs/nonEmptyString" },
+            "forced_binding": { "enum": ["Delete", "Escape"] },
+            "_provenance": true
+          }
+        }
+      ]
+    },
+    "fixedControl": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "route_id", "kind", "title", "description", "audience", "availability", "bindings", "context", "_provenance"],
+          "properties": {
+            "id": true,
+            "route_id": true,
+            "kind": { "const": "fixed" },
+            "title": true,
+            "description": true,
+            "audience": true,
+            "availability": true,
+            "bindings": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            },
+            "context": { "$ref": "#/$defs/nonEmptyString" },
+            "_provenance": true
+          }
+        }
+      ]
+    },
+    "launchOption": {
+      "allOf": [
+        { "$ref": "#/$defs/common" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "route_id", "kind", "title", "description", "audience", "availability", "syntax", "_provenance"],
+          "properties": {
+            "id": true,
+            "route_id": true,
+            "kind": { "const": "launch" },
+            "title": true,
+            "description": true,
+            "audience": true,
+            "availability": true,
+            "syntax": { "$ref": "#/$defs/nonEmptyString" },
+            "aliases": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/nonEmptyString" }
+            },
+            "_provenance": true
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,61 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from './Breadcrumb.astro';
+import Feedback from './Feedback.astro';
+import FormatKeyTable from './FormatKeyTable.astro';
+import FormatSpec from './FormatSpec.astro';
+import LifecycleHistory from './LifecycleHistory.astro';
+import RelatedResources from './RelatedResources.astro';
+import { UI } from '../i18n/en.mjs';
+import { allKeys } from '../lib/data';
+import { allFormats, formatKeyMatches } from '../lib/formats';
+import { historyHeading } from '../lib/lifecycle';
+import { relatedResourcesFor } from '../lib/related';
+import { siteConfig, sourceFileUrl } from '../lib/site-config.mjs';
+
+interface Props {
+	entry: CollectionEntry<'formats'>;
+}
+
+const { entry } = Astro.props;
+const format = allFormats().get(entry.data.format_id);
+if (!format) throw new Error(`Format page ${entry.id}: missing synchronous catalog record ${entry.data.format_id}`);
+if (format.slug !== entry.id) throw new Error(`Format page ${entry.id}: catalog slug is ${format.slug}`);
+const { Content, headings } = await render(entry);
+const acceptedSettings = formatKeyMatches(format, allKeys());
+const related = await relatedResourcesFor(
+	{ type: 'format', id: format.format_id },
+	format.related,
+	`Format ${format.format_id}`,
+);
+const parentCrumb = format.route.startsWith('/mapping/')
+	? { label: UI.navigation.mapping, href: '/mapping/' }
+	: { label: UI.navigation.formats, href: '/formats/' };
+const pageHeadings = [
+	...(format.kind === 'registry' ? [{ depth: 2, slug: 'registration-sections', text: 'Registration sections' }] : []),
+	...(format.kind === 'record' ? [{ depth: 2, slug: 'fields', text: 'Fields' }] : []),
+	...headings,
+	...(acceptedSettings.length > 0 ? [{ depth: 2, slug: 'accepted-settings', text: 'Accepted settings' }] : []),
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+	{ depth: 2, slug: 'source-files', text: 'Source files' },
+	...historyHeading(await getCollection('changes'), { type: 'format', id: format.format_id }),
+];
+---
+
+<StarlightPage frontmatter={{ title: format.title, description: format.summary }} headings={pageHeadings}>
+	<Breadcrumb crumbs={[parentCrumb]} />
+	<LifecycleHistory reference={{ type: 'format', id: format.format_id }} showHistory={false} />
+	<p class="ots-lede">{format.summary}</p>
+	<FormatSpec format={format} />
+	<Content />
+	<FormatKeyTable format={format} />
+	<RelatedResources resources={related} />
+	<h2 id="source-files">Source files</h2>
+	<p class="ots-source-revision">Linked at revision <code data-pagefind-ignore>{siteConfig.revision.slice(0, 12)}</code>.</p>
+	<ul class="ots-source-files">
+		{format.source_files.map((path) => <li><a href={sourceFileUrl(path)}><code>{path}</code></a></li>)}
+	</ul>
+	<LifecycleHistory reference={{ type: 'format', id: format.format_id }} showBadges={false} />
+	<Feedback title={format.title} path={format.route} />
+</StarlightPage>

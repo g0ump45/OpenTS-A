@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import Feedback from '../../components/Feedback.astro';
+import RelatedResources from '../../components/RelatedResources.astro';
+import { UI } from '../../i18n/en.mjs';
+import { requireKey } from '../../lib/data';
+import { withBase } from '../../lib/paths';
+import { relatedResourcesFor } from '../../lib/related';
+import { guideCategoryTitle } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+	const guides = await getCollection('guides');
+	const errors: string[] = [];
+	for (const guide of guides) {
+		for (const key of guide.data.uses_keys) {
+			try {
+				requireKey(key, `Guide ${guide.id}`);
+			} catch (error) {
+				errors.push(error instanceof Error ? error.message : String(error));
+			}
+		}
+		for (const reference of guide.data.related) {
+			if (reference.type === 'key' && !reference.scope && guide.data.uses_keys.includes(reference.id)) {
+				errors.push(`${guide.id}: related duplicates uses_keys shortcut ${reference.id}`);
+			}
+		}
+	}
+	if (errors.length) throw new Error(`Guide validation failed:\n${errors.join('\n')}`);
+	return guides.map((guide) => ({ params: { id: guide.id }, props: { guide } }));
+}
+
+const { guide } = Astro.props;
+const { Content, headings } = await render(guide);
+const related = await relatedResourcesFor(
+	{ type: 'guide', id: guide.id },
+	guide.data.related,
+	`Guide ${guide.id}`,
+);
+const pageHeadings = [
+	...headings,
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+];
+---
+
+<StarlightPage frontmatter={{ title: guide.data.title, description: guide.data.summary }} headings={pageHeadings}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.guides, href: '/guides/' },
+		{ label: guideCategoryTitle(guide.data.category) },
+	]} />
+	<p class="ots-lede">{guide.data.summary}</p>
+	{guide.data.prerequisites.length > 0 && <div class="ots-aside ots-aside-note"><div class="ots-aside-title">Before you start</div><ul>{guide.data.prerequisites.map((item) => <li>{item}</li>)}</ul></div>}
+	<Content />
+	{guide.data.uses_keys.length > 0 && (
+		<div class="ots-seealso"><strong>Keys used</strong>{' \u2014 '}{guide.data.uses_keys.map((key, index) => <>{index > 0 && ', '}<a href={withBase(`/keys/${requireKey(key, `Guide ${guide.id}`).route_id}/`)}><code>{key}</code></a></>)}</div>
+	)}
+	<RelatedResources resources={related} />
+	<Feedback title={guide.data.title} path={`/guides/${guide.id}/`} />
+</StarlightPage>

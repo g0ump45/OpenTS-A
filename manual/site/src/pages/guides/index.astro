@@ -1,0 +1,34 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { withBase } from '../../lib/paths';
+import { GUIDE_CATEGORIES } from '../../lib/taxonomy';
+
+const guides = await getCollection('guides');
+const populatedCategories = GUIDE_CATEGORIES.map((category) => ({
+	...category,
+	entries: guides
+		.filter((guide) => guide.data.category === category.id)
+		.sort((left, right) => left.data.title.localeCompare(right.data.title) || left.id.localeCompare(right.id)),
+})).filter((category) => category.entries.length > 0);
+---
+
+<StarlightPage frontmatter={{ title: 'Guides', description: 'Procedures and failure cases for OpenTS and Tiberian Sun modding tasks.', tableOfContents: false }}>
+	<p class="ots-lede">Procedures and failure cases for common modding tasks.</p>
+	{populatedCategories.length > 0 ? populatedCategories.map((category) => (
+		<section class="ots-hub-section">
+			<h2 id={category.id}>{category.title}</h2>
+			<p class="ots-compact">{category.description}</p>
+			<CardGrid>
+				{category.entries.map((guide) => (
+					<LinkCard
+						title={guide.data.title}
+						href={withBase(`/guides/${guide.id}/`)}
+						description={guide.data.summary}
+					/>
+				))}
+			</CardGrid>
+		</section>
+	)) : <p>The manual contains no guides yet.</p>}
+</StarlightPage>

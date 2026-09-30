@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/ini-read-exclusions.schema.json",
+  "title": "Intentional INI read classifications",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "reader_exclusions", "site_exclusions"],
+  "properties": {
+    "version": { "const": 1 },
+    "reader_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "function", "reason"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^code/[^/].*\\.cpp$" },
+          "function": { "type": "string", "pattern": "^[A-Za-z_][A-Za-z0-9_]*::Read_INI$" },
+          "reason": { "type": "string", "minLength": 20 }
+        }
+      }
+    },
+    "site_exclusions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "function", "keys", "classification", "reason"],
+        "properties": {
+          "path": { "type": "string", "pattern": "^code/[^/].*\\.(?:cpp|h|hh)$" },
+          "function": { "type": "string", "minLength": 1 },
+          "keys": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "accessors": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^T?Get_[A-Za-z_][A-Za-z0-9_]*$" }
+          },
+          "classification": { "enum": ["adapter", "duplicate", "excluded"] },
+          "canonical_key": { "type": "string", "minLength": 1 },
+          "reason": { "type": "string", "minLength": 20 }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "classification": { "const": "duplicate" } } },
+            "then": { "required": ["canonical_key"] },
+            "else": { "not": { "required": ["canonical_key"] } }
+          }
+        ]
+      }
+    }
+  }
+}

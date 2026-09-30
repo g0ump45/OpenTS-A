@@ -1,0 +1,47 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { UI } from '../i18n/en.mjs';
+import { withBase } from '../lib/paths';
+
+const frontmatter = {
+	title: 'OpenTS Manual',
+	description: 'OpenTS setup, features, commands, formats, INI files, mapping, internals, and changes.',
+	template: 'splash' as const,
+	tableOfContents: false,
+	hero: {
+		tagline: 'Setup, runtime behavior, configuration, mapping, and source-level internals.',
+		actions: [
+			{ text: 'Using OpenTS', link: withBase('/using/'), icon: 'document' as const },
+			{ text: UI.navigation.allKeys, link: withBase('/reference/all/'), icon: 'magnifier' as const, variant: 'secondary' as const },
+			{ text: UI.navigation.howToRead, link: withBase('/how-to-read/'), icon: 'open-book' as const, variant: 'secondary' as const },
+		],
+	},
+};
+---
+
+<StarlightPage frontmatter={frontmatter}>
+	<h2>{UI.navigation.bandModding}</h2>
+	<CardGrid>
+		<LinkCard title="Using OpenTS" href={withBase('/using/')} description="Developer-build setup, local data, configuration, and compatibility." />
+		<LinkCard title="Features & systems" href={withBase('/systems/')} description="Gameplay, interface, presentation, multiplayer, and runtime behavior." />
+		<LinkCard title={UI.navigation.reference} href={withBase('/reference/')} description="Settings grouped by file, section, and object type." />
+		<LinkCard title="Guides" href={withBase('/guides/')} description="Procedures and failure cases." />
+		<LinkCard title="Mapping" href={withBase('/mapping/')} description="Scenario sections, triggers, and AI team definitions." />
+		<LinkCard title="Commands" href={withBase('/commands/')} description="Player and debug commands with their hotkeys and fixed controls." />
+		<LinkCard title="Formats" href={withBase('/formats/')} description="File loading, registries, record layouts, and binary data." />
+	</CardGrid>
+
+	<h2>{UI.navigation.bandDevelopment}</h2>
+	<CardGrid>
+		<LinkCard title="Engine internals" href={withBase('/internals/')} description="Source-level architecture and subsystem behavior." />
+	</CardGrid>
+
+	<CardGrid>
+		<LinkCard title="Changes" href={withBase('/changes/')} description="Versioned OpenTS behavior and compatibility changes." />
+	</CardGrid>
+
+	{/* The one site-level statement about how the manual was produced. It is
+	    never repeated onto individual pages. */}
+	<p class="ots-site-note">{UI.site.projectNotice}</p>
+</StarlightPage>

@@ -1,0 +1,29 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Feedback from '../../../components/Feedback.astro';
+import FileReferenceTable from '../../../components/FileReferenceTable.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { referenceRowsForFile } from '../../../lib/data';
+
+const rows = referenceRowsForFile('map seed file');
+if (rows.length !== 21) {
+	throw new Error(`Map seed reference expected 21 extracted scopes, found ${rows.length}`);
+}
+if (rows.some((row) => row.scope.section.kind !== 'literal' || row.scope.section.name !== 'RandomMap')) {
+	throw new Error('Map seed reference contains a scope outside [RandomMap]');
+}
+---
+
+<StarlightPage frontmatter={{ title: 'Map seed files', description: 'Settings read from the RandomMap section of a map seed .SED file.', tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: UI.navigation.mapSeeds },
+	]} />
+	<p class="ots-lede">Settings read from <code>[RandomMap]</code> in a map seed <code>.SED</code> file.</p>
+	<FileReferenceTable
+		file="map seed file"
+		levelLabels={{ MapSeedClass: 'Map seed definition', RandomMap: 'Random map generator' }}
+	/>
+	<Feedback title="Map seed files" path="/reference/map-seeds/" />
+</StarlightPage>

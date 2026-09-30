@@ -1,0 +1,25 @@
+---
+import { UI } from '../i18n/en.mjs';
+import type { RelatedResource } from '../lib/related';
+import { withBase } from '../lib/paths';
+
+interface Props {
+	resources: RelatedResource[];
+}
+
+const { resources } = Astro.props;
+---
+
+{resources.length > 0 && (
+	<section class="ots-related-resources" aria-labelledby="related-resources">
+		<h2 id="related-resources">{UI.related.title}</h2>
+		<ul>
+			{resources.map((resource) => (
+				<li>
+					<a href={withBase(resource.href)}>{resource.label}</a>
+					<small>{UI.related.types[resource.type]}</small>
+				</li>
+			))}
+		</ul>
+	</section>
+)}

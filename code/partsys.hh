@@ -1,0 +1,54 @@
+/*******************************************************************************
+ *                                O P E N  T S
+ *******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2026 OpenTS contributors
+ *
+ * See LICENSE.md for applicable additional terms and warranty disclaimers.
+ ******************************************************************************/
+
+#pragma once
+
+enum ParticleSystemType {
+	PARTSYS_NONE=-1,
+
+	PARTSYS_GAS_CLOUD_SYS,
+	PARTSYS_FIRE_STREAM_SYS,
+	PARTSYS_BIG_GREY_SMOKE_SYS,
+	PARTSYS_SMALL_GREY_S_SYS,
+	PARTSYS_DEBRIS_SMOKE_SYS,
+	PARTSYS_SPARK_SYS,
+	PARTSYS_FIRESTORM_SPARK_SYS,
+	PARTSYS_TEST_SMOKE_SYS,
+	PARTSYS_SMALL_RAILGUN_SYS,
+	PARTSYS_LARGE_RAILGUN_SYS,
+	PARTSYS_WELDING_SYS,
+	PARTSYS_LG_SPARK_SYS,
+
+	/*
+	 * Firestorm additions start here
+	 */
+	PARTSYS_SMALL_GREY_SMOKE_SYS,
+	PARTSYS_WEB_SYS,
+	PARTSYS_GAS_PUFF_SYS,
+	PARTSYS_SMOKE_STACK_SYS,
+
+	PARTSYS_COUNT,
+	PARTSYS_FIRST=0
+};
+
+
+enum ParticleSystemBehaviorType
+{
+	PSYS_BEHAVIOR_SMOKE,
+	PSYS_BEHAVIOR_GAS,
+	PSYS_BEHAVIOR_FIRE,
+	PSYS_BEHAVIOR_SPARK,
+	PSYS_BEHAVIOR_RAILGUN,
+	PSYS_BEHAVIOR_WEB,
+	PSYS_BEHAVIOR_WEAKGAS,
+
+	PSYS_BEHAVIOR_COUNT,
+	PSYS_BEHAVIOR_NONE = -1,
+	PSYS_BEHAVIOR_FIRST = 0
+};

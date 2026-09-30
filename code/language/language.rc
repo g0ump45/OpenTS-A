@@ -1,0 +1,2590 @@
+/******************************************************************************
+ *                               O P E N  T S
+ ******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2025 Electronic Arts Inc.
+ * Copyright 2026 OpenTS contributors
+ *
+ * Contains material derived from Electronic Arts source code.
+ * Modified by OpenTS contributors, 2026.
+ * EA's GPLv3 Section 7 additional terms and supplemental warranty
+ * disclaimers apply; see LICENSE.md.
+ *****************************************************************************/
+
+//Microsoft Developer Studio generated resource script.
+//
+#include "language.h"
+
+// Generated Help ID header file
+#define APSTUDIO_HIDDEN_SYMBOLS
+#include "language.hm"
+#undef APSTUDIO_HIDDEN_SYMBOLS
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <winres.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+// The version resource reports the project version and the commit it was built from.
+#include "opents_version.h"
+#include "opents_build.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(65001)
+#endif //_WIN32
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION OPENTS_RC_FILEVERSION
+ PRODUCTVERSION OPENTS_RC_FILEVERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG | OPENTS_RC_PRERELEASE_FLAG
+#else
+ FILEFLAGS OPENTS_RC_PRERELEASE_FLAG
+#endif
+ FILEOS 0x4L
+ FILETYPE VFT_DLL
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "United States & United Kingdom\0"
+            VALUE "CompanyName", "OpenTS contributors\0"
+            VALUE "FileDescription", "Tiberian Sun Language Definitions\0"
+            VALUE "FileVersion", OPENTS_VERSION "\0"
+            VALUE "InternalName", "English Resources\0"
+            VALUE "LegalCopyright", "Copyright © 2000 Westwood Studios, © 2026 OpenTS contributors\0"
+            VALUE "LegalTrademarks", "Command & Conquer is a trademark of Westwood Studios\0"
+            VALUE "OriginalFilename", "Language.dll\0"
+            VALUE "PrivateBuild", OPENTS_BUILD_DESCRIPTION "\0"
+            VALUE "ProductName", "Command & Conquer: Tiberian Sun\0"
+            VALUE "ProductVersion", OPENTS_VERSION_DISPLAY "\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "language.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_MISSION_ABORT DIALOG DISCARDABLE  0, 0, 256, 63
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,174,37,60,14
+    CTEXT           "Do you want to abort the mission?",-1,22,12,212,19,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Abort",IDC_ABORT_MISSION,"Button",BS_OWNERDRAW,22,37,60,
+                    14
+    CONTROL         "Restart",IDC_RESTART_MISSION,"Button",BS_OWNERDRAW,98,
+                    37,60,14
+END
+
+IDD_OPT_CONFIRM_MODE DIALOG DISCARDABLE  0, 0, 239, 70
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,111,44,50,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,167,44,50,14
+    LTEXT           "Click OK to keep this display mode or wait and your old display settings will be restored.",
+                    IDC_CONFIRM_MODE_TEXT,22,12,195,26,NOT WS_GROUP
+END
+
+IDD_OPT_KEYBOARD DIALOGEX 0, 0, 336, 208
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Category:",-1,22,27,146,9,SS_CENTERIMAGE | NOT WS_GROUP
+    COMBOBOX        IDC_KEY_CATEGORY,22,42,138,146,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    LTEXT           "Commands:",-1,168,27,146,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LISTBOX         IDC_KEY_COMMANDS,168,41,146,104,LBS_SORT | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    LTEXT           "Press new shortcut key:",-1,22,119,128,9,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "Description:",-1,22,57,138,57
+    LTEXT           "",IDC_KEY_DESCRIPTION,29,68,127,42,NOT WS_GROUP,
+                    WS_EX_TRANSPARENT
+    CONTROL         "HotKey1",IDC_KEY_HOTKEY,"msctls_hotkey32",WS_BORDER,22,
+                    131,85,14
+    CONTROL         "Assign",IDC_KEY_ASSIGN,"Button",BS_OWNERDRAW,110,132,50,
+                    14
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,187,181,50,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,264,181,50,14
+    CTEXT           "Customize Keyboard",-1,22,12,292,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LTEXT           "Currently assigned to:",-1,22,151,146,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LTEXT           "Current shortcut:",-1,168,151,146,11,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LTEXT           "",IDC_KEY_ASSIGNED_TO,22,166,146,10,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LTEXT           "",IDC_KEY_CURRENT_SHORTCUT,168,166,146,10,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Reset All",IDC_KEY_RESET_ALL,"Button",BS_OWNERDRAW,22,
+                    181,54,14
+END
+
+IDD_OPT_DISPLAY DIALOG DISCARDABLE  0, 0, 229, 196
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,22,170,62,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,145,170,62,14
+    LISTBOX         IDC_DISPLAY_RESLIST,22,37,185,110,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    CTEXT           "Resolution Modes",IDC_DISPLAY_RESLABEL,22,25,185,10,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CTEXT           "Display Options:",-1,22,12,185,9,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Stretch movies to fit resolution",IDC_STRETCH_MOVIES,
+                    "Button",BS_AUTOCHECKBOX | BS_FLAT,22,153,185,10
+END
+
+IDD_DROPSHIP_LIMITS DIALOGEX 0, 0, 230, 140
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dropship Loadout Limits"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDC_DROPSHIP_OK,101,114,50,14
+    PUSHBUTTON      "Cancel",IDC_CANCEL,158,113,50,14
+    CONTROL         "List1",IDC_DROPSHIP_LIST,"SysListView32",LVS_REPORT | 
+                    LVS_SORTASCENDING | LVS_EDITLABELS | WS_BORDER | 
+                    WS_TABSTOP,7,7,202,98,0,HIDC_DROPSHIP_LIST
+END
+
+IDD_DROPSHIP_LIMIT DIALOG DISCARDABLE  0, 0, 203, 71
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dropship Unit Limit"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDC_DROPSHIP_OK,78,48,50,14
+    PUSHBUTTON      "Cancel",IDC_CANCEL,139,48,50,14
+    LTEXT           "Unit Name",IDC_DROPSHIP_UNITNAME_LABEL,19,7,55,10
+    EDITTEXT        IDC_DROPSHIP_LIMIT_EDIT,19,24,49,14,ES_AUTOHSCROLL
+    LTEXT           "(Use -1 to signify an unlimited supply)",-1,73,25,123,
+                    12
+END
+
+IDD_OPT_CTRL_GAME_MP DIALOG DISCARDABLE  0, 0, 292, 175
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Options Menu",1,"Button",BS_OWNERDRAW,196,149,77,14
+    CONTROL         "Keyboard",IDC_OPT_KEYBOARD_BTN,"Button",BS_OWNERDRAW,
+                    109,149,77,14
+    CONTROL         "Sound",IDC_OPT_SOUND_BTN,"Button",BS_OWNERDRAW,22,149,
+                    77,14
+    CONTROL         "Slider1",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,90,12,128,15
+    RTEXT           "Game Speed:",-1,22,12,63,15,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider2",IDC_SCROLL_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,90,43,128,15
+    RTEXT           "Scroll Rate:",-1,22,43,63,15,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider3",IDC_DETAIL_LEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,90,74,128,15
+    RTEXT           "Visual Details:",-1,22,74,63,15,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Higher",IDC_DETAIL_LEVEL_LABEL,224,74,50,15,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Faster",IDC_SCROLL_SPEED_LABEL,224,43,50,15,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Faster",IDC_GAME_SPEED_LABEL,224,12,50,15,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Sidebar Text",IDC_SIDEBAR_TEXT,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,94,119,10
+    CONTROL         "Target Lines",IDC_TARGET_LINES,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,112,119,10
+    CONTROL         "Tooltips",IDC_TOOLTIPS,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,147,94,127,10
+    CONTROL         "Scroll Coasting",IDC_SCROLL_COASTING,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,147,112,127,10
+    CONTROL         "Edge Scrolling",IDC_EDGE_SCROLL,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,22,130,119,10
+END
+
+IDD_OPT_CTRL_GAME_SP DIALOG DISCARDABLE  0, 0, 292, 179
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Main Menu",1,"Button",BS_OWNERDRAW,81,153,130,14
+    CONTROL         "Slider1",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,80,12,148,13
+    LTEXT           "Game Speed",-1,22,12,58,13,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider2",IDC_SCROLL_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,80,34,148,13
+    LTEXT           "Scroll Rate",-1,22,34,58,13,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider3",IDC_DETAIL_LEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,80,56,148,13
+    LTEXT           "Visual Details",-1,22,56,58,13,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    RTEXT           "Higher",IDC_DETAIL_LEVEL_LABEL,229,56,45,13,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    RTEXT           "Faster",IDC_SCROLL_SPEED_LABEL,229,34,45,13,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    RTEXT           "Faster",IDC_GAME_SPEED_LABEL,229,12,45,13,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider3",IDC_DIFFICULTY_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,80,78,148,13
+    LTEXT           "Difficulty",-1,22,78,58,13,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    RTEXT           "Harder",IDC_DIFFICULTY_LABEL,229,78,45,13,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Cameo Text",IDC_SIDEBAR_TEXT,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,103,124,10
+    CONTROL         "Target Lines",IDC_TARGET_LINES,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,119,124,10
+    CONTROL         "Tooltips",IDC_TOOLTIPS,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,146,103,128,10
+    CONTROL         "Scroll Coasting",IDC_SCROLL_COASTING,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,146,119,128,10
+    CONTROL         "Edge Scrolling",IDC_EDGE_SCROLL,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,22,135,124,10
+END
+
+IDD_GAME_SETTINGS_FLAGS DIALOG DISCARDABLE  0, 0, 220, 77
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Bases",IDC_BASES,"Button",BS_AUTOCHECKBOX,5,18,102,10
+    CONTROL         "Harvester Truce",IDC_HARVTRUCE,"Button",BS_AUTOCHECKBOX,
+                    5,61,203,10
+    CONTROL         "Allies allowed",IDC_ALLIES,"Button",BS_AUTOCHECKBOX,5,4,
+                    103,10
+    LTEXT           "Time Limit",-1,0,67,50,10,NOT WS_VISIBLE | WS_DISABLED
+    LTEXT           "Kill Limit",-1,112,67,50,10,NOT WS_VISIBLE | 
+                    WS_DISABLED
+    CONTROL         "Slider1",IDC_TIMELIMIT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_DISABLED,43,64,64,13
+    CONTROL         "Slider2",IDC_KILLLIMIT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | NOT WS_VISIBLE | WS_DISABLED,149,64,64,13
+    CONTROL         "Bridges Destroyable",IDC_BRIDGE_DESTROY,"Button",
+                    BS_AUTOCHECKBOX,5,47,204,10
+    CONTROL         "Re-Deployable MCV",IDC_REDEPLOY_MCV,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,5,32,206,11
+    CONTROL         "Fog Of War",IDC_FOG_OF_WAR,"Button",BS_AUTOCHECKBOX,118,
+                    4,93,10
+    CONTROL         "Crates",IDC_CRATES,"Button",BS_AUTOCHECKBOX,118,18,95,
+                    10
+END
+
+IDD_GAME_SETTINGS_SLIDERS DIALOG DISCARDABLE  0, 0, 220, 77
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Slider1",IDC_UNITCOUNT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,105,33,70,13
+    LTEXT           "Unit Count",-1,45,35,60,10
+    CONTROL         "Slider2",IDC_TECHLEVEL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,105,48,70,13
+    CONTROL         "Slider3",IDC_CREDITS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,105,3,70,13
+    LTEXT           "Tech Level",-1,45,50,60,10
+    LTEXT           "Credits",-1,45,5,60,10
+    LTEXT           "AI Players",-1,45,65,60,10
+    CONTROL         "Slider3",IDC_AIPLAYERS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,105,63,70,13
+    LTEXT           "Difficulty",-1,45,20,60,10
+    CONTROL         "Slider3",IDC_GAMESET_DIFFICULTY,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,105,18,70,13
+END
+
+IDD_OPT_MAIN DIALOG DISCARDABLE  0, 0, 200, 148
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Main Menu",IDC_OPTMAIN_MAINMENU,"Button",BS_OWNERDRAW | 
+                    BS_CENTER,37,120,126,18
+    CONTROL         "Display",IDC_OPTMAIN_DISPLAY,"Button",BS_OWNERDRAW | 
+                    BS_CENTER,37,32,126,18
+    CONTROL         "Keyboard",IDC_OPTMAIN_KEYBOARD,"Button",BS_OWNERDRAW | 
+                    BS_CENTER,37,76,126,18
+    CONTROL         "Sound",IDC_OPTMAIN_SOUND,"Button",BS_OWNERDRAW | 
+                    BS_CENTER,37,54,126,18
+    CONTROL         "Game Settings",IDC_OPTMAIN_GAME_SETTINGS,"Button",
+                    BS_OWNERDRAW | BS_CENTER,37,10,126,18
+END
+
+IDD_MAIN_MENU DIALOG DISCARDABLE  0, 0, 204, 147
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Exit Game",IDC_EXIT_GAME,"Button",BS_OWNERDRAW,37,117,
+                    130,18
+    CONTROL         "New Campaign",IDC_NEWCAMPAIGN,"Button",BS_OWNERDRAW,37,
+                    12,130,18
+    CONTROL         "Load Mission",IDC_LOAD_MISSION,"Button",BS_OWNERDRAW,37,
+                    33,130,18
+    CONTROL         "Multiplayer Game",IDC_MULTIPLAYER_GAME,"Button",
+                    BS_OWNERDRAW,37,54,130,18
+    CONTROL         "Intro / Sneak Peek",IDC_INTRO,"Button",BS_OWNERDRAW,37,
+                    75,130,18
+    CONTROL         "Options",IDC_OPTIONS,"Button",BS_OWNERDRAW,37,96,130,18
+END
+
+IDD_MAPGEN DIALOG DISCARDABLE  0, 0, 424, 242
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,265,220,65,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,337,220,65,14
+    COMBOBOX        IDC_MAPGEN_ENVIRONMENT,95,8,100,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    CONTROL         "Slider1",IDC_MAPGEN_HILLS,"msctls_trackbar32",TBS_TOP,
+                    95,104,100,14
+    LTEXT           "Hills:",-1,22,104,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_WATER,"msctls_trackbar32",TBS_TOP,
+                    95,161,100,14
+    LTEXT           "Players:",-1,22,47,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Map Width:",-1,206,8,65,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Map Height:",-1,205,25,65,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_VEGETATION,"msctls_trackbar32",
+                    TBS_TOP,95,180,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_CITIES,"msctls_trackbar32",TBS_TOP,
+                    95,199,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_TIBERIUM_FIELDS,"msctls_trackbar32",
+                    TBS_TOP,95,142,100,14
+    LTEXT           "Tiberium Fields:",-1,22,142,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_ACCESSIBILITY,"msctls_trackbar32",
+                    TBS_TOP,95,85,100,14
+    LTEXT           "Environment:",-1,22,8,66,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    EDITTEXT        IDC_MAPGEN_DIMENSION_EDIT,345,25,57,12,ES_NUMBER | NOT 
+                    WS_VISIBLE | WS_DISABLED | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    CONTROL         "Load Map",IDC_MAPGEN_LOAD_MAP,"Button",BS_OWNERDRAW,100,
+                    220,65,14
+    CONTROL         "Save Map",IDC_MAPGEN_SAVE_MAP,"Button",BS_OWNERDRAW,22,
+                    220,65,14
+    COMBOBOX        IDC_MAPGEN_TIME_OF_DAY,95,25,100,101,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    LTEXT           "Water:",-1,22,161,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Time of Day:",-1,22,27,66,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Vegetation:",-1,22,180,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Cities:",-1,22,199,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Accessability:",-1,22,85,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Preview Map",IDC_MAPGEN_PREVIEW,"Button",BS_OWNERDRAW,
+                    314,193,88,14
+    GROUPBOX        "",IDC_PREVIEW_FRAME,205,47,197,134
+    CTEXT           "Preview",-1,208,101,194,16,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Surprise Me",IDC_MAPGEN_SURPRISE,"Button",BS_OWNERDRAW,
+                    205,193,88,14
+    CONTROL         "Delete Map",IDC_MAPGEN_DELETE_MAP,"Button",BS_OWNERDRAW,
+                    178,220,65,14
+    CONTROL         "Slider1",IDC_MAPGEN_CLIFFS,"msctls_trackbar32",TBS_TOP,
+                    95,66,100,14
+    LTEXT           "Cliffs:",-1,22,66,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_PLAYERS,"msctls_trackbar32",TBS_TOP,
+                    95,47,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_TIBERIUM_AMOUNT,"msctls_trackbar32",
+                    TBS_TOP,95,123,100,14
+    LTEXT           "Tiberium Amount:",-1,22,123,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    COMBOBOX        IDC_MAPGEN_MAP_WIDTH,277,8,63,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_MAPGEN_MAP_HEIGHT,277,25,63,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+END
+
+IDD_MSGBOX_1 DIALOG DISCARDABLE  0, 0, 218, 64
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,
+                    83,38,50,14
+    CTEXT           "",IDC_MSGBOX_TEXT,22,12,174,23,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+END
+
+IDD_MSGBOX_3 DIALOG DISCARDABLE  0, 0, 260, 84
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,178,58,60,14
+    CTEXT           "Do you want to abort the mission?",IDC_MSGBOX_TEXT,22,
+                    12,216,38,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "OK",IDC_MSGBOX_OK,"Button",BS_OWNERDRAW,22,58,60,14
+    CONTROL         "Button 3",IDC_MSGBOX_BTN3,"Button",BS_OWNERDRAW,100,58,
+                    60,14
+END
+
+IDD_MISSION_DELETE DIALOG DISCARDABLE  0, 0, 302, 198
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Delete",1,"Button",BS_OWNERDRAW | WS_TABSTOP,173,172,50,
+                    14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | WS_TABSTOP,230,
+                    172,50,14
+    LISTBOX         IDC_MISSION_DELETE_LIST,22,42,258,122,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | 
+                    WS_TABSTOP
+    CTEXT           "DELETE",-1,22,12,258,8,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Description",-1,22,26,121,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CTEXT           "Mission",-1,149,26,33,8,SS_CENTERIMAGE | NOT WS_VISIBLE | 
+                    WS_DISABLED | NOT WS_GROUP
+    CTEXT           "Time Stamp",-1,196,26,71,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+END
+
+IDD_MISSION_LOAD DIALOG DISCARDABLE  0, 0, 302, 198
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Load",1,"Button",BS_OWNERDRAW | WS_TABSTOP,171,171,50,
+                    14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | WS_TABSTOP,230,
+                    171,50,14
+    LISTBOX         IDC_MISSION_LOAD_LIST,22,40,258,124,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    CTEXT           "LOAD",-1,22,12,258,8,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Description",-1,22,26,121,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CTEXT           "Mission",-1,149,26,39,8,SS_CENTERIMAGE | NOT WS_VISIBLE | 
+                    WS_DISABLED | NOT WS_GROUP
+    CTEXT           "Time Stamp",-1,196,26,72,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+END
+
+IDD_MISSION_SAVE DIALOG DISCARDABLE  0, 0, 302, 198
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Save",1,"Button",BS_OWNERDRAW | WS_TABSTOP,174,172,50,
+                    14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | WS_TABSTOP,230,
+                    172,50,14
+    LISTBOX         IDC_MISSION_SAVE_LIST,22,42,258,105,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | 
+                    WS_TABSTOP
+    CTEXT           "SAVE",-1,22,12,258,8,SS_CENTERIMAGE | NOT WS_GROUP
+    EDITTEXT        IDC_MISSION_SAVE_DESC,22,154,258,14,NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    LTEXT           "Description",-1,22,26,121,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CTEXT           "Mission",-1,149,26,33,8,SS_CENTERIMAGE | NOT WS_VISIBLE | 
+                    WS_DISABLED | NOT WS_GROUP
+    CTEXT           "Time Stamp",-1,199,26,66,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+END
+
+IDD_MODEM_GUEST DIALOG DISCARDABLE  0, 0, 426, 238
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_INPUT,15,218,268,12,ES_MULTILINE | ES_AUTOHSCROLL | 
+                    ES_WANTRETURN | NOT WS_BORDER | NOT WS_TABSTOP
+    LTEXT           "Name:",-1,15,7,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    COMBOBOX        IDC_MODEM_YOURSIDE,68,24,83,90,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_MODEM_YOURCOLOR,68,41,83,146,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Side:",-1,15,24,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Color:",-1,15,41,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Accept",1,"Button",BS_OWNERDRAW | WS_DISABLED,289,218,
+                    58,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,353,218,58,14
+    LISTBOX         IDC_PMESSAGES,15,130,268,84,NOT LBS_NOTIFY | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    LTEXT           "None",IDC_SCENARIONAME,35,112,241,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LTEXT           "Map:",-1,15,112,23,12,SS_CENTERIMAGE | NOT WS_GROUP
+    EDITTEXT        IDC_NAME,68,7,83,12,ES_MULTILINE | ES_AUTOHSCROLL | 
+                    ES_WANTRETURN | NOT WS_BORDER | NOT WS_TABSTOP
+    LTEXT           "Opponent:",-1,15,61,122,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "????",IDC_MODEM_OPPONENT,15,78,125,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LTEXT           "Unit Count:",-1,157,39,49,12,SS_CENTERIMAGE | 
+                    WS_DISABLED | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MODEM_UNITCOUNT,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_DISABLED,210,39,83,12
+    LTEXT           "Tech Level:",-1,157,7,49,12,SS_CENTERIMAGE | 
+                    WS_DISABLED | NOT WS_GROUP
+    CONTROL         "Slider2",IDC_TECHLEVEL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,210,7,83,12
+    LTEXT           "Credits:",-1,157,23,49,12,SS_CENTERIMAGE | WS_DISABLED | 
+                    NOT WS_GROUP
+    CONTROL         "Slider4",IDC_CREDITS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,210,23,83,12
+    CONTROL         "Slider4",IDC_AIPLAYERS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,210,55,83,12
+    LTEXT           "AI Players:",-1,157,55,49,12,SS_CENTERIMAGE | 
+                    WS_DISABLED | NOT WS_GROUP
+    GROUPBOX        "",IDC_PREVIEW_FRAME,289,127,122,80
+    CONTROL         "Slider4",IDC_AILEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_DISABLED,210,71,83,12
+    LTEXT           "AI Level:",-1,157,71,49,12,SS_CENTERIMAGE | WS_DISABLED | 
+                    NOT WS_GROUP
+    CONTROL         "Slider4",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_DISABLED,210,87,83,12
+    LTEXT           "Game Speed",-1,157,87,49,12,SS_CENTERIMAGE | 
+                    WS_DISABLED | NOT WS_GROUP
+    CONTROL         "Bases",IDC_MODEM_BASES,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_DISABLED,301,19,110,12
+    CONTROL         "Crates",IDC_GOODIES,"Button",BS_AUTOCHECKBOX | BS_FLAT | 
+                    WS_DISABLED,301,31,110,12
+    CONTROL         "Fog Of War",IDC_MODEM_FOG,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_DISABLED,301,55,110,12
+    CONTROL         "Bridges Destroyable",IDC_BRIDGE_DESTROY,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_DISABLED,301,43,110,12
+    CONTROL         "Harvester Truce",IDC_HARVTRUCE,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_DISABLED,301,67,110,12
+    CONTROL         "Re-Deployable MCV",IDC_MODEM_REDEPLOY_MCV,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_DISABLED,301,7,110,12
+    CONTROL         "Short Game",IDC_SHORT_GAME,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT | WS_DISABLED,301,79,110,12
+    CONTROL         "Multi Engineer",IDC_MULTI_ENGINEER,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT | WS_DISABLED,301,91,110,12
+END
+
+IDD_MODEM_HOST DIALOG DISCARDABLE  0, 0, 426, 243
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_INPUT,15,223,268,12,ES_MULTILINE | ES_AUTOHSCROLL | 
+                    ES_WANTRETURN | NOT WS_BORDER | NOT WS_TABSTOP
+    LTEXT           "Name:",-1,15,7,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    COMBOBOX        IDC_MODEM_YOURSIDE,68,24,83,90,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_MODEM_YOURCOLOR,68,41,83,146,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Side:",-1,15,24,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Color:",-1,15,41,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Go!",1,"Button",BS_OWNERDRAW | WS_DISABLED,289,223,58,
+                    14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,353,223,58,14
+    LISTBOX         IDC_PMESSAGES,15,128,268,91,NOT LBS_NOTIFY | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    LTEXT           "None",IDC_SCENARIONAME,36,110,242,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    CONTROL         "Multiplayer Map",IDC_MULTIMAP,"Button",BS_OWNERDRAW,299,
+                    204,100,14
+    LTEXT           "Map:",-1,15,110,32,12,SS_CENTERIMAGE | NOT WS_GROUP
+    EDITTEXT        IDC_NAME,68,7,83,12,ES_MULTILINE | ES_WANTRETURN | NOT 
+                    WS_BORDER | NOT WS_TABSTOP
+    LTEXT           "Opponent:",-1,15,63,122,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "????",IDC_MODEM_OPPONENT,15,80,129,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    CONTROL         "Bases",IDC_MODEM_BASES,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,301,19,110,12
+    CONTROL         "Crates",IDC_GOODIES,"Button",BS_AUTOCHECKBOX | BS_FLAT,
+                    301,31,110,12
+    CONTROL         "Fog Of War",IDC_MODEM_FOG,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,301,55,110,12
+    CONTROL         "Bridges Destroyable",IDC_BRIDGE_DESTROY,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,301,43,110,12
+    GROUPBOX        "",IDC_PREVIEW_FRAME,289,123,122,75
+    LTEXT           "Unit Count:",-1,157,39,49,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MODEM_UNITCOUNT,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,210,39,83,12
+    LTEXT           "Tech Level:",-1,157,7,49,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider2",IDC_TECHLEVEL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,210,7,83,12
+    LTEXT           "Credits:",-1,157,23,49,12,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider4",IDC_CREDITS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,210,23,83,12
+    CONTROL         "Slider4",IDC_AIPLAYERS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,210,55,83,12
+    LTEXT           "AI Players:",-1,157,55,49,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider4",IDC_AILEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,210,71,83,12
+    LTEXT           "AI Level:",-1,157,71,49,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Harvester Truce",IDC_HARVTRUCE,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,301,67,110,12
+    CONTROL         "Re-Deployable MCV",IDC_MODEM_REDEPLOY_MCV,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,301,7,110,12
+    CONTROL         "Short Game",IDC_SHORT_GAME,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,301,79,110,12
+    LTEXT           "Game Speed",-1,157,88,49,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider4",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,210,87,83,12
+    CONTROL         "Multi Engineer",IDC_MULTI_ENGINEER,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,301,91,94,12
+END
+
+IDD_MPLAYER_SELECT_GAME DIALOG DISCARDABLE  0, 0, 204, 144
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Main Menu",2,"Button",BS_OWNERDRAW | WS_TABSTOP,37,112,
+                    130,18
+    CTEXT           "Select Multiplayer Game",-1,37,12,130,12,SS_CENTERIMAGE
+    CONTROL         "Internet",IDC_INTERNET,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,37,28,130,18
+    CONTROL         "Modem / Serial",IDC_MODEMSERIAL,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,37,49,130,18
+    CONTROL         "Network",IDC_NETWORK,"Button",BS_OWNERDRAW | WS_TABSTOP,
+                    37,70,130,18
+    CONTROL         "Skirmish",IDC_SKIRMISH,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,37,91,130,18
+END
+
+IDD_MPLAYER_HOST DIALOGEX 0, 0, 426, 240
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_INPUT,18,199,256,12,ES_MULTILINE | ES_WANTRETURN | 
+                    NOT WS_BORDER
+    LTEXT           "Players:",-1,18,41,57,12,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Kick a user from your game",IDC_KICK,"Button",
+                    BS_OWNERDRAW,18,215,20,18
+    COMBOBOX        IDC_YOURSIDE,73,6,76,90,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_YOURCOLOR,73,22,76,146,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Your Side:",-1,18,8,50,12,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Your Color:",-1,18,23,52,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Go!",IDC_GO,"Button",BS_OWNERDRAW,354,219,54,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,291,219,53,14
+    LISTBOX         IDC_USERS,18,56,150,67,LBS_MULTIPLESEL | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    LISTBOX         IDC_PMESSAGES,18,130,256,65,NOT LBS_NOTIFY | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    GROUPBOX        "",IDC_PREVIEW_FRAME,281,138,126,73,0,0,
+                    HIDC_PREVIEW_FRAME
+    LTEXT           "None",IDC_SCENARIONAME,255,8,153,10
+    CONTROL         "Multiplayer Map",IDC_MULTIMAP,"Button",BS_OWNERDRAW,160,
+                    5,90,14
+    CONTROL         "Bases",IDC_BASES,"Button",BS_AUTOCHECKBOX,300,49,108,10
+    CONTROL         "Harvester Truce",IDC_HARVTRUCE,"Button",BS_AUTOCHECKBOX,
+                    300,37,108,10
+    CONTROL         "Allies allowed",IDC_ALLIES,"Button",BS_AUTOCHECKBOX,300,
+                    25,105,10
+    RTEXT           "AI Players:",-1,166,44,58,10
+    CONTROL         "Slider3",IDC_AIPLAYERS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,227,43,66,12
+    CONTROL         "Slider1",IDC_UNITCOUNT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,227,75,66,12
+    RTEXT           "Unit Count:",-1,166,76,58,10
+    CONTROL         "Slider2",IDC_TECHLEVEL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,227,91,66,12
+    CONTROL         "Slider3",IDC_CREDITS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS,227,107,66,12
+    RTEXT           "Tech Level:",-1,166,92,58,10
+    RTEXT           "Credits:",-1,166,108,58,10
+    CONTROL         "Fog Of War",IDC_FOG_OF_WAR,"Button",BS_AUTOCHECKBOX,300,
+                    73,108,10
+    CONTROL         "Bridges Destroyable",IDC_BRIDGE_DESTROY,"Button",
+                    BS_AUTOCHECKBOX,300,85,108,10
+    CONTROL         "Crates",IDC_CRATES,"Button",BS_AUTOCHECKBOX,300,97,108,
+                    10
+    RTEXT           "AI Level:",-1,166,60,58,10
+    CONTROL         "Slider3",IDC_AILEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,227,59,66,12
+    CONTROL         "Re-Deployable MCV",IDC_REDEPLOY_MCV,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,300,61,108,10
+    CONTROL         "Short Game",IDC_SHORT_GAME,"Button",BS_AUTOCHECKBOX,300,
+                    109,108,10
+    CONTROL         "Slider1",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,227,27,66,12
+    RTEXT           "Game Speed:",-1,166,28,58,10
+    CONTROL         "Multi Engineer",IDC_MULTI_ENGINEER,"Button",
+                    BS_AUTOCHECKBOX,300,121,108,10
+END
+
+IDD_MPLAYER_GUEST DIALOGEX 0, 0, 426, 240
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Map:",-1,149,7,26,10,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Players:",-1,18,42,50,12,SS_CENTERIMAGE | NOT WS_GROUP
+    COMBOBOX        IDC_YOURSIDE,66,7,76,101,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_YOURCOLOR,66,24,76,145,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Your Side:",-1,18,7,50,12,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Your Color:",-1,18,24,50,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Accept",IDC_ACCEPT,"Button",BS_OWNERDRAW,350,215,58,18
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,279,215,58,18
+    LTEXT           "None",IDC_SCENARIONAME,176,7,232,10,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    LISTBOX         IDC_USERS,18,56,150,68,LBS_MULTIPLESEL | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    CONTROL         "Bases",IDC_BASES,"Button",BS_AUTOCHECKBOX | WS_DISABLED,
+                    300,49,108,10
+    CONTROL         "Harvester Truce",IDC_HARVTRUCE,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED,300,37,108,10
+    CONTROL         "Allies allowed",IDC_ALLIES,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED,300,25,105,10
+    RTEXT           "AI Players",-1,162,44,57,10,WS_DISABLED
+    CONTROL         "Slider3",IDC_AIPLAYERS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,227,43,66,12
+    CONTROL         "Slider1",IDC_UNITCOUNT,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,227,75,66,12
+    RTEXT           "Unit Count",-1,162,76,57,10,WS_DISABLED
+    CONTROL         "Slider2",IDC_TECHLEVEL,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,227,91,66,12
+    CONTROL         "Slider3",IDC_CREDITS,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_DISABLED,227,107,66,12
+    RTEXT           "Tech Level",-1,162,92,57,10,WS_DISABLED
+    RTEXT           "Credits",-1,162,108,57,10,WS_DISABLED
+    CONTROL         "Fog Of War",IDC_FOG_OF_WAR,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED,300,73,108,10
+    CONTROL         "Bridges Destroyable",IDC_BRIDGE_DESTROY,"Button",
+                    BS_AUTOCHECKBOX | WS_DISABLED,300,85,108,10
+    CONTROL         "Crates",IDC_CRATES,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED,300,97,108,10
+    RTEXT           "AI Level",-1,162,60,57,10,WS_DISABLED
+    CONTROL         "Slider3",IDC_AILEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_DISABLED,227,59,66,12
+    CONTROL         "Re-Deployable MCV",IDC_REDEPLOY_MCV,"Button",
+                    BS_AUTOCHECKBOX | WS_DISABLED | WS_TABSTOP,300,61,108,10
+    EDITTEXT        IDC_INPUT,18,199,256,12,ES_MULTILINE | ES_WANTRETURN | 
+                    NOT WS_BORDER
+    LISTBOX         IDC_PMESSAGES,18,130,256,65,NOT LBS_NOTIFY | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    GROUPBOX        "",IDC_PREVIEW_FRAME,281,138,126,73,0,0,
+                    HIDC_PREVIEW_FRAME
+    CONTROL         "Short Game",IDC_SHORT_GAME,"Button",BS_AUTOCHECKBOX | 
+                    WS_DISABLED,300,109,84,10
+    CONTROL         "Slider3",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS | WS_DISABLED,227,27,66,12
+    RTEXT           "Game Speed",-1,162,28,57,10,WS_DISABLED
+    CONTROL         "Multi Engineer",IDC_MULTI_ENGINEER,"Button",
+                    BS_AUTOCHECKBOX | WS_DISABLED,300,121,108,10
+END
+
+IDD_MPLAYER_GAME_LIST DIALOG DISCARDABLE  0, 0, 426, 240
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Join",IDC_GAMELIST_JOIN,"Button",BS_OWNERDRAW,264,214,
+                    62,18
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,181,214,62,18
+    CONTROL         "New",IDC_GAMELIST_NEW,"Button",BS_OWNERDRAW,345,214,62,
+                    18
+    LISTBOX         IDC_GAMELIST,294,27,113,68,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    LISTBOX         IDC_USERS,294,111,113,100,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    LISTBOX         IDC_PMESSAGES,19,27,266,166,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT 
+                    WS_BORDER
+    EDITTEXT        IDC_INPUT,19,198,266,12,ES_MULTILINE | ES_WANTRETURN | 
+                    NOT WS_BORDER
+    EDITTEXT        IDC_YOURNAME,89,8,68,12,NOT WS_BORDER
+    LTEXT           "Games:",-1,296,14,50,10
+    LTEXT           "Players:",-1,296,99,50,10
+    LTEXT           "Your Name:",-1,24,9,62,10
+END
+
+IDD_OPT_CTRL_SP DIALOG DISCARDABLE  0, 0, 209, 140
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Resume Mission",IDC_RESUME_MISSION,"Button",
+                    BS_OWNERDRAW,47,114,115,14
+    CONTROL         "Restate Briefing",IDC_BRIEFING,"Button",BS_OWNERDRAW,47,
+                    29,115,14
+    CONTROL         "Load Game",IDC_LOAD_GAME,"Button",BS_OWNERDRAW,47,46,
+                    115,14
+    CONTROL         "Save Game",IDC_SAVE_GAME,"Button",BS_OWNERDRAW,47,63,
+                    115,14
+    CONTROL         "Delete Game",IDC_DELETE_GAME,"Button",BS_OWNERDRAW,47,
+                    80,115,14
+    CONTROL         "Game Controls",IDC_GAME_CONTROLS,"Button",BS_OWNERDRAW,
+                    47,12,115,14
+    CONTROL         "Abort Mission",IDC_ABORT_MISSION,"Button",BS_OWNERDRAW,
+                    47,97,115,14
+END
+
+IDD_OPT_CTRL_MP DIALOG DISCARDABLE  0, 0, 209, 75
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Resume Mission",IDC_RESUME_MISSION,"Button",
+                    BS_OWNERDRAW,55,48,99,14
+    CONTROL         "Game Controls",IDC_GAME_CONTROLS,"Button",BS_OWNERDRAW,
+                    55,12,99,14
+    CONTROL         "Abort Mission",IDC_ABORT_MISSION,"Button",BS_OWNERDRAW,
+                    55,30,99,14
+END
+
+IDD_SERIAL_PHONE_LIST DIALOG DISCARDABLE  0, 0, 344, 167
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Dial",1,"Button",BS_OWNERDRAW,209,141,50,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,272,141,50,14
+    CTEXT           "Phone List",-1,22,12,300,11,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LISTBOX         IDC_PHONE_LIST,96,28,226,84,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    EDITTEXT        IDC_PHONE_NAME,96,120,226,14,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    CONTROL         "Add",IDC_SERIAL_ADD,"Button",BS_OWNERDRAW,22,28,69,14
+    CONTROL         "Delete",IDC_PHONE_DELETE,"Button",BS_OWNERDRAW,22,70,69,
+                    14
+    CONTROL         "Edit",IDC_PHONE_EDIT,"Button",BS_OWNERDRAW,22,49,69,14
+    LTEXT           "Phone Number:",-1,22,120,67,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+END
+
+IDD_SERIAL_PHONE_ENTRY DIALOG DISCARDABLE  0, 0, 247, 136
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Save",1,"Button",BS_OWNERDRAW,117,110,50,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,175,110,50,14
+    CTEXT           "Phonebook Entry",-1,22,12,203,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    EDITTEXT        IDC_PHONE_NAME,76,35,149,14,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    RTEXT           "Name:",-1,22,35,47,14,SS_CENTERIMAGE | NOT WS_GROUP
+    RTEXT           "Number:",-1,22,56,47,14,SS_CENTERIMAGE | NOT WS_GROUP
+    EDITTEXT        IDC_PHONE_NUMBER,76,56,149,14,ES_MULTILINE | 
+                    ES_AUTOHSCROLL | ES_WANTRETURN | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    CONTROL         "Default",IDC_PHONE_DEFAULT,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,28,84,95,12
+    CONTROL         "Custom",IDC_PHONE_CUSTOM,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,123,84,96,12
+    GROUPBOX        "Settings:",-1,22,73,203,30
+END
+
+IDD_PROGRESS_WAIT DIALOGEX 0, 0, 192, 53
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "",IDC_PROGRESS_BAR_FRAME,46,26,100,15,0,0,
+                    HIDC_PROGRESS_BAR_FRAME
+    CTEXT           "Working - Please Wait",IDC_PROGRESS_TEXT,22,12,148,11,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+END
+
+IDD_MPLAYER_DISCONNECT DIALOG DISCARDABLE  0, 0, 339, 220
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | WS_TABSTOP,22,
+                    194,295,14
+    LISTBOX         IDC_DISCONNECT_MESSAGES,22,103,295,84,NOT LBS_NOTIFY | 
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | 
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    CONTROL         "Player 1",IDC_DISCONNECT_PLAYER1,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,22,12,90,14
+    CONTROL         "Player 3",IDC_DISCONNECT_PLAYER3,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,22,48,90,14
+    CONTROL         "Player 2",IDC_DISCONNECT_PLAYER2,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,22,30,90,14
+    CONTROL         "Player 4",IDC_DISCONNECT_PLAYER4,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,22,66,90,14
+    CONTROL         "Player 5",IDC_DISCONNECT_PLAYER5,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,175,12,90,14
+    CONTROL         "Player 6",IDC_DISCONNECT_PLAYER6,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,175,30,90,14
+    CONTROL         "Player 7",IDC_DISCONNECT_PLAYER7,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,175,48,90,14
+    CONTROL         "Player 8",IDC_DISCONNECT_PLAYER8,"Button",BS_OWNERDRAW | 
+                    WS_TABSTOP,175,66,90,14
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER1_BOX,118,12,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER2_BOX,118,30,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER3_BOX,118,48,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER4_BOX,118,66,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER5_BOX,271,12,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER6_BOX,271,30,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER7_BOX,271,48,40,10
+    GROUPBOX        "",IDC_DISCONNECT_PLAYER8_BOX,271,66,40,10
+    LTEXT           "Time Remaining:",IDC_DISCONNECT_TIME_REMAINING,29,88,
+                    279,8,NOT WS_GROUP
+END
+
+IDD_DESYNC_HOST DIALOG DISCARDABLE  0, 0, 360, 264
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Synchronization Error",IDC_DESYNC_HEADER,30,10,280,10,
+                    NOT WS_GROUP
+    LTEXT           "Players:",-1,30,23,100,10,NOT WS_GROUP
+    LISTBOX         IDC_DESYNC_PLAYER_LIST,30,35,120,105,NOT LBS_NOTIFY |
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS |
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    LTEXT           "The game has gone out of sync.\r\n\r\nPress ""Load Game"" to load a saved game from this session, re-syncing the game for all players.\r\n\r\nPress ""Continue"" to continue playing without the desynced players. They will continue in a separate game session.",
+                    -1,160,25,180,82,NOT WS_GROUP
+    LTEXT           "Press ""Quit"" to exit the game.",-1,160,127,180,22,
+                    NOT WS_GROUP
+    LISTBOX         IDC_DESYNC_CHAT_LIST,30,145,300,60,NOT LBS_NOTIFY |
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS |
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    EDITTEXT        IDC_DESYNC_CHAT_EDIT,30,207,299,12,ES_AUTOHSCROLL |
+                    NOT WS_BORDER
+    LTEXT           "Loading in 5 seconds...",
+                    IDC_DESYNC_COUNTDOWN_TEXT,30,223,140,10,NOT WS_GROUP |
+                    NOT WS_VISIBLE
+    GROUPBOX        "",IDC_DESYNC_COUNTDOWN_BAR,180,222,149,12,NOT WS_VISIBLE
+    CONTROL         "Load Game",IDC_DESYNC_LOAD,"Button",BS_OWNERDRAW |
+                    WS_TABSTOP,30,239,70,12
+    CONTROL         "Continue",IDC_DESYNC_CONTINUE,"Button",BS_OWNERDRAW |
+                    WS_TABSTOP,145,239,70,12
+    CONTROL         "Quit",IDC_DESYNC_QUIT,"Button",BS_OWNERDRAW |
+                    WS_TABSTOP,260,239,70,12
+END
+
+IDD_DESYNC_WAIT DIALOG DISCARDABLE  0, 0, 360, 264
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Synchronization Error",IDC_DESYNC_HEADER,30,10,280,10,
+                    NOT WS_GROUP
+    LTEXT           "Players:",-1,30,23,100,10,NOT WS_GROUP
+    LISTBOX         IDC_DESYNC_PLAYER_LIST,30,35,120,105,NOT LBS_NOTIFY |
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS |
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    LTEXT           "The game has gone out of sync.\r\n\r\nIf there are saves available from this session, the game host can attempt to load a save to re-sync the game.\r\n\r\nAlternatively, the host can choose for the desynced players to continue playing in separate game sessions.",
+                    -1,160,25,180,82,NOT WS_GROUP
+    LTEXT           "Please wait while the host is making a decision.",-1,160,
+                    127,180,22,
+                    NOT WS_GROUP
+    LISTBOX         IDC_DESYNC_CHAT_LIST,30,145,300,60,NOT LBS_NOTIFY |
+                    LBS_OWNERDRAWFIXED | LBS_HASSTRINGS |
+                    LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT WS_BORDER
+    EDITTEXT        IDC_DESYNC_CHAT_EDIT,30,207,299,12,ES_AUTOHSCROLL |
+                    NOT WS_BORDER
+    LTEXT           "Loading in 5 seconds...",
+                    IDC_DESYNC_COUNTDOWN_TEXT,30,223,140,10,NOT WS_GROUP |
+                    NOT WS_VISIBLE
+    GROUPBOX        "",IDC_DESYNC_COUNTDOWN_BAR,180,222,149,12,NOT WS_VISIBLE
+    CONTROL         "Quit",IDC_DESYNC_QUIT,"Button",BS_OWNERDRAW |
+                    WS_TABSTOP | WS_DISABLED,145,239,70,12
+END
+
+IDD_SELECT_SERIAL DIALOG DISCARDABLE  0, 0, 191, 147
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,37,115,117,18
+    CONTROL         "Dial",IDC_SERIAL_DIAL,"Button",BS_OWNERDRAW,37,27,117,
+                    18
+    CONTROL         "Answer",IDC_SERIAL_ANSWER,"Button",BS_OWNERDRAW,37,49,
+                    117,18
+    CONTROL         "Null Modem",IDC_SERIAL_NULLMODEM,"Button",BS_OWNERDRAW,
+                    37,71,117,18
+    CONTROL         "Settings",IDC_SERIAL_SETTINGS_BTN,"Button",BS_OWNERDRAW,
+                    37,93,117,18
+    CTEXT           "Modem / Serial",-1,37,12,117,8,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+END
+
+IDD_SERIAL_SETTINGS DIALOG DISCARDABLE  0, 0, 361, 225
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,289,199,50,14
+    CTEXT           "Serial Settings",-1,22,12,317,11,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    COMBOBOX        IDC_SERIAL_PORT,22,38,144,30,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Port:",-1,22,25,144,12,SS_CENTERIMAGE | NOT WS_GROUP
+    COMBOBOX        IDC_SERIAL_BAUD,22,70,144,30,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Baud:",-1,22,54,63,12,SS_CENTERIMAGE | NOT WS_GROUP
+    COMBOBOX        IDC_SERIAL_CALLWAITING,180,38,144,30,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    EDITTEXT        IDC_SERIAL_CALLWAITING_EDIT,180,38,129,12,ES_MULTILINE | 
+                    ES_WANTRETURN | NOT WS_VISIBLE | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    CONTROL         "Pulse Dial",IDC_SERIAL_PULSE,"Button",BS_AUTOCHECKBOX | 
+                    BS_NOTIFY | BS_FLAT,180,55,68,10
+    CONTROL         "Tone Dial",IDC_SERIAL_TONE,"Button",BS_AUTOCHECKBOX | 
+                    BS_NOTIFY | BS_FLAT,180,69,69,10
+    CONTROL         "Save",1,"Button",BS_OWNERDRAW,226,199,50,14
+    EDITTEXT        IDC_SERIAL_INITSTRING,88,122,245,12,ES_MULTILINE | 
+                    ES_WANTRETURN | NOT WS_BORDER | NOT WS_TABSTOP
+    LISTBOX         IDC_SERIAL_INITLIST,88,138,245,52,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    EDITTEXT        IDC_SERIAL_PORT_EDIT,22,39,129,12,ES_MULTILINE | 
+                    ES_WANTRETURN | NOT WS_VISIBLE | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    LTEXT           "Call Waiting:",-1,180,25,144,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Delete",IDC_SERIAL_INIT_DELETE,"Button",BS_OWNERDRAW,28,
+                    142,55,14
+    CONTROL         "Add",IDC_SERIAL_ADD,"Button",BS_OWNERDRAW,28,122,55,14
+    CONTROL         "Error Correction",IDC_SERIAL_ERROR_CORRECTION,"Button",
+                    BS_AUTOCHECKBOX | BS_NOTIFY | BS_FLAT,180,83,144,10
+    CONTROL         "Data Compression",IDC_SERIAL_DATA_COMPRESSION,"Button",
+                    BS_AUTOCHECKBOX | BS_NOTIFY | BS_FLAT,180,97,145,10
+    GROUPBOX        "Init String",-1,22,108,317,86
+END
+
+IDD_SKIRMISH DIALOG DISCARDABLE  0, 0, 426, 240
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Name:",-1,22,12,78,8,NOT WS_GROUP
+    EDITTEXT        IDC_SKIRMISH_NAME,22,24,78,12,NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    LTEXT           "Side:",-1,22,42,78,8,NOT WS_GROUP
+    COMBOBOX        IDC_SKIRMISH_SIDE,22,52,78,74,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    LTEXT           "Color:",-1,22,71,78,8,NOT WS_GROUP
+    COMBOBOX        IDC_SKIRMISH_COLOR,22,82,78,73,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS | WS_VSCROLL
+    LTEXT           "Unit Count:",IDC_SKIRMISH_UNITCOUNT_LABEL,298,18,100,8,
+                    NOT WS_GROUP
+    CONTROL         "Slider1",IDC_SKIRMISH_UNITCOUNT,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,298,30,100,14
+    LTEXT           "Credits:",IDC_SKIRMISH_CREDITS_LABEL,298,47,100,8,NOT 
+                    WS_GROUP
+    CONTROL         "Slider3",IDC_SKIRMISH_CREDITS,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,298,59,100,14
+    LTEXT           "Tech Level:",IDC_SKIRMISH_TECHLEVEL_LABEL,298,76,100,8,
+                    NOT WS_GROUP
+    CONTROL         "Slider2",IDC_SKIRMISH_TECHLEVEL,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,298,88,100,14
+    LTEXT           "AI Level:",IDC_SKIRMISH_AILEVEL_LABEL,298,105,100,8,NOT 
+                    WS_GROUP
+    CONTROL         "Slider4",IDC_DIFFICULTY_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,298,117,100,14
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,294,214,50,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,354,214,50,14
+    CONTROL         "Slider4",IDC_SKIRMISH_AIPLAYERS,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,298,146,100,14
+    LTEXT           "AI Players:",IDC_SKIRMISH_AIPLAYERS_LABEL,298,134,100,8,
+                    NOT WS_GROUP
+    CONTROL         "Multiplay Map",IDC_MULTIMAP,"Button",BS_OWNERDRAW,294,
+                    197,110,14
+    GROUPBOX        "",IDC_PREVIEW_FRAME,22,122,215,106
+    LTEXT           "Map:",-1,22,97,36,10,NOT WS_GROUP
+    LTEXT           "None",IDC_SCENARIONAME,22,111,268,10,NOT WS_GROUP
+    CTEXT           "Preview",-1,22,165,215,13,SS_CENTERIMAGE | NOT WS_GROUP
+    GROUPBOX        "",-1,294,12,110,181
+    CONTROL         "Bases",IDC_SKIRMISH_BASES,"Button",BS_AUTOCHECKBOX,123,
+                    21,157,10
+    CONTROL         "Crates",IDC_SKIRMISH_CRATES,"Button",BS_AUTOCHECKBOX,
+                    123,33,157,10
+    CONTROL         "Fog Of War",IDC_SKIRMISH_FOG,"Button",BS_AUTOCHECKBOX,
+                    123,45,157,10
+    CONTROL         "Bridges Destroyable",IDC_SKIRMISH_BRIDGES,"Button",
+                    BS_AUTOCHECKBOX,123,57,157,10
+    GROUPBOX        "",-1,117,12,167,96
+    CONTROL         "Re-Deployable MCV",IDC_REDEPLOY_MCV,"Button",
+                    BS_AUTOCHECKBOX,123,69,157,10
+    CONTROL         "Short Game",IDC_SHORT_GAME,"Button",BS_AUTOCHECKBOX,123,
+                    81,157,10
+    CONTROL         "Slider4",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,298,175,100,14
+    LTEXT           "Game Speed",IDC_SKIRMISH_GAMESPEED_LABEL,298,163,100,8,
+                    NOT WS_GROUP
+    CONTROL         "Multi Engineer",IDC_MULTI_ENGINEER,"Button",
+                    BS_AUTOCHECKBOX,123,93,108,10
+END
+
+IDD_SOUND_OPTIONS_DIALOG DIALOG DISCARDABLE  0, 0, 294, 215
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | WS_TABSTOP,210,189,62,
+                    14
+    CONTROL         "Slider1",IDC_MUSIC_VOLUME,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,97,12,175,15
+    CONTROL         "Slider2",IDC_SOUND_VOLUME,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,97,34,175,15
+    RTEXT           "Music Volume:",-1,22,12,70,15,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    RTEXT           "Sound Volume:",-1,22,34,70,15,SS_CENTERIMAGE
+    LISTBOX         IDC_SOUND_TRACKLIST,97,82,175,99,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | 
+                    WS_TABSTOP
+    CONTROL         "Play",IDC_SOUND_PLAY,"Button",BS_OWNERDRAW | WS_TABSTOP,
+                    22,86,70,14
+    CONTROL         "Stop",IDC_SOUND_STOP,"Button",BS_OWNERDRAW | WS_TABSTOP,
+                    22,113,70,14
+    RTEXT           "Voice Volume:",-1,22,56,70,15,SS_CENTERIMAGE
+    CONTROL         "Slider2",IDC_VOICE_VOLUME,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,97,56,175,15
+    CONTROL         "Shuffle",IDC_SOUND_SHUFFLE,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,140,70,14
+    CONTROL         "Repeat",IDC_SOUND_REPEAT,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,167,70,14
+END
+
+IDD_SOUND_OPTIONS_DIALOG_LITE DIALOG DISCARDABLE  0, 0, 294, 112
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    RTEXT           "Music Volume:",-1,22,17,70,15,SS_CENTERIMAGE
+    CONTROL         "Slider1",IDC_MUSIC_VOLUME,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,99,17,173,15
+    RTEXT           "Sound Volume:",-1,22,40,71,15,SS_CENTERIMAGE
+    CONTROL         "Slider2",IDC_SOUND_VOLUME,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,99,40,173,15
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | BS_CENTER | WS_TABSTOP,
+                    115,86,62,14
+    RTEXT           "Voice Volume:",-1,22,62,71,15,SS_CENTERIMAGE
+    CONTROL         "Slider2",IDC_VOICE_VOLUME,"msctls_trackbar32",TBS_BOTH | 
+                    TBS_NOTICKS | WS_TABSTOP,99,62,173,15
+END
+
+IDD_VERSION DIALOG DISCARDABLE  0, 0, 272, 106
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | BS_CENTER | WS_TABSTOP,
+                    111,80,50,14
+    LISTBOX         IDC_VERSION_INFO,22,12,228,55,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_NOSEL | NOT 
+                    WS_BORDER | WS_TABSTOP
+END
+
+IDD_MSGBOX_3_SMALL DIALOG DISCARDABLE  0, 0, 290, 90
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,120,64,
+                    50,14
+    CTEXT           "Msg",IDC_MSGBOX_TEXT,22,12,246,40
+    CONTROL         "No",7,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,70,64,50,
+                    14
+    CONTROL         "Yes",6,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,169,64,50,
+                    14
+END
+
+IDD_CAMPAIGN DIALOG DISCARDABLE  0, 0, 246, 149
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Select Campaign:",-1,22,12,206,10,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LISTBOX         IDC_LIST,22,28,206,51,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,178,121,50,16
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,121,121,50,16
+    CONTROL         "Slider3",IDC_DIFFICULTY_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,22,98,206,15
+    CONTROL         "Difficulty",-1,"Static",SS_LEFTNOWORDWRAP | 
+                    SS_CENTERIMAGE,22,84,136,15
+    RTEXT           "Harder",IDC_DIFFICULTY_LABEL,162,84,66,15,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+END
+
+IDD_EXCEPTION DIALOG DISCARDABLE  0, 0, 294, 231
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Tiberian Sun Has Encountered Difficulty"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Debug",IDC_EXCEPT_DEBUG,115,200,60,14,BS_CENTER
+    PUSHBUTTON      "Main Menu",IDC_EXCEPT_MAINMENU,217,200,60,14
+    CTEXT           "Tiberian Sun has encountered a problem.\nSee the file DEBUG.TXT for details.",
+                    -1,7,7,280,26,NOT WS_GROUP
+    DEFPUSHBUTTON   "Quit",IDC_EXCEPT_QUIT,19,200,60,14
+    EDITTEXT        IDC_EXCEPT_DETAILS,17,53,261,140,ES_MULTILINE | 
+                    ES_NOHIDESEL | ES_READONLY | ES_WANTRETURN | WS_VSCROLL | 
+                    WS_HSCROLL
+    LTEXT           "Details:",IDC_EXCEPT_DETAILS_LABEL,19,41,45,8
+END
+
+IDD_EXCEPTION_SIMPLE DIALOG DISCARDABLE  0, 0, 252, 82
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Tiberian Sun"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Tiberian Sun has encountered an internal error",-1,7,11,
+                    238,8,NOT WS_GROUP
+    CTEXT           "and is unable to continue normally.",
+                    IDC_EXCEPT_DETAILS_LABEL,7,19,238,8,NOT WS_GROUP
+    CTEXT           "Please visit our website at http://www.westwood.com",
+                    IDC_EXCEPT_WEBSITE,7,36,238,8,NOT WS_GROUP
+    PUSHBUTTON      "OK",IDC_EXCEPT_QUIT,83,61,79,14
+    CTEXT           "for the latest updates and technical support.",-1,7,44,
+                    238,8,NOT WS_GROUP
+END
+
+IDD_MPLAYER_SELECT_GAME_FS DIALOG DISCARDABLE  0, 0, 197, 146
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Select Multiplayer Game",-1,30,8,130,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    CONTROL         "Main Menu",2,"Button",BS_OWNERDRAW,30,118,130,18
+    CONTROL         "Internet",IDC_INTERNET,"Button",BS_OWNERDRAW,30,22,130,
+                    18
+    CONTROL         "Modem / Serial",IDC_MODEMSERIAL,"Button",BS_OWNERDRAW,
+                    30,60,130,18
+    CONTROL         "Network",IDC_NETWORK,"Button",BS_OWNERDRAW,30,79,130,18
+    CONTROL         "Skirmish",IDC_SKIRMISH,"Button",BS_OWNERDRAW,30,98,130,
+                    18
+    CONTROL         "World Domination! (Internet)",IDC_WORLDDOM,"Button",
+                    BS_OWNERDRAW,30,41,130,18
+END
+
+IDD_SELECT_GAME_TYPE DIALOG DISCARDABLE  0, 0, 228, 108
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Main Menu",2,"Button",BS_OWNERDRAW,62,82,104,14
+    CTEXT           "Select Game Type",-1,22,12,184,19,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Tiberian Sun (Original)",IDC_GAMETYPE_ORIGINAL,"Button",
+                    BS_OWNERDRAW,62,42,104,14
+    CONTROL         "Firestorm",IDC_GAMETYPE_FIRESTORM,"Button",BS_OWNERDRAW,
+                    62,62,104,14
+END
+
+IDD_MAPGEN_FS DIALOG DISCARDABLE  0, 0, 426, 242
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,265,220,65,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,337,220,65,14
+    COMBOBOX        IDC_MAPGEN_ENVIRONMENT,79,8,100,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    CONTROL         "Slider1",IDC_MAPGEN_HILLS,"msctls_trackbar32",TBS_TOP,
+                    95,92,100,14
+    LTEXT           "Hills:",-1,22,92,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_WATER,"msctls_trackbar32",TBS_TOP,
+                    95,143,100,14
+    LTEXT           "Players:",-1,22,41,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Map Width:",-1,187,8,53,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Map Height:",-1,186,25,53,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_VEGETATION,"msctls_trackbar32",
+                    TBS_TOP,95,160,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_CITIES,"msctls_trackbar32",TBS_TOP,
+                    95,177,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_TIBERIUM_FIELDS,"msctls_trackbar32",
+                    TBS_TOP,95,126,100,14
+    LTEXT           "Tiberium Fields:",-1,22,126,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_ACCESSIBILITY,"msctls_trackbar32",
+                    TBS_TOP,95,75,100,14
+    LTEXT           "Environment:",-1,22,7,53,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    EDITTEXT        IDC_MAPGEN_DIMENSION_EDIT,22,206,57,12,ES_NUMBER | NOT 
+                    WS_VISIBLE | WS_DISABLED | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    CONTROL         "Load Map",IDC_MAPGEN_LOAD_MAP,"Button",BS_OWNERDRAW,100,
+                    220,65,14
+    CONTROL         "Save Map",IDC_MAPGEN_SAVE_MAP,"Button",BS_OWNERDRAW,22,
+                    220,65,14
+    COMBOBOX        IDC_MAPGEN_TIME_OF_DAY,79,25,100,101,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    LTEXT           "Water:",-1,22,143,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Time of Day:",-1,22,24,53,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Vegetation:",-1,22,160,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Cities:",-1,22,177,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Accessability:",-1,22,75,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Preview Map",IDC_MAPGEN_PREVIEW,"Button",BS_OWNERDRAW,
+                    316,200,88,14
+    GROUPBOX        "",IDC_PREVIEW_FRAME,207,57,197,134
+    CTEXT           "Preview",-1,210,123,194,16,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Surprise Me",IDC_MAPGEN_SURPRISE,"Button",BS_OWNERDRAW,
+                    205,200,88,14
+    CONTROL         "Delete Map",IDC_MAPGEN_DELETE_MAP,"Button",BS_OWNERDRAW,
+                    178,220,65,14
+    CONTROL         "Slider1",IDC_MAPGEN_CLIFFS,"msctls_trackbar32",TBS_TOP,
+                    95,58,100,14
+    LTEXT           "Cliffs:",-1,22,58,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_PLAYERS,"msctls_trackbar32",TBS_TOP,
+                    95,41,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_TIBERIUM_AMOUNT,"msctls_trackbar32",
+                    TBS_TOP,95,109,100,14
+    LTEXT           "Tiberium Amount:",-1,22,109,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    COMBOBOX        IDC_MAPGEN_MAP_WIDTH,248,8,63,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_MAPGEN_MAP_HEIGHT,248,26,63,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    CONTROL         "Transitions",IDC_MAPGEN_TRANSITIONS,"Button",
+                    BS_AUTOCHECKBOX,320,26,84,10
+    CONTROL         "Ion Storms",IDC_MAPGEN_ION_STORMS,"Button",
+                    BS_AUTOCHECKBOX,320,8,84,10
+    CONTROL         "Slider1",IDC_MAPGEN_VEINHOLES,"msctls_trackbar32",
+                    TBS_TOP,95,194,100,14
+    LTEXT           "Veinholes:",-1,22,194,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Lifeforms",IDC_MAPGEN_LIFEFORMS,"Button",
+                    BS_AUTOCHECKBOX,320,44,84,10
+END
+
+IDD_WDT_PICK_CLAN DIALOG DISCARDABLE  0, 0, 206, 163
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "World Domination Tour games use your Battle Clan affiliation to determine which side you are fighting for.  If you do not wish to join a Battle Clan, select which side you wish to fight for.",
+                    -1,15,11,180,48,NOT WS_GROUP
+    CONTROL         "Join Battle Clan",IDC_PICKCLAN_JOIN,"Button",
+                    BS_OWNERDRAW,27,64,150,19
+    CONTROL         "GDI",IDC_PICKCLAN_GDI,"Button",BS_OWNERDRAW,27,87,150,
+                    19
+    CONTROL         "Nod",IDC_PICKCLAN_NOD,"Button",BS_OWNERDRAW,27,110,150,
+                    19
+    CONTROL         "Cancel",IDC_CANCEL,"Button",BS_OWNERDRAW,27,
+                    133,150,19
+END
+
+IDD_MAPGEN_WDT DIALOG DISCARDABLE  0, 0, 426, 242
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,265,220,65,14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,337,220,65,14
+    COMBOBOX        IDC_MAPGEN_ENVIRONMENT,79,8,100,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    CONTROL         "Slider1",IDC_MAPGEN_HILLS,"msctls_trackbar32",TBS_TOP,
+                    95,92,100,14
+    LTEXT           "Hills:",-1,22,92,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_WATER,"msctls_trackbar32",TBS_TOP,
+                    95,143,100,14
+    LTEXT           "Map Width:",-1,187,8,53,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Map Height:",-1,186,25,53,12,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_VEGETATION,"msctls_trackbar32",
+                    TBS_TOP,95,160,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_CITIES,"msctls_trackbar32",TBS_TOP,
+                    95,177,100,14
+    CONTROL         "Slider1",IDC_MAPGEN_TIBERIUM_FIELDS,"msctls_trackbar32",
+                    TBS_TOP,95,126,100,14
+    LTEXT           "Tiberium Fields:",-1,22,126,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_ACCESSIBILITY,"msctls_trackbar32",
+                    TBS_TOP,95,75,100,14
+    LTEXT           "Environment:",-1,22,7,53,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    EDITTEXT        IDC_MAPGEN_DIMENSION_EDIT,22,206,57,12,ES_NUMBER | NOT 
+                    WS_VISIBLE | WS_DISABLED | NOT WS_BORDER | NOT 
+                    WS_TABSTOP
+    CONTROL         "Load Map",IDC_MAPGEN_LOAD_MAP,"Button",BS_OWNERDRAW,100,
+                    220,65,14
+    CONTROL         "Save Map",IDC_MAPGEN_SAVE_MAP,"Button",BS_OWNERDRAW,22,
+                    220,65,14
+    COMBOBOX        IDC_MAPGEN_TIME_OF_DAY,79,25,100,101,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_SORT | CBS_HASSTRINGS
+    LTEXT           "Water:",-1,22,143,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Time of Day:",-1,22,24,53,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Vegetation:",-1,22,160,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Cities:",-1,22,177,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Accessability:",-1,22,75,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Preview Map",IDC_MAPGEN_PREVIEW,"Button",BS_OWNERDRAW,
+                    316,198,88,14
+    GROUPBOX        "",IDC_PREVIEW_FRAME,207,56,197,134
+    CTEXT           "Preview",-1,210,122,194,16,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Surprise Me",IDC_MAPGEN_SURPRISE,"Button",BS_OWNERDRAW,
+                    205,198,88,14
+    CONTROL         "Delete Map",IDC_MAPGEN_DELETE_MAP,"Button",BS_OWNERDRAW,
+                    178,220,65,14
+    CONTROL         "Slider1",IDC_MAPGEN_CLIFFS,"msctls_trackbar32",TBS_TOP,
+                    95,58,100,14
+    LTEXT           "Cliffs:",-1,22,58,74,14,SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_MAPGEN_TIBERIUM_AMOUNT,"msctls_trackbar32",
+                    TBS_TOP,95,109,100,14
+    LTEXT           "Tiberium Amount:",-1,22,109,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    COMBOBOX        IDC_MAPGEN_MAP_WIDTH,248,8,63,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    COMBOBOX        IDC_MAPGEN_MAP_HEIGHT,248,26,63,103,CBS_DROPDOWNLIST | 
+                    CBS_OWNERDRAWFIXED | CBS_HASSTRINGS
+    CONTROL         "Transitions",IDC_MAPGEN_TRANSITIONS,"Button",
+                    BS_AUTOCHECKBOX,320,25,84,10
+    CONTROL         "Ion Storms",IDC_MAPGEN_ION_STORMS,"Button",
+                    BS_AUTOCHECKBOX,320,8,84,10
+    CONTROL         "Slider1",IDC_MAPGEN_VEINHOLES,"msctls_trackbar32",
+                    TBS_TOP,96,194,100,14
+    LTEXT           "Veinholes:",-1,22,194,74,14,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "1 on 1",IDC_WDT_1ON1,"Button",BS_AUTOCHECKBOX,22,44,73,
+                    10
+    CONTROL         "2 on 2",IDC_WDT_2ON2,"Button",BS_AUTOCHECKBOX,102,44,73,
+                    10
+    CONTROL         "Lifeforms",IDC_MAPGEN_LIFEFORMS,"Button",
+                    BS_AUTOCHECKBOX,320,42,84,10
+END
+
+IDD_OPT_CTRL_WOL DIALOG DISCARDABLE  0, 0, 340, 185
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Resume Mission",IDC_RESUME_MISSION,"Button",
+                    BS_OWNERDRAW,120,76,99,14
+    CONTROL         "Game Controls",IDC_GAME_CONTROLS,"Button",BS_OWNERDRAW,
+                    120,8,99,14
+    CONTROL         "Load Game",IDC_LOAD_GAME,"Button",BS_OWNERDRAW,
+                    120,25,99,14
+    CONTROL         "Save Game",IDC_SAVE_GAME,"Button",BS_OWNERDRAW,
+                    120,42,99,14
+    CONTROL         "Abort Mission",IDC_ABORT_MISSION,"Button",BS_OWNERDRAW,
+                    120,59,99,14
+    CONTROL         "Slider1",IDC_GAME_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,95,132,148,13
+    LTEXT           "Game Speed",-1,39,132,58,13,SS_CENTERIMAGE | NOT
+                    WS_GROUP
+    RTEXT           "Faster",IDC_GAME_SPEED_LABEL,247,132,45,13,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Slider1",IDC_CTRLWOL_CONNECTION,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,95,110,148,13
+    LTEXT           "Connection",-1,39,110,58,13,SS_CENTERIMAGE | NOT
+                    WS_GROUP
+    RTEXT           "Better",IDC_SCROLL_SPEED_LABEL,247,110,64,13,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    GROUPBOX        "Internet Game Controls",-1,28,92,283,68
+END
+
+IDD_MPLAYER_SELECT_MAP DIALOGEX 0, 0, 360, 200
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | WS_TABSTOP,22,174,50,
+                    14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | WS_TABSTOP,288,
+                    174,50,14
+    LISTBOX         IDC_SELECTMAP_LIST,22,26,175,142,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | 
+                    WS_TABSTOP
+    CTEXT           "Select Multiplayer Map",-1,22,12,316,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+    GROUPBOX        "",IDC_PREVIEW_FRAME,209,59,129,80,0,0,
+                    HIDC_PREVIEW_FRAME
+    CONTROL         "Create Random Map",IDC_CREATE_RANDOM_MAP,"Button",
+                    BS_OWNERDRAW | WS_TABSTOP,132,174,106,14
+END
+
+IDD_MPLAYER_SELECT_MAP_SIMPLE DIALOG DISCARDABLE  0, 0, 219, 200
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | WS_TABSTOP,22,174,50,
+                    14
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW | WS_TABSTOP,147,
+                    174,50,14
+    LISTBOX         IDC_SELECTMAP_LIST,22,26,175,143,LBS_OWNERDRAWFIXED | 
+                    LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | NOT WS_BORDER | 
+                    WS_TABSTOP
+    CTEXT           "Select Multiplayer Map",-1,22,12,175,12,SS_CENTERIMAGE | 
+                    NOT WS_GROUP
+END
+
+IDD_MSGBOX_2 DIALOG DISCARDABLE  0, 0, 290, 90
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW,22,64,50,14
+    CTEXT           "Msg",IDC_MSGBOX_TEXT,22,12,246,40
+    CONTROL         "Cancel",IDCANCEL,"Button",BS_OWNERDRAW,218,64,50,14
+END
+
+IDD_MSGBOX_3_LARGE DIALOG DISCARDABLE  0, 0, 360, 160
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "OK",IDOK,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,155,134,
+                    50,14
+    CTEXT           "Msg",IDC_MSGBOX_TEXT,22,12,316,112
+    CONTROL         "No",7,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,105,134,50,
+                    14
+    CONTROL         "Yes",6,"Button",BS_OWNERDRAW | NOT WS_VISIBLE,204,134,
+                    50,14
+END
+
+IDD_OPT_CTRL_GAME_WOL DIALOG DISCARDABLE  0, 0, 294, 144
+STYLE WS_CHILD
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Options Menu",1,"Button",BS_OWNERDRAW,196,118,77,14
+    CONTROL         "Keyboard",IDC_OPT_KEYBOARD_BTN,"Button",BS_OWNERDRAW,
+                    109,118,77,14
+    CONTROL         "Sound",IDC_OPT_SOUND_BTN,"Button",BS_OWNERDRAW,22,118,
+                    77,14
+    CONTROL         "Slider2",IDC_SCROLL_SPEED_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,90,12,128,15
+    RTEXT           "Scroll Rate:",-1,22,12,63,15,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    CONTROL         "Slider3",IDC_DETAIL_LEVEL_SLIDER,"msctls_trackbar32",
+                    TBS_BOTH | TBS_NOTICKS,90,43,128,15
+    RTEXT           "Visual Details:",-1,22,43,63,15,SS_CENTERIMAGE | NOT 
+                    WS_GROUP
+    LTEXT           "Higher",IDC_DETAIL_LEVEL_LABEL,226,43,50,15,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    LTEXT           "Faster",IDC_SCROLL_SPEED_LABEL,226,12,50,15,
+                    SS_CENTERIMAGE | NOT WS_GROUP
+    CONTROL         "Sidebar Text",IDC_SIDEBAR_TEXT,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,63,119,10
+    CONTROL         "Target Lines",IDC_TARGET_LINES,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,22,81,119,10
+    CONTROL         "Tooltips",IDC_TOOLTIPS,"Button",BS_AUTOCHECKBOX | 
+                    BS_FLAT,147,63,129,10
+    CONTROL         "Scroll Coasting",IDC_SCROLL_COASTING,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,147,81,129,10
+    CONTROL         "Edge Scrolling",IDC_EDGE_SCROLL,"Button",
+                    BS_AUTOCHECKBOX | BS_FLAT,22,99,119,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_NONE                " "
+    TXT_COPYRIGHT           "© 2000 Electronic Arts, All Rights Reserved"
+    TXT_TIME_FORMAT_HOURS   "Time:%02d:%02d:%02d"
+    TXT_TIME_FORMAT_NO_HOURS "Time:%02d:%02d"
+    TXT_MONEY_FORMAT_1      "$%d"
+    TXT_MONEY_FORMAT_2      "%s ($%d)"
+    TXT_READY               "Ready"
+    TXT_HOLD                "On Hold"
+    TXT_PRIMARY             "Primary"
+    TXT_PRI                 "Pri."
+    TXT_OK                  "OK"
+    TXT_YES                 "Yes"
+    TXT_NO                  "No"
+    TXT_SCENARIO_WON        "Mission Accomplished"
+    TXT_SCENARIO_LOST       "Mission Failed"
+    TXT_CANCEL              "Cancel"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_IGNORE              "Ignore"
+    TXT_CLICK_CONTINUE      "Click to Continue"
+    TXT_MISSION_EFFICIENCY  "MISSION EFFICIENCY"
+    TXT_MISSION_TIME_LAPSE  "MISSION TIME LAPSE"
+    TXT_CURRENCY            "CURRENCY"
+    TXT_CASUALTIES          "CASUALTIES"
+    TXT_BEST_SCORES         "Best Scores"
+    TXT_STRUCTURES          "Structures"
+    TXT_RESUME_MISSION      "Resume Mission"
+    TXT_VIDEO               "Video"
+    TXT_MORE                "-- More --"
+    TXT_INTERFACE           "Interface"
+    TXT_TEAM                "Team"
+    TXT_SELECTION           "Selection"
+    TXT_CONTROL             "Control"
+    TXT_CREATE_TEAM         "Create Team %2d"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_CD_ERROR1           "Tiberian Sun is unable to detect your CD ROM drive."
+    TXT_DLL_INVALID         "Tiberian Sun requires %s version %d.%d or newer.\n\nPlease consult the read me for instructions on how to\nobtain a newer version of %s."
+    TXT_ENEMY_SOLDIER       "Enemy Soldier"
+    TXT_ENEMY_VEHICLE       "Enemy Unit"
+    TXT_ENEMY_STRUCTURE     "Enemy Structure"
+    TXT_INITGAME_FAILED     "Failed to initialize. Please reinstall."
+    TXT_PREPARECOM_FAILED   "One or more DLL files were missing\nor damaged. Please reinstall."
+    TXT_NO_SOUND_CARD       "No Sound Card Detected"
+    TXT_INVALIDMODE         "This product requires a 16bit pixel depth!"
+    TXT_LOST                "Game Over"
+    TXT_MOUSE_REQUIRED      "A mouse is required for playing Tiberian Sun."
+    TXT_DSOUND_ACCESS       "Unable to play Direct Sound primary buffer."
+    TXT_DDRAW_UNKNOWN       "Unrecognized Direct Draw result code."
+    TXT_VIDEO_ERROR         "Error - Unable to set the video mode."
+    TXT_SHORT_TITLE         "Tiberian Sun"
+    TXT_CRITICALLY_LOW      "Warning - you are critically low on free disk space for saving games. Do you want to play Tiberian Sun anyway?"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_TAB_SIDEBAR         "Sidebar"
+    TXT_TAB_BUTTON_CONTROLS "Options"
+    TXT_SHADOW              "Unrevealed Terrain"
+    TXT_OPTIONS_MENU        "Options Menu"
+    TXT_STOP                "Stop"
+    TXT_DEPLOY_OBJECT       "Deploy Object"
+    TXT_DEPLOY_OBJECT_DESC  "Deploy selected object(s)."
+    TXT_WAYPOINTMODE        "Waypoint Mode"
+    TXT_WAYPOINTMODE_DESC   "Toggle waypoint placement mode on / off."
+    TXT_ON                  "On"
+    TXT_OFF                 "Off"
+    TXT_MULTIPLAYER_GAME    "Multiplayer Game"
+    TXT_SCRNCAP             "Screen Capture"
+    TXT_SCRNCAP_DESC        "Take a snapshot of the game screen. (Saved as 'SCRNxxxx.PCX' file in Tiberian Sun run directory.)"
+    TXT_SENDING_GO          "Sending GO request - Please Wait..."
+    TXT_WAITING_GO          "Waiting for GO response - Please Wait..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_SENDING_GO_ACK      "Sending GO acknowlegement - Please Wait..."
+    TXT_CWAIT_STAR70        "*70"
+    TXT_CWAIT_70NUM         "70#"
+    TXT_CWAIT_1170          "1170"
+    TXT_EASY                "Easy"
+    TXT_NORMAL              "Normal"
+    TXT_HARD                "Hard"
+    TXT_HIGH                "High"
+    TXT_LOW                 "Low"
+    TXT_FASTEST             "Fastest"
+    TXT_FASTER              "Faster"
+    TXT_SLOWER              "Slower"
+    TXT_SLOWEST             "Slowest"
+    TXT_SLOW                "Slow"
+    TXT_MEDIUM              "Medium"
+    TXT_FAST                "Fast"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_UNABLE_READ_SCENARIO "Unable to read scenario!"
+    TXT_ERROR_LOADING_GAME  "Error loading game!"
+    TXT_OBSOLETE_SAVEGAME   "[OBSOLETE]"
+    TXT_MUSTENTER_DESCRIPTION "You must enter a description!"
+    TXT_ERROR_SAVING_GAME   "Error saving mission!"
+    TXT_DELETE_FILE_QUERY   "Delete this file?"
+    TXT_EMPTY_SLOT          "[EMPTY SLOT]"
+    TXT_MAP                 "Map: %s"
+    TXT_EXPANSION_TITLE     "Firestorm"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_REQUEST_DENIED      "Request denied."
+    TXT_UNABLE_PLAY_WAAUGH  "Unable to play; scenario not found."
+    TXT_NOTHING_TO_JOIN     "Nothing to join!"
+    TXT_NAME_ERROR          "You must enter a name!"
+    TXT_YOURGAME_OUTDATED   "Your game version is outdated."
+    TXT_DESTGAME_OUTDATED   "Destination game version is outdated."
+    TXT_THATGUYS_GAME       "%s's Game"
+    TXT_THATGUYS_GAME_BRACKET "[%s's Game]"
+    TXT_REJECT              "Reject"
+    TXT_CANT_REJECT_SELF    "You can't reject yourself!"
+    TXT_SELECT_PLAYER_REJECT "You must select a player to reject."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_CREDITS_COLON       "Credits:"
+    TXT_ONLY_ONE            "Only one player?"
+    TXT_OOPS                "Oops!"
+    TXT_TO                  "To %s:"
+    TXT_TO_ALL              "To All:"
+    TXT_MESSAGE             "Message:"
+    TXT_CONNECTION_LOST     "Connection to %s lost!"
+    TXT_LEFT_GAME           "%s has left the game."
+    TXT_PLAYER_DEFEATED     "%s has been defeated!"
+    TXT_COMPUTER            "Computer"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_NONAME              "[NONAME]"
+    TXT_DEFAULT             "Default"
+    TXT_SETTINGS            "Settings"
+    TXT_NAME_COLON          "Name:"
+    TXT_OUT_OF_SYNC         "The game is out of sync."
+    TXT_PACKET_TOO_LATE     "Packet received too late!"
+    TXT_USER_SIGNED_OFF     "User signed off!"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_POWER_DRAIN         "Power = %d\rDrain = %d"
+    TXT_STAND_BY            "Please Stand By..."
+    TXT_LOW_POWER           "Low Power"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_KILLS_COLON         "Kills:"
+    TXT_SPY_INFO            "Spy Info"
+    TXT_INFANTRY            "Infantry"
+    TXT_BUILDNGS            "Buildings"
+    TXT_CIVILIAN_BUILDING   "Civilian Building"
+    TXT_TECHNICIAN          "Technician"
+    TXT_UNITS               "Units"
+    TXT_TO_REPLAY           "Would you like to replay this mission?"
+    TXT_SURRENDER           "Surrender"
+    TXT_GAMENAME_MUSTBE_UNIQUE "Your game name must be unique."
+    TXT_GAME_IS_CLOSED      "Game is closed."
+    TXT_NAME_MUSTBE_UNIQUE  "Your name must be unique."
+    TXT_RECONNECTING_TO     "Connection to %s has been interrupted. Attempting to reconnect."
+    TXT_WAITING_FOR_CONNECTIONS 
+                            "Waiting for all players to enter the game...."
+    TXT_TIME_ALLOWED        "Time allowed: %02d seconds"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_JUST_YOU_AND_ME     "From Computer: It's just you and me now!"
+    TXT_HAS_ALLIED          "%s has allied with %s"
+    TXT_AT_WAR              "%s declares war on %s"
+    TXT_SCENARIOS_DO_NOT_MATCH "Scenarios don't match."
+    TXT_CONTINUE            "Continue"
+    TXT_QUEUE_FULL          "Data Queue Overflow"
+    TXT_SPECIAL_WARNING     "%s changed game options!"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WAITING_FOR_OPPONENT "Waiting for Opponent"
+    TXT_GAME_WAS_SAVED      "Mission Saved"
+    TXT_SPACE_CANT_SAVE     "Insufficient disk space to save a game.  Please delete a previous saved games to free up some disk space and try again."
+    TXT_LOADING             "Mission is loading. Please wait..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_LOBBY               "Lobby"
+    TXT_SAVING_GAME         "Mission saving - Please Wait..."
+    TXT_GAME_FULL           "Game is full."
+    TXT_MUST_SELECT_GAME    "You must select a game!"
+    TXT_S_PLAYING_S         "%s playing %s"
+    TXT_ONLY_HOST_CAN_MODIFY "Only the host can modify this option."
+    TXT_GAME_CANCELLED      "Game was cancelled."
+    TXT_S_FORMED_NEW_GAME   "%s has formed a new game."
+    TXT_GAME_NOW_IN_PROGRESS "%s's game is now in progress."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_NO_DIAL_TONE        "No dial tone. Ensure your modem is connected to the phone line and try again."
+    TXT_CONNECTING          "Connecting..."
+    TXT_SELECT_SETTINGS     "Please select 'Settings' to setup default configuration"
+    TXT_ANSWERING           "Answering..."
+    TXT_INITIALIZING_MODEM  "Initializing Modem...Standby"
+    TXT_ERROR_NO_INIT       "Error - Modem did not respond to initialisation string."
+    TXT_ERROR_NO_DISABLE    "Error - Unable to disable modem auto answer."
+    TXT_ERROR_TOO_MANY      "Error - Too many errors initialising modem - Aborting."
+    TXT_ERROR_ERROR         "Error - Modem returned error status."
+    TXT_ERROR_TIMEOUT       "Error - TIme out waiting for connect."
+    TXT_RECEIVING_SCENARIO  "Receiving scenario from host."
+    TXT_SENDING_SCENARIO    "Sending scenario to remote players."
+    TXT_NO_FLOW_CONTROL_RESPONSE 
+                            "Error - Modem failed to respond to flow control command. Your Windows configuration may be incorrect."
+    TXT_NO_COMP_DISABLE_RESPONSE 
+                            "Error - Modem failed to respond to compression disable command. Your Windows configuration may be incorrect."
+    TXT_NO_EC_DISABLE_RESPONSE 
+                            "Error - Modem failed to respond to error correction disable command. Your Windows configuration may be incorrect."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_UNABLE_TO_OPEN_PORT "Invalid Port or Port is in use"
+    TXT_INVALID_PORT_ADDRESS "Invalid Port/Address. COM 1-4 OR ADDRESS"
+    TXT_IRQ_ALREADY_IN_USE  "IRQ already in use"
+    TXT_ERROR_IN_INITSTRING "Error in the InitString"
+    TXT_MODEM_OR_LOOPBACK   "Not a Null Modem Cable Attached! It is a modem or loopback cable."
+    TXT_UNABLE_FIND_MODEM   "Unable to find modem. Check power and cables."
+    TXT_NULL_CONNERR_CHECK_CABLES 
+                            "Connection error! Check your cables. Attempting to Reconnect..."
+    TXT_MODEM_CONNERR_REDIALING "Connection error! Redialing..."
+    TXT_MODEM_CONNERR_WAITING "Connection error! Waiting for Call..."
+    TXT_WAITING_CONNECT     "Waiting to Connect..."
+    TXT_CUSTOM              "CUSTOM -"
+    TXT_COM1                "COM1 - 3F8"
+    TXT_COM2                "COM2 - 2F8"
+    TXT_COM3                "COM3 - 3E8"
+    TXT_COM4                "COM4 - 2E8"
+    TXT_NO_CARRIER          "No carrier."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_NUCLEAR_BOMB        "Atom Bomb"
+    TXT_ION_CANNON          "Ion Cannon"
+    TXT_FIRESTORM           "Firestorm Defense Toggle"
+    TXT_ION_STORM_APPROACHING "Warning: Ion Storm approaching."
+    TXT_ION_STORM           "Warning: Ion Storm here!"
+    TXT_EM_PULSE            "EM Pulse"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_FIRESTORM_ON        "Activated"
+    TXT_CHARGING            "Charging..."
+    TXT_YELLOW              "Yellow"
+    TXT_GRAY                "Gray"
+    TXT_RED                 "Red"
+    TXT_PURPLE              "Purple"
+    TXT_BLUE                "Blue"
+    TXT_CYAN                "Cyan"
+    TXT_TAN                 "Tan"
+    TXT_GREEN               "Green"
+    TXT_MODE                "Mode"
+    TXT_RANK                "Rank"
+    TXT_BACK                "Back"
+    TXT_NOT_IN_LADDER       "Sorry, that player or rank is not in the ladder."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_BYTES_W_TIME        "Bytes read: %d / %d.    Time left: %d seconds"
+    TXT_BYTES_WO_TIME       "Bytes read: %d / %d."
+    TXT_FINDING_PATCH       "Finding Patch..."
+    TXT_NO_SERV_LIST        "Couldn't get the server list"
+    TXT_UPGRADEREQUIRED     "An upgrade is required for this game\nDo you want to download it now?\n \n \nWarning: use of ""trainers"", third-party cheat programs, or any other modification of Tiberian Sun may cause the automatic update procedure to fail. Please remove any such programs or reinstall Tiberian Sun before continuing."
+    TXT_DOWNLOADING_X_OF_Y  "Downloading file %d of %d..."
+    TXT_SERVER_ERROR        "Chat Server Error"
+    TXT_LOGIN_USED          "That login is already being used."
+    TXT_BADPASS             "That login or password was incorrect."
+    TXT_BANNED              "You've been temporarily banned. Would you like to open your web browser to get more information?"
+    TXT_CANT_CONNECT        "Could not connect to Westwood Online, check your Internet connection."
+    TXT_CHANCREATE_FAILED   "Could not create the channel"
+    TXT_CREATED_CHAN        "Created channel: %s"
+    TXT_CANT_JOINCHAN       "Error joining channel %X"
+    TXT_PAGESENT            "Page was successful."
+    TXT_PAGEDISABLED        "User has pages disabled"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_PAGEUSERGONE        "User isn't logged in"
+    TXT_PAGEFAILED          "Couldn't page user"
+    TXT_FINDOK              "User is in channel %s"
+    TXT_FINDNONE            "User isn't in any channels"
+    TXT_FINDGONE            "User isn't logged in"
+    TXT_FINDDISABLED        "User has find disabled"
+    TXT_FINDFAILED          "Find failed"
+    TXT_YOURE_DISCON        "You've been disconnected from the server"
+    TXT_BANNEDTILL          "You've been banned from Westwood Online until %s"
+    TXT_CHAN_BAN            "%s has been banned from the channel"
+    TXT_CHAN_UNBAN          "The channel ban on %s has been removed"
+    TXT_YOURE_KICKED        "You were kicked out of channel %s by %s"
+    TXT_USER_KICKED         "User %s was kicked out of channel %s by %s"
+    TXT_YOULEFT             "You left channel %s"
+    TXT_FETCHING_SERVLIST   "Fetching server list"
+    TXT_CONNECTING_SERVER   "Connecting to Westwood Online"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_REQ_CHANLIST        "Requesting channel list"
+    TXT_JOINLOB             "Joining Lobby"
+    TXT_JOININGCHAN         "Joining channel: %s"
+    TXT_SEARCHING           "SEARCHING..."
+    TXT_SEARCHING_FOR       "Searching for %s...."
+    TXT_ACCEPTFIRST         "All users must accept before the game can start."
+    TXT_NO_BOUND_NET_CARD   "IPX not available"
+    TXT_INVALID_SOCKET      "Socket number must be between 0 and 16383"
+    TXT_DESTNET_ADDR_ERROR  "Destination network address must be in the format xx.xx.xx.xx"
+    TXT_ABOUT_TO_TRY_MODE   "The display mode will be changed. If there is a problem with the new display mode then wait and the old mode will be restored."
+    TXT_APIMISSING          "The Westwood online support library is either missing or invalid. Please reinstall the shared internet components from your CD."
+    TXT_APIWRONGVERSION     "The installed version of the Westwood Online support library is too old. Please reinstall the shared internet components from your CD."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_NOTCHANOP           "You must be a channel operator to do this."
+    TXT_NOSQUAD             "You are not in a Tiberian Sun squad."
+    TXT_LAUNCHBROWSER       "Would you like to launch your web browser to visit this page?"
+    TXT_NOBROWSER           "You don't have a web browser associated with HTML files."
+    TXT_BAD_CHANNAME        "You can't make a channel with this name.  Try removing spaces and other punctuation."
+    TXT_BAD_CHANKEY         "You can't make a channel with this password. Try removing spaces and other punctuation."
+    TXT_CANTCREATE_CHAN     "You cannot create this channel."
+    TXT_NAME_BLANK          "Your player name is blank, please enter a name."
+    TXT_GAME_CLOSED         "That game channel has closed"
+    TXT_CHANNEL_FULL        "That channel is full"
+    TXT_JOINBAN             "You've been banned from this channel"
+    TXT_ENTER_MESSAGE       "Please enter a message to send"
+    TXT_NOT_IN_CHAN         "You can't send a message when you're not in a channel"
+    TXT_WOL_CONNLOST        "Lost connection to Westwood Online, outside users will not be able to page you."
+    TXT_DSOUND_PROCEED      "Proceeding with audio disabled."
+    TXT_REQ_NICK            "Requesting new login..."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_DISK_NAME           "Tiberian Sun Disk %d"
+    TXT_CONFIRM_SAVE        "Overwrite existing save game?"
+    TXT_DISKFULL            "Warning - you are critically low on free disk space for saving games."
+    TXT_SIGNING_OFF         "Signing off - Please Wait..."
+    TXT_CD_DIALOG_1         "Please insert a Tiberian Sun CD into the CD-ROM drive."
+    TXT_CD_DIALOG_2         "Please insert CD %d (%s) into the CD-ROM drive."
+    TXT_NAMES               "Players"
+    TXT_LOSSES              "Losses"
+    TXT_ECONOMY             "Economy"
+    TXT_SCORE               "Score"
+    TXT_KILLS               "Kills"
+    TXT_RESET_HOTKEYS       "Are you sure you want to reset the hotkey assignments?"
+    TXT_DSOUND_CANT_CREATE  "Warning - Unable to create Direct Sound Object."
+    TXT_DSOUND_NO_COOP      "Warning - Unable to set Direct Sound cooperative level."
+    TXT_DSOUND_NO_PRIMARY   "Warning - Unable to create Direct Sound primary buffer."
+    TXT_DSOUND_INCOMPAT     "Warning - Your sound card does not meet the product's audio requirements."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_GDI01A              "Destroy all enemy units"
+    TXT_GDI02A              "The Nod forces that attacked our Phoenix base are in this sector.  Their base must be destroyed in order to secure the region.  However, there is a significant civilian population requiring evacuation.  GDI transports will evacuate the civilians once all Nod SAM sites are destroyed.  The Nod base can then be safely terminated."
+    TXT_GDI03A              "It is highly probable that the Brotherhood will attempt to remove technology from the crash site and store it at the technology center.  Locate and secure the crash site, then capture the technology center."
+    TXT_GDI03B              "Destroying the base in this sector will prevent further removal of artifacts from the crash site.  In addition, Nod will not be able to reinforce the site from this location."
+    TXT_GDI04A              "Be advised, the Brotherhood will attempt to destroy the impact site.  GDI reinforcements are en route.  Protect the site until they arrive."
+    TXT_GDI05A              "A sensor net protects the valley where Tratos is being held.  To facilitate his rescue, we must disable the array that controls this highly sensitive net.  Once down, it will be much easier to get Tratos out of the valley."
+    TXT_GDI05C              "Tratos is being held in a hospital prison facility within this sector.  Avoid detection and rescue Tratos from the facility.  Once he is out, a transport will be sent in to evacuate him.  Once Tratos is clear, destroy all Nod forces in the area to prevent further experimentation."
+    TXT_GDI06A              "The large dams that power Vega's base lie in this sector.  Destroying them will temporarily drain power from his base.  To aid you in your objective, attack his island facility before he can bring new generators online.  The dam can be destroyed by disabling the two regulator stations in this sector.  GDI air support will be available if you can find a way to contact them and confirm your target. "
+    TXT_GDI06B              "Vega's base is secreted on an island in this sector.  Reaching it will be difficult, as there is only one overland access.  Your best chance of success lies in the use of amphibious APCs to land on the island and penetrate Vega's defenses.  Once on the island, destroy Vega's facility and command center."
+    TXT_GDI07A              "Nod has taken over much of our Hammerfest base in their search for the disrupter. Nod has reactivated the perimeter to prevent GDI from attacking.  Water assault remains your only option.  Find the Firestorm Defense structure generating the perimeter and deactivate it.  Only then can reinforcements arrive.  Proceed to destroy Nod's primary base, and prevent them from attacking again."
+    TXT_GDI08A              "It is imperative that you prevent the train from reaching the Nod base.  Remember, destroying the locomotive will immediately stop the train.  Recent ice melts in the region have disabled the only train bridge.  You must move quickly as Nod engineers are on their way to repair it.  The crystals can be recovered easily if you get to the train before Nod can repair the bridge.  Otherwise, we will need to attack the base in order to reclaim the crystals."
+    TXT_GDI09A              "The mutants are being held on an island in this sector.  We can spare a small force to attempt a rescue.  The area leading to the island is heavily guarded.  If you are detected, more Nod forces will arrive.  Avoiding Nod patrols is advised.  You must rescue all ten mutants and lead them to the dust-off zone.  Periodic airstrikes will be available."
+    TXT_GDI09B              "Destroying the supply base here will prevent the missile complex from receiving reinforcements."
+    TXT_GDI09C              "The train transporting the mutants is headed to this power grid.  The grid powers the missile complex.  Merely destroying the grid is inadequate: Nod will compensate by building more power plants at the base.  Use all the mutants to plant C4 charges on all the power plants.  We'll detonate the C4 when we attack the missile complex."
+    TXT_GDI09D              "Complete destruction of the missile complex is essential.  Be advised, Nod will use their Tiberium missiles and their new fighter prototypes against you."
+    TXT_GDI10A              "One of two possible locations for the fighter production facility.  Use the mutants to locate its whereabouts while remaining undetected.  If detected, Nod will cloak the factory and deploy more troops.  Hide the mutants, and Nod will once again uncloak their base.  After the base location is recorded, GDI dropships will immediately arrive with reinforcements."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_GDI10B              "Another possible location of the fighter production facility.  Use the mutants to locate the position of the fighter production facility.  They must remain undetected. If Nod suspects enemy forces, they will cloak their production facility and deploy troops.  If the mutants can hide from the Nod troops for a short period, Nod will assume the area is clear, and uncloak the base.  Once we have recorded the location of the base, the mission will be complete."
+    TXT_GDI11A              "Be advised: Kane is determined to destroy you.  The ion storm has grounded the Kodiak.  We must protect it until the storm abates.  Production will be limited.  There is a high probability of equipment malfunction.  Caution is advised."
+    TXT_GDI12A              "Impulse signatures emanating from Cairo suggest Kane will launch his world-altering missile within hours.  You must destroy the pyramid temple before he has the chance to launch.  There are no alternatives."
+    TXT_NOD01A              "Destroy all enemy units."
+    TXT_NOD02A              "Hassan communicates to the Brotherhood through a nearby TV station.  With the Brotherhood in chaos, the opportunity to divide Hassan from his followers presents itself.  Capture the TV station and those once loyal to Kane's technology of peace will return to the fold.  And as for Hassan's pathetic guards -- crush them."
+    TXT_NOD03A              "The infidel Hassan has been tracked to this region of Cairo.  Build a base and remove the usurper."
+    TXT_NOD03B              "We have become aware of an imprisoned commander in this region who WAS loyal to Hassan.  Free him and his forces and they should be sympathetic to our cause -- and help in the capture of Hassan.  The commander may have information vital to my.......your movement."
+    TXT_NOD04A              "Taking out this weak GDI position will allow us to reclaim our Sarajevo temple without interruption.  Move to an open area and build your base.  GDI patrols are known to be in the area.  Do not mar the brotherhood's name any further."
+    TXT_NOD05A              "The alien craft is located in this region - find it!  You must utilize your stealth advantage, as the area is infested with GDI.  Once the craft is located, get an engineer inside to retrieve the Tacitus.  Should you encounter Vega's forces, consider them expendable."
+    TXT_NOD06A              "Control of the mutants is in our grasp.  Their headquarters is located to the north of your drop-off position.  The GDI units you will need to implicate in this deception occupy a small base to the southwest.  Do not mar the Brotherhood's name any further.  Allow the blame to fall squarely on Solomon's shoulders."
+    TXT_NOD06B              "You must reach the medical colony in the region without being prematurely detected by GDI and forcing a base evacuation.  To prevent this, consider first destroying the 3 sensor towers protecting the base.  Our new artillery unit should be sufficient for the job, even in your hands.  Once inside the base, the capture of the mutant female should be simple."
+    TXT_NOD06C              "The mutant female may be trying to reach the underground railway system located in New Detroit.  Move in and control the station before she arrives.  If she boards the train, you must stop it immediately.  This may be our last chance of capturing the abomination."
+    TXT_NOD07A              "The informant must make contact with the mutants south of the GDI base.  Use the mutants to protect the informant and to eliminate GDI patrols.  Reinforcements will arrive after you have secured the railway tunnel here.  Use them to locate and destroy the research facility.  The mutants, of course, are expendable."
+    TXT_NOD07B              "Use the cyborg commando and his team to locate the bio-toxin tanker trucks.  Both trucks must reach the convoy point here if they are to arrive in time to aid you in your assault against the research facility.  GDI patrols are known to be in the area."
+    TXT_NOD08A              "A cyborg commando has been sent to retrieve you.  Once free, rendezvous with your rescue team to the south.  Use them to locate and free Oxanna before she is transported to the main GDI facility.  After she has been freed, capture a GDI transport to make your escape.  "
+    TXT_NOD09A              "In this sector lies a Nod base overrun with tiberium-based lifeforms.  Find the base, reactivate it, and use the tiberium life to fill our missiles.  When you have enough of the tiberium substance, launch the missile against the GDI base and destroy it."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_NOD09B              "Enter the sector and deploy your base.  Once you have established a tiberium waste facility, convoys of tiberium waste will begin arriving.  Protect the convoys at all cost.  Once we have enough tiberium waste, the missile will be ready for use against GDI.  Destroying their base, once it is infected, will be a simple matter."
+    TXT_NOD10A              "We must destroy GDI's new weapon.  They will, of course, build more in the future but it will buy us valuable time.  We know GDI is testing the Mammoth somewhere in this sector.  Use a chameleon spy to infiltrate a GDI comm center and locate the test site.  Your fighter prototype should be all you need to obliterate the nuisance."
+    TXT_NOD11A              "The GDI defense perimeter is located here.  Do not destroy any GDI factories during your assault - you will need them to build GDI units under our control.  Once Jake McNeil's inspection detail is in our converted base, attack!  Kill all but McNeil.  Use the special toxin soldiers provided to control McNeil.  Once he has been ""persuaded"" to help us in our cause, EVAC him as directed.  If he detects the trap, capture him before he can flee the sector.   "
+    TXT_NOD12A              "Kane's vision is at hand.  Unfortunately GDI's orbital station, the Philadelphia, can stop the missile that will take us into the future.   We must destroy the Philadelphia at all costs!  The Philadelphia will require three orbits over this sector before it can locate our missile.  You must get three ICBM launchers into position before the Philadelphia's final orbit is complete.  With the ICBMs in place, we can bring GDI's command station down.  All this remains contingent, of course, on McNeil's helpfulness.  You must pretend to pursue him back towards the GDI base.  They will open the perimeter to let him in.  Once he is in, he will deactivate the perimeter shortly thereafter."
+    TXT_NOD12B              "We suggest that the brotherhood should not suffer the indignations of the past.  In order to prevent history from repeating itself, you must steal the firing codes for GDI's ion cannon.    Paranoid security measures prevent GDI from storing the entire code in one place.  Therefore, use a chameleon spy to infiltrate three different comm centers.  Once we have the codes and the spy is safely evacuated, we will be able to use GDI's ion cannon against them in the final assault.  Unfortunately GDI will have to use the ion cannon once before we can use the codes."
+    TXT_JANUARY             "January"
+    TXT_FEBRUARY            "February"
+    TXT_MARCH               "March"
+    TXT_APRIL               "April"
+    TXT_MAY                 "May"
+    TXT_JUNE                "June"
+    TXT_JULY                "July"
+    TXT_AUGUST              "August"
+    TXT_SEPTEMBER           "September"
+    TXT_OCTOBER             "October"
+    TXT_NOVEMBER            "November"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_DECEMBER            "December"
+    TXT_RELEASE_THE_HOUNDS  "Release"
+    TXT_LOADING_GAME1A      "Analyzing combat zone topography..."
+    TXT_LOADING_GAME1C      "Compiling wartime conventions..."
+    TXT_LOADING_GAME1D      "Gathering intel on involved factions..."
+    TXT_LOADING_GAME1E      "Creating theories on likely enemy plan..."
+    TXT_LOADING_GAME1F      "Secondary check of combat zone..."
+    TXT_LOADING_GAME1G      "Deploying forces to combat zone..."
+    TXT_LOADING_GAME1H      "Final analysis of outcome..."
+    TXT_RECONNECT_HELP1     "Click on a name to propose removing that player from the game."
+    TXT_RECONNECT_HELP2     "If all other players have connection times in the red then you have probably been"
+    TXT_RECONNECT_HELP3     "Check your connection to the internet.  If you were disconnected from the internet"
+    TXT_RECONNECT_HELP4     "disconnected from the network."
+    TXT_RECONNECT_HELP5     "Click cancel to abort this game and return to the lobby."
+    TXT_RECONNECT_HELP2B    "disconnected from your internet service provider."
+    TXT_RECONNECT_HELP3B    "you can re-dial your provider and continue the game as normal provided the other"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_RECONNECT_HELP3C    "players don't elect to remove you from the game.."
+    TXT_RECONNECT_KICK_SELF "You can't propose removing yourself. Click cancel to leave the game."
+    TXT_RECONNECT_KICK_RECEIVED "%s proposes kicking %s from the game."
+    TXT_BIOME_TUNDRA        "Tundra"
+    TXT_BIOME_TAIGA         "Taiga"
+    TXT_BIOME_TEMPERATE     "Temperate"
+    TXT_BIOME_DESERT        "Desert"
+    TXT_TIME_MORNING        "Morning"
+    TXT_TIME_AFTERNOON      "Afternoon"
+    TXT_TIME_DUSK           "Dusk"
+    TXT_TIME_NIGHT          "Night"
+    TXT_MAPSIZE_SMALL       "Small"
+    TXT_MAPSIZE_MEDIUM      "Medium"
+    TXT_MAPSIZE_LARGE       "Large"
+    TXT_MAPSIZE_VERY_LARGE  "V.Large"
+    TXT_RANDOM_MAP_DESCRIPTION "Random Map"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_LOADING_GAME1B      "Compensating for ambient light values..."
+    TXT_CONSENT_REQUIRED    "Since you are under the age of 13 our privacy policy requires that you send us a parental consent form to continue.  Press 'yes' to open your web browser to this page."
+    TXT_CLAN_NOSTART        "To start a BattleClan tournament game there needs to be an even number of people from two clans.  Everyone in the game must be in a clan."
+    TXT_DISABLED            "Your account has been temporarily disabled.  Make sure the Email address you registered with is correct.  Would you like to open your web browser to get more information?"
+    TXT_SERIALBANNED        "(NOT USED ANYMORE)"
+    TXT_SERIALDUP           "Your Serial number is currently in use.  Would you like to open your web browser to get more information?"
+    TXT_NOD04B              "Taking out this weak GDI position will allow us to reclaim our Sarajevo temple without interruption.  Move in under the cover of an ion storm when GDI's communications will be down.  Take out the comm center before the storm subsides."
+    TXT_SEL_USER            "You must select a user to kick/ignore/ban them."
+    TXT_GOLD                "Gold"
+    TXT_ORANGE              "Orange"
+    TXT_SKY_BLUE            "Sky Blue"
+    TXT_PINK                "Pink"
+    TXT_COLOR_IN_USE        "The requested color is already taken."
+    TXT_NO_CLAN             "You must be in a BattleClan to join this game."
+    TXT_LANGCODE            "0"
+    TXT_SERIAL_DUP          "There are already 2 players with your serial# in that game."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_MISMATCH            "Game versions incompatible. To make sure you have the latest version, visit www.westwood.com"
+    TXT_NO_EXPANSION_SCENARIO 
+                            "Error - other player does not have this expansion scenario."
+    TXT_SCENARIO_ERROR      "Incompatable scenario file detected. The scenario may be corrupt."
+    TXT_INVALID             "Invalid option switch."
+    TXT_OPTION_HELP_01      "Tiberian Sun © 1999, Westwood Studios\n"
+    TXT_OPTION_HELP_02      "Parameters:\n"
+    TXT_OPTION_HELP_03      "  -DESTNET = Specify Network Number of destination system\n"
+    TXT_OPTION_HELP_04      "  -SOCKET = Network Socket ID (0 - 16383)\n"
+    TXT_OPTION_HELP_05      "  -STEALTH = Hide multiplayer names (""Boss mode"")\n"
+    TXT_OPTION_HELP_06      "  -MESSAGES = Allow messages from outside this game.\n"
+    TXT_MAP_ERROR           "Map Error!"
+    TXT_SCATTER             "Scatter"
+    TXT_SCATTER_DESC        "Scatter selected object(s)."
+    TXT_CENTER_VIEW         "Center View"
+    TXT_CENTER_VIEW_DESC    "Center the view about selected object(s)."
+    TXT_CENTER_BASE         "Center Base"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_LINE_BUSY           "Line busy."
+    TXT_NUMBER_INVALID      "Number invalid."
+    TXT_DIALING             "Dialing..."
+    TXT_DIALING_CANCELED    "Dialing Canceled"
+    TXT_WAITING_FOR_CALL    "Waiting for Call..."
+    TXT_ANSWERING_CANCELED  "Answering Canceled"
+    TXT_SYSTEM_NOT_RESPONDING "Other system not responding!"
+    TXT_NO_COMP_ENABLE_RESPONSE 
+                            "Error - Modem failed to respond to compression enable command. Your Windows configuration may be incorect."
+    TXT_NO_EC_ENABLE_RESPONSE 
+                            "Error - Modem failed to respond to error correction enable command. Your Windows configuration may be incorrect."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_CREATE_TEAM_DESC    "Creates Team %d from currently selected units."
+    TXT_SELECT_TEAM         "Select Team %2d"
+    TXT_SELECT_TEAM_DESC    "Select members of team %d."
+    TXT_ADD_SELECT_TEAM     "Add Select Team %2d"
+    TXT_ADD_SELECT_TEAM_DESC 
+                            "Select members of team %d without unselecting other units."
+    TXT_CENTER_TEAM         "Center Team %2d"
+    TXT_CENTER_TEAM_DESC    "Select and center view about team %d."
+    TXT_NEXT_OBJECT         "Next Object"
+    TXT_NEXT_OBJECT_DESC    "Select the next object."
+    TXT_PREV_OBJECT         "Previous Object"
+    TXT_PREV_OBJECT_DESC    "Select the previous object."
+    TXT_STOP_OBJECT         "Stop Object"
+    TXT_STOP_OBJECT_DESC    "Stop the selected object(s)."
+    TXT_GUARD               "Guard"
+    TXT_GUARD_DESC          "Set the selected object(s) into 'guard area' mode."
+    TXT_VICTORIOUS          "You Are Victorious!"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_CENTER_BASE_DESC    "Center the view about the player's base."
+    TXT_ALLIANCE            "Alliance"
+    TXT_ALLIANCE_DESC       "Toggle alliance with owner of selected object."
+    TXT_SELECT_VIEW         "Select View"
+    TXT_SELECT_VIEW_DESC    "Select all owned objects in the current view."
+    TXT_REPAIR_MODE         "Repair Mode"
+    TXT_REPAIR_MODE_DESC    "Toggle repair mode on / off."
+    TXT_SELL_MODE           "Sell Mode"
+    TXT_SELL_MODE_DESC      "Toggle sell mode on / off."
+    TXT_POWER_MODE          "Power Mode"
+    TXT_POWER_MODE_DESC     "Toggle power mode on / off."
+    TXT_RADAR_EVENT         "Goto Radar Event"
+    TXT_RADAR_EVENT_DESC    "Center the tactical view on the last radar event."
+    TXT_RADAR_TOGGLE        "Radar Toggle"
+    TXT_RADAR_TOGGLE_DESC   "Toggle radar display mode on / off."
+    TXT_SIDEBAR_UP          "Sidebar Up"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_SIDEBAR_UP_DESC     "Scrolls sidebar selection list upward."
+    TXT_LSIDEBAR_UP         "Structure List up"
+    TXT_LSIDEBAR_UP_DESC    "Scroll sidebar structure selection list upward."
+    TXT_RSIDEBAR_UP         "Unit List Up"
+    TXT_RSIDEBAR_UP_DESC    "Scroll sidebar unit selection list upward."
+    TXT_SIDEBAR_PGUP        "Sidebar PageUp"
+    TXT_SIDEBAR_PGUP_DESC   "Page sidebar selection list upward."
+    TXT_LSIDEBAR_PGUP       "Structure List PageUp"
+    TXT_LSIDEBAR_PGUP_DESC  "Page sidebar structure selection list upward."
+    TXT_RSIDEBAR_PGUP       "Unit List PageUp"
+    TXT_RSIDEBAR_PGUP_DESC  "Page sidebar unit selection list upward."
+    TXT_SIDEBAR_DOWN        "Sidebar Down"
+    TXT_SIDEBAR_DOWN_DESC   "Scroll sidebar selection list downward."
+    TXT_LSIDEBAR_DOWN       "Structure List Down"
+    TXT_LSIDEBAR_DOWN_DESC  "Scroll sidebar structure selection list downward."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_RSIDEBAR_DOWN       "Unit List Down"
+    TXT_RSIDEBAR_DOWN_DESC  "Scroll sidebar unit selection list downward."
+    TXT_SIDEBAR_PGDN        "Sidebar PageDown"
+    TXT_SIDEBAR_PGDN_DESC   "Page sidebar selection list downward."
+    TXT_LSIDEBAR_PGDN       "Structure List PageDown"
+    TXT_LSIDEBAR_PGDN_DESC  "Page sidebar structure selection list downward."
+    TXT_RSIDEBAR_PGDN       "Unit List PageDown"
+    TXT_RSIDEBAR_PGDN_DESC  "Page sidebar unit selection list downward."
+    TXT_OPTIONS             "Options Menu"
+    TXT_OPTIONS_DESC        "Display game options dialog."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_SCROLL_N            "Scroll North"
+    TXT_SCROLL_N_DESC       "Scroll tactical map to the north."
+    TXT_SCROLL_S            "Scroll South"
+    TXT_SCROLL_S_DESC       "Scroll tactical map to the south."
+    TXT_SCROLL_E            "Scroll East"
+    TXT_SCROLL_E_DESC       "Scroll tactical map to the east."
+    TXT_SCROLL_W            "Scroll West"
+    TXT_SCROLL_W_DESC       "Scroll tactical map to the west."
+    TXT_VIEW_BOOKMARK1      "View Bookmark 1"
+    TXT_VIEW_BOOKMARK1_DESC "View bookmarked map position 1."
+    TXT_VIEW_BOOKMARK2      "View Bookmark 2"
+    TXT_VIEW_BOOKMARK2_DESC "View bookmarked map position 2."
+    TXT_VIEW_BOOKMARK3      "View Bookmark 3"
+    TXT_VIEW_BOOKMARK3_DESC "View bookmarked map position 3."
+    TXT_VIEW_BOOKMARK4      "View Bookmark 4"
+    TXT_VIEW_BOOKMARK4_DESC "View bookmarked map position 4."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_SET_BOOKMARK1       "Set Bookmark 1"
+    TXT_SET_BOOKMARK1_DESC  "Set view bookmark map position 1."
+    TXT_SET_BOOKMARK2       "Set Bookmark 2"
+    TXT_SET_BOOKMARK2_DESC  "Set view bookmark map position 2."
+    TXT_SET_BOOKMARK3       "Set Bookmark 3"
+    TXT_SET_BOOKMARK3_DESC  "Set view bookmark map position 3."
+    TXT_SET_BOOKMARK4       "Set Bookmark 4"
+    TXT_SET_BOOKMARK4_DESC  "Set view bookmark map position 4."
+    TXT_FOLLOW              "Follow"
+    TXT_FOLLOW_DESC         "Toggle follow state of selected object(s)."
+    TXT_DEL_WAYPOINT        "Delete Waypoint"
+    TXT_DEL_WAYPOINT_DESC   "Delete selected waypoint."
+    TXT_PAGEUSER            "Page User"
+    TXT_PAGEUSER_DESC       "Page a Westwood Online user. (Internet play only)"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_SCENARIO_TOO_SMALL  "This map has a %d player max.  The max includes human and AI players."
+    TXT_DOWNLOAD_FAILED     "The download failed, please check your connection and try again later."
+    TXT_GAME_RESTART        "Tiberian Sun will now restart to update itself."
+    TXT_PASSWORD_TOO_SHORT  "Your password must be exactly 8 letters long."
+    TXT_PASSWORD_VERIFY     "You need to enter the same password twice."
+    TXT_LOB_1               "GDI Barracks"
+    TXT_LOB_2               "NOD Barracks"
+    TXT_LOB_3               "GDI Comm. Center"
+    TXT_LOB_4               "Temple of NOD"
+    TXT_LOB_5               "GDI Tech Center"
+    TXT_LOB_6               "Hand of NOD"
+    TXT_NEW_GAME            "New Game"
+    TXT_NEW_CHAT            "New Chat"
+    TXT_NEW                 "New"
+    TXT_GAME_CHAN           "Tiberian Sun game channels"
+    TXT_OTHER_GAME          "Other game channels"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_OFFICIAL_CHAT       "Official chat channels"
+    TXT_USER_CHAT           "User chat channels"
+    TXT_GAME_PASSWORD       "Game has a password"
+    TXT_LEAVE               "Leave"
+    TXT_JOIN                "Join"
+    TXT_OPER                "Channel Operator"
+    TXT_VOICE               "Voice"
+    TXT_IGNOREUSER          "Ignore User"
+    TXT_ACCEPTED            "Accepted"
+    TXT_JOINED_S            "You joined channel %s"
+    TXT_REQUIRED_FIELD      "A required field is missing, or invalid."
+    TXT_SCENARIO_COLON      "Scenario:"
+    TXT_TOURNEY_COLON       "Tournament:"
+    TXT_BATTLE_CLAN         "BattleClan"
+    TXT_HOST_RANK           "Host Rank:"
+    TXT_UNRANKED            "Unranked"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_CANT_KICK           "You cannot kick a player from a tournament game."
+    TXT_HOST_CHANGED_OPTIONS 
+                            "The host has changed game options, press accept if you're ready."
+    TXT_GDI                 "GDI"
+    TXT_NOD                 "Nod"
+    TXT_GAME_ID             "Game# %d"
+    TXT_TOURNAMENT_GAME     "Tournament Game"
+    TXT_BATTLECLAN_GAME     "BattleClan Game"
+    TXT_GAME                "Game: %d"
+    TXT_WDT_FORMAT_TWO_LINES "%s\n%s"
+    TXT_WDT_TERRITORY_CONTROL "\nGDI: %2d%%\nNod: %2d%%"
+    TXT_WDT_REVIEWING_HISTORY "Reviewing History\n"
+    TXT_WDT_DAY             "Day : %d"
+    TXT_BIOME_MUTATED       "Mutated"
+    TXT_WDT_INVALID_MISSING "Invalid/Missing"
+    TXT_WDT_INFO_CORRUPT    "The World Domination Tour information was either not downloaded or is corrupt."
+    TXT_WDT_NAME_DESC_RANK  "%s\n%s\nRank : %d"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_CANCEL          "Cancel"
+    TXT_WDT_WEB_PAGE        "Web Page"
+    TXT_WDT_NAME_RANK       "%s\nRank : %d"
+    TXT_BAD_MAP_01          "The host has selected"
+    TXT_BAD_MAP_02          "a modified map."
+    TXT_BAD_MAP_03          "This may give the host"
+    TXT_BAD_MAP_04          "an unfair advantage."
+    TXT_BAD_MAP_05          "No preview available."
+    TXT_AMOUNT_VERY_FEW     "Very Few"
+    TXT_AMOUNT_FEW          "Few"
+    TXT_AMOUNT_MANY         "Many"
+    TXT_AMOUNT_VERY_MANY    "Very Many"
+    TXT_AMOUNT_VERY_LOW     "Very Low"
+    TXT_AMOUNT_LOW          "Low"
+    TXT_AMOUNT_HIGH         "High"
+    TXT_AMOUNT_VERY_HIGH    "Very High"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_AMOUNT_VERY_SCARCE  "Very Scarce"
+    TXT_AMOUNT_SCARCE       "Scarce"
+    TXT_AMOUNT_ABUNDANT     "Abundant"
+    TXT_AMOUNT_VERY_ABUNDANT "Very Abundant"
+    TXT_AMOUNT_VERY_SPARSE  "Very Sparse"
+    TXT_AMOUNT_SPARSE       "Sparse"
+    TXT_AMOUNT_HEAVY        "Heavy"
+    TXT_AMOUNT_VERY_HEAVY   "Very Heavy"
+    TXT_WDT_HARV_TRUCE      "Harvester Truce"
+    TXT_WDT_BASES_ON        "Starting Bases"
+    TXT_WDT_BASES_OFF       "No Starting Bases"
+    TXT_WDT_MCV_REDEPLOY_ON "Redeployable MCV"
+    TXT_WDT_FOG_OF_WAR      "Fog of War"
+    TXT_WDT_BRIDGE_DESTROY_ON "Bridges Destroyable"
+    TXT_WDT_BRIDGE_DESTROY_OFF "Indestructable Bridges"
+    TXT_WDT_GOODIES_ON      "Goodie Crates"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_GOODIES_OFF     "No Goodie Crates"
+    TXT_WDT_TIME_OF_DAY_TRANSITIONS "Time of Day Transitions"
+    TXT_WDT_FMT_CLIFFS      "%s Cliffs"
+    TXT_WDT_FMT_ACCESSIBILITY "%s Accessibility"
+    TXT_WDT_FMT_HILLS       "%s Hills"
+    TXT_WDT_FMT_TIBERIUM    "%s Tiberium"
+    TXT_WDT_FMT_TIBERIUM_FIELDS "%s Tiberium Fields"
+    TXT_WDT_FMT_WATER       "%s Water"
+    TXT_WDT_FMT_VEGETATION  "%s Vegetation"
+    TXT_WDT_FMT_CITIES      "%s Cities"
+    TXT_WDT_LIFEFORMS       "Tiberium Lifeforms"
+    TXT_WDT_VEINHOLES       "Veinholes"
+    TXT_WDT_TECHLEVEL       "Tech Level %d"
+    TXT_WDT_STARTING_UNITS  "%d Starting Units"
+    TXT_WDT_CREDITS         "%d Credits"
+    TXT_WDT_MCV_REDEPLOY_OFF "MCV Not Redeployable"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_SHORT_GAME_ON   "Short Game"
+    TXT_WDT_SHORT_GAME_OFF  "Unlimited Game Length"
+    TXT_WDT_TWO_PLAYER_ONLY "Two Player Only"
+    TXT_WDT_FOUR_PLAYER_ONLY "Four Player Only"
+    TXT_WDT_MAP_TINY        "Tiny Map"
+    TXT_WDT_MAP_SMALL       "Small Map"
+    TXT_WDT_MAP_NARROW      "Narrow Map"
+    TXT_WDT_MAP_TALL_NARROW "Tall & Narrow Map"
+    TXT_WDT_MAP_SHORT       "Short Map"
+    TXT_WDT_MAP_LARGE       "Large Map"
+    TXT_WDT_MAP_SHORT_WIDE  "Short & Wide Map"
+    TXT_WDT_MAP_HUGE        "Huge Map"
+    TXT_FETCHING_SQUAD      "Fetching squad information"
+    TXT_FETCHING_LADDER     "Fetching ladder information"
+    TXT_WDT_NET_ERR         "Could not connect to the World Domination Tour server, or there is no server available"
+    TXT_NO_FREE_SLOTS       "There are no more free slots in that game for your side"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_FRONT_LINE_CHANGED 
+                            "The active World Domination Tour territories have changed.  Relocating to new front line..."
+    TXT_FETCHING_WDT        "Fetching World Domination Tour information"
+    TXT_CHOOSE_MAP          "Please Choose Map"
+    TXT_WOL_LOGGING_OUT     "Logging off Westwood Online"
+    TXT_PLAYER_CHANGED_LATENCY 
+                            "Player %s has changed the connection speed setting."
+    TXT_PLAYER_CHANGED_SPEED "Player %s has changed the game speed setting."
+    TXT_WORST_CONNECTION    "Bad"
+    TXT_POOR_CONNECTION     "Poor"
+    TXT_GOOD_CONNECTION     "Normal"
+    TXT_BEST_CONNECTION     "Fast"
+    TXT_WARNING_LOCALE_UNKNOWN 
+                            "You have not set your location. Click OK to continue anyway or cancel to go back and set your location."
+    TXT_DELETE_USER         "Are you sure you want to remove user '%s' from the login list?"
+    TXT_ALL_LOCATIONS       "All Locations"
+    TXT_TS_PLAYERS          "Tiberian Sun Players"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_TS_BATTLECLANS      "Tiberian Sun BattleClans"
+    TXT_FS_PLAYERS          "Firestorm Players"
+    TXT_FS_BATTLECLANS      "Firestorm BattleClans"
+    TXT_WDT_NOD_PLAYERS     "WDT Nod Players"
+    TXT_WDT_GDI_PLAYERS     "WDT GDI Players"
+    TXT_SELECT_TYPE         "Select Same Type"
+    TXT_SELECT_TYPE_DESC    "Selects all on-screen units of the same types as currently selected. Press twice quickly to select across the whole map."
+    TXT_FIRESTORM_REQUIRED  "Firestorm required to join this game."
+    TXT_FIRESTORM_MUST_ENABLE "Firestorm must be enabled to join this game."
+    TXT_FIRESTORM_NO_JOIN_TS 
+                            "Unable to join original Tiberian Sun game with Firestorm enabled."
+    TXT_SERIALUNKNOWN       "Your serial number was not found.  This is most likely due to a mistyped serial number during installation.  You must reinstall the game, specifying a valid serial number, to play online."
+    TXT_SKUSERIALMISMATCH   "Your serial number is associated with a product other than Tiberian Sun.  You must reinstall the game, specifying a valid Tiberian Sun serial number, to play online."
+    TXT_WDT_TIBERIUM_RANGE  "Very Scarce Tiberium"
+    TXT_WDT_TIBERIUM_SCARCE "Scarce Tiberium"
+    TXT_WDT_TIBERIUM_ABUNDANT "Abundant Tiberium"
+    TXT_WDT_TIBERIUM_VERY_ABUNDANT "Very Abundant Tiberium"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_TIBERIUM_FIELDS_RANGE "Very Few Tiberium Fields"
+    TXT_WDT_TIBERIUM_FIELDS_FEW "Few Tiberium Fields"
+    TXT_WDT_TIBERIUM_FIELDS_MANY "Many Tiberium Fields"
+    TXT_WDT_TIBERIUM_FIELDS_NUMEROUS "Numerous Tiberium Fields"
+    TXT_WDT_ACCESSIBILITY_RANGE "Very Low Accessibility"
+    TXT_WDT_ACCESSIBILITY_LOW "Low Accessibility"
+    TXT_WDT_ACCESSIBILITY_HIGH "High Accessibility"
+    TXT_WDT_ACCESSIBILITY_VERY_HIGH "Very High Accessibility"
+    TXT_WDT_CLIFFS_RANGE    "Very Few Cliffs"
+    TXT_WDT_CLIFFS_FEW      "Few Cliffs"
+    TXT_WDT_CLIFFS_MANY     "Many Cliffs"
+    TXT_WDT_CLIFFS_NUMEROUS "Numerous Cliffs"
+    TXT_WDT_HILLS_RANGE     "Very Few Hills"
+    TXT_WDT_HILLS_FEW       "Few Hills"
+    TXT_WDT_HILLS_MANY      "Many Hills"
+    TXT_WDT_HILLS_NUMEROUS  "Numerous Hills"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_WATER_RANGE     "Very Scarce Water"
+    TXT_WDT_WATER_SCARCE    "Scarce Water"
+    TXT_WDT_WATER_ABUNDANT  "Abundant Water"
+    TXT_WDT_WATER_VERY_ABUNDANT "Very Abundant Water"
+    TXT_WDT_VEGETATION_RANGE "Very Sparse Vegetation"
+    TXT_WDT_VEGETATION_SPARSE "Sparse Vegetation"
+    TXT_WDT_VEGETATION_HEAVY "Heavy Vegetation"
+    TXT_WDT_VEGETATION_VERY_HEAVY "Very Heavy Vegetation"
+    TXT_WDT_CITIES_RANGE    "Very Few Cities"
+    TXT_WDT_CITIES_FEW      "Few Cities"
+    TXT_WDT_CITIES_MANY     "Many Cities"
+    TXT_WDT_CITIES_NUMEROUS "Numerous Cities"
+    TXT_MULTI_ENGINEERS     "Multi-Engineers"
+    TXT_NORMAL_ENGINEERS    "Normal Engineers"
+    TXT_NEED_PLAYERS_TO_START "You need %d players to start the game."
+    TXT_NEED_EQUAL_TEAMS    "You must have an equal number of GDI and Nod players to start the game."
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    TXT_WDT_NO_ALLIANCE_CHANGE 
+                            "You cannot change alliances in a World Domination Tour game."
+    TXT_UNKNOWN_STATUS      "Unknown Status"
+    TXT_UNKNOWN_PING        "Unknown Ping"
+    TXT_MANUAL_PLACE        "Place Building"
+    TXT_MANUAL_PLACE_DESC   "Enters placement mode for the completed building waiting on the sidebar."
+    TXT_TO_TEAM             "To Team:"
+    TXT_TO_OBSERVERS        "To Observers:"
+    TXT_CHAT_TAGGED         "%s [%s]"
+    TXT_CHAT_TO_TEAM        "to team"
+    TXT_CHAT_TO_OBSERVERS   "to observers"
+    TXT_CHAT_TO_PLAYER      "to %s"
+    TXT_CHAT                "Chat"
+    TXT_CHAT_TO_ALL         "Message to All"
+    TXT_CHAT_TO_ALL_DESC    "Starts a message to every player."
+    TXT_CHAT_TO_ALLIES      "Message to Team"
+    TXT_CHAT_TO_ALLIES_DESC "Starts a message to your allies, or to the other observers while you watch."
+    TXT_AUTOSAVING          "Auto-saving..."
+    TXT_AUTOSAVE_FAILED     "The game could not be auto-saved."
+    TXT_AUTOSAVE_DESCRIPTION "Auto-Save %d: %s"
+    TXT_AUTOSAVE_MULTIPLAYER "Multiplayer Game (Auto-Save)"
+    TXT_SAVE_FAILED         "The game could not be saved."
+    TXT_REPEAT_LAST_BUILDING "Repeat Last Building"
+    TXT_REPEAT_LAST_BUILDING_DESC "Queues the last structure that was built, while it is still on the sidebar."
+    TXT_REPEAT_LAST_INFANTRY "Repeat Last Infantry"
+    TXT_REPEAT_LAST_INFANTRY_DESC "Queues the last infantry that was trained, while it is still on the sidebar."
+    TXT_REPEAT_LAST_UNIT    "Repeat Last Vehicle"
+    TXT_REPEAT_LAST_UNIT_DESC "Queues the last vehicle that was built, while it is still on the sidebar."
+    TXT_REPEAT_LAST_AIRCRAFT "Repeat Last Aircraft"
+    TXT_REPEAT_LAST_AIRCRAFT_DESC "Queues the last aircraft that was built, while it is still on the sidebar."
+    TXT_SCROLL_NE           "Scroll North-East"
+    TXT_SCROLL_NE_DESC      "Scroll tactical map to the north-east."
+    TXT_SCROLL_SE           "Scroll South-East"
+    TXT_SCROLL_SE_DESC      "Scroll tactical map to the south-east."
+    TXT_SCROLL_SW           "Scroll South-West"
+    TXT_SCROLL_SW_DESC      "Scroll tactical map to the south-west."
+    TXT_SCROLL_NW           "Scroll North-West"
+    TXT_SCROLL_NW_DESC      "Scroll tactical map to the north-west."
+    TXT_JUMP_CAMERA_W       "Jump Camera West"
+    TXT_JUMP_CAMERA_W_DESC  "Jump tactical map to the west edge of the map."
+    TXT_JUMP_CAMERA_E       "Jump Camera East"
+    TXT_JUMP_CAMERA_E_DESC  "Jump tactical map to the east edge of the map."
+    TXT_JUMP_CAMERA_N       "Jump Camera North"
+    TXT_JUMP_CAMERA_N_DESC  "Jump tactical map to the north edge of the map."
+    TXT_JUMP_CAMERA_S       "Jump Camera South"
+    TXT_JUMP_CAMERA_S_DESC  "Jump tactical map to the south edge of the map."
+    TXT_PREV_THEME          "Music: Previous Track"
+    TXT_PREV_THEME_DESC     "Plays the previous music track."
+    TXT_NEXT_THEME          "Music: Next Track"
+    TXT_NEXT_THEME_DESC     "Plays the next music track."
+    TXT_NOW_PLAYING         "Now Playing: %s"
+    TXT_VETERANCY_FILTER    "Veterancy Filter"
+    TXT_VETERANCY_FILTER_DESC "Narrows a mixed selection to its highest rank, and cycles through the ranks when pressed again."
+    TXT_VETERANCY_FILTER_ADD "Veterancy Filter (Add Lower)"
+    TXT_VETERANCY_FILTER_ADD_DESC "Adds the next lower rank back to a filtered selection."
+    TXT_HEALTH_FILTER       "Health Filter"
+    TXT_HEALTH_FILTER_DESC  "Narrows a mixed selection to its most damaged units, and cycles through the health bands when pressed again."
+    TXT_HEALTH_FILTER_ADD   "Health Filter (Add Lower)"
+    TXT_HEALTH_FILTER_ADD_DESC "Adds the next healthier band back to a filtered selection."
+    TXT_SELECT_ONE_LESS     "Select One Less"
+    TXT_SELECT_ONE_LESS_DESC "Removes the last unit from the selection."
+    TXT_QUICK_SAVE          "Quick Save"
+    TXT_QUICK_SAVE_DESC     "Saves the game to the quick save file."
+    TXT_QUICK_LOAD          "Quick Load"
+    TXT_QUICK_LOAD_DESC     "Loads the quick save file."
+    TXT_QUICKSAVE_DESCRIPTION "Quick Save: %s"
+    TXT_NO_QUICKSAVE        "No quick save to load."
+    TXT_MOVIE_SKIP_ONE      "%s wants to skip the video."
+    TXT_MOVIE_SKIP_SELF     "You want to skip the video."
+    TXT_MOVIE_SKIP_MANY     "%d players want to skip the video."
+    TXT_MOVIE_SKIP_AGREE    "Press ESC to agree. (%d/%d)"
+    TXT_MOVIE_SKIP_WAIT     "Waiting for other players... (%d/%d)"
+    TXT_SYNC_STATUS_OUT     "Desynced"
+    TXT_SYNC_STATUS_LEFT    "Quit"
+    TXT_LOADING_IN_SECONDS  "Loading in %d seconds..."
+    TXT_LOADING_IN_SECOND   "Loading in 1 second..."
+    TXT_LOADING_SAVED_GAME  "Loading the saved game..."
+    TXT_CHAT_HINT           "Type here to chat..."
+    TXT_DIFFICULTY_LEVEL    "Difficulty: %s"
+    TXT_ADD_TO_TEAM         "Add To Team %2d"
+    TXT_ADD_TO_TEAM_DESC    "Adds the selected units to team %d and selects the whole team."
+    TXT_GAME_SAVED          "Game saved."
+    TXT_GAME_AUTO_SAVED     "Game auto-saved."
+    TXT_SCENARIO_DATA_DAMAGED "Unable to read scenario %s: its map data is damaged."
+    TXT_CONNECTION_QUALITY_STATUS "Connection quality target: %s."
+    TXT_CONNECTION_QUALITY_RUNG "%s (rung %u)"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

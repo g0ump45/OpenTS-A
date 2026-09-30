@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/generated-ini-keys.schema.json",
+  "title": "Generated OpenTS INI key catalog",
+  "type": "object",
+  "minProperties": 1,
+  "additionalProperties": { "$ref": "#/$defs/key" },
+  "$defs": {
+    "nonEmptyString": { "type": "string", "minLength": 1 },
+    "sectionSelector": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "name"],
+          "properties": {
+            "kind": { "const": "literal" },
+            "name": { "type": "string", "minLength": 1, "pattern": "^[^\\[\\]]+$" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "source"],
+          "properties": {
+            "kind": { "const": "identifier" },
+            "source": {
+              "enum": [
+                "object-type",
+                "house",
+                "difficulty",
+                "campaign",
+                "theme",
+                "sound",
+                "tile-set",
+                "land-type",
+                "mission",
+                "multiplayer-map"
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "fallback"],
+          "properties": {
+            "kind": { "const": "image" },
+            "fallback": { "const": "object-type" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "const": "image" }
+          }
+        }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default_candidate", "declared_in", "member", "source", "guard"],
+      "properties": {
+        "default_candidate": { "type": ["string", "null"] },
+        "declared_in": { "$ref": "#/$defs/nonEmptyString" },
+        "member": { "type": ["string", "null"] },
+        "source": { "type": "string", "pattern": "^code/[^:]+$" },
+        "guard": { "type": ["string", "null"] }
+      }
+    },
+    "readSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "section", "value_type", "applies_to"],
+      "properties": {
+        "file": { "$ref": "#/$defs/nonEmptyString" },
+        "section": { "$ref": "#/$defs/sectionSelector" },
+        "value_type": { "$ref": "#/$defs/nonEmptyString" },
+        "applies_to": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applies_to", "file", "section", "value_type", "level", "status", "_provenance"],
+      "properties": {
+        "applies_to": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        },
+        "file": { "$ref": "#/$defs/nonEmptyString" },
+        "section": { "$ref": "#/$defs/sectionSelector" },
+        "value_type": { "$ref": "#/$defs/nonEmptyString" },
+        "level": { "$ref": "#/$defs/nonEmptyString" },
+        "status": { "enum": ["generated", "needs_review", "reviewed"] },
+        "note": { "$ref": "#/$defs/nonEmptyString" },
+        "precedence": { "$ref": "#/$defs/nonEmptyString" },
+        "shares_name_with": { "type": ["string", "null"] },
+        "read_from": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/readSource" }
+        },
+        "_provenance": { "$ref": "#/$defs/provenance" }
+      }
+    },
+    "key": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "scopes"],
+      "properties": {
+        "key": { "$ref": "#/$defs/nonEmptyString" },
+        "scopes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/scope" }
+        },
+        "case_collides_with": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/nonEmptyString" }
+        }
+      }
+    }
+  }
+}

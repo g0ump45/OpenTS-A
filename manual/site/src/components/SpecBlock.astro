@@ -1,0 +1,83 @@
+---
+import SectionSelector from './SectionSelector.astro';
+import {
+	applicabilitySummary,
+	enumForValueType,
+	formatWhenOmitted,
+	referenceFileLabel,
+	type KeyScope,
+	type WhenOmitted,
+} from '../lib/data';
+import { withBase } from '../lib/paths';
+import { UI } from '../i18n/en.mjs';
+
+interface Props {
+	scope: KeyScope;
+	label?: string;
+	noEffect?: boolean;
+	whenOmitted?: WhenOmitted;
+}
+
+const { scope, label, noEffect = false, whenOmitted } = Astro.props;
+const omission = formatWhenOmitted(whenOmitted);
+const coverage = applicabilitySummary(scope.applies_to, scope.level);
+const condensedCoverage = scope.applies_to.length > 4;
+const valueEnum = enumForValueType(scope.value_type);
+---
+
+<div class="ots-spec">
+	<div class="ots-spec-head">
+		{UI.specification.title}{label && <span class="ots-scopename">{' \u2014 '}{label}</span>}
+	</div>
+	<dl>
+		<dt>{UI.specification.appliesTo}</dt>
+		<dd>
+			{condensedCoverage ? (
+				<details class="ots-type-coverage">
+					<summary><a href={withBase('/internals/class-hierarchy/')}>{coverage}</a></summary>
+					<div class="ots-typelist">{scope.applies_to.map((type) => <span>{type}</span>)}</div>
+				</details>
+			) : <div class="ots-typelist">{scope.applies_to.map((type) => <span>{type}</span>)}</div>}
+		</dd>
+		<dt>{UI.specification.file}</dt>
+		<dd><code>{referenceFileLabel(scope.file)}</code></dd>
+		<dt>{UI.specification.section}</dt>
+		<dd><SectionSelector selector={scope.section} explainImage /></dd>
+		<dt>{UI.specification.value}</dt>
+		<dd>{valueEnum ? <a href={withBase(`/reference/enums/${valueEnum.slug}/`)}>{scope.value_type}</a> : scope.value_type}</dd>
+		<dt>{UI.specification.whenOmitted}</dt>
+		<dd>
+			{omission.code ? <code>{omission.text}</code> : <em>{omission.text}</em>}
+			{omission.note && <small>{omission.note}</small>}
+		</dd>
+		{noEffect && <><dt>{UI.specification.usedByGame}</dt><dd>{UI.specification.notUsed}</dd></>}
+	</dl>
+</div>
+
+{scope.precedence && scope.read_from && (
+	<div class="ots-aside ots-aside-warn">
+		<div class="ots-aside-title">{UI.specification.readOrder}</div>
+		<p>This setting is {scope.precedence}.</p>
+		<div class="ots-tablewrap">
+			<table>
+				<thead><tr><th>{UI.specification.order}</th><th>{UI.specification.file}</th><th>{UI.specification.section}</th></tr></thead>
+				<tbody>
+					{scope.read_from.map((read, index) => (
+						<tr>
+							<td class="num">{index + 1}</td>
+							<td><code>{referenceFileLabel(read.file)}</code></td>
+							<td><SectionSelector selector={read.section} explainImage /></td>
+						</tr>
+					))}
+				</tbody>
+			</table>
+		</div>
+	</div>
+)}
+
+{scope.note && (
+	<div class="ots-aside ots-aside-note">
+		<div class="ots-aside-title">{UI.specification.parseBehavior}</div>
+		<p>{scope.note}</p>
+	</div>
+)}

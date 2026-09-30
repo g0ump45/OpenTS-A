@@ -1,0 +1,22 @@
+name: Feature proposal
+description: Propose an OpenTS engine, platform, or modding capability
+title: "[Feature] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Large or breaking changes need agreement here before implementation.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: The player, modder, or engine-development need this would solve.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: The outcome you want. Note known compatibility impact or alternatives if any.
+    validations:
+      required: true

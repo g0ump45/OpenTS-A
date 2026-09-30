@@ -1,0 +1,13 @@
+---
+key: Groundspeed
+scope: housetype
+label: Country speed multiplier
+see_also: ["system:difficulty"]
+when_omitted:
+  kind: value
+  value: "1.0"
+---
+
+Every object of a house of this country has its ground speed multiplied by this value, so a figure above 1 travels faster. The product is worked out once, when the house is [given its difficulty slot](/systems/difficulty/#how-the-figures-are-combined), and not per step.
+
+Outside campaign games this value, the [difficulty setting's own multiplier](/keys/groundspeed/#scope-difficulty-settings) and [`GameSpeedBias`](/keys/gamespeedbias/) are multiplied together. In a campaign game the country's value is dropped and only the difficulty setting's multiplier and `GameSpeedBias` remain.

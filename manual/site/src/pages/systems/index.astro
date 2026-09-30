@@ -1,0 +1,49 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { withBase } from '../../lib/paths';
+import { SYSTEM_CATEGORIES, SYSTEM_GROUPS } from '../../lib/taxonomy';
+
+const systems = await getCollection('systems');
+const groups = SYSTEM_GROUPS.map((group) => ({
+	...group,
+	categories: group.categories.map((categoryId) => {
+		const category = SYSTEM_CATEGORIES.find((candidate) => candidate.id === categoryId);
+		if (!category) throw new Error(`System group ${group.id} names unknown category ${categoryId}`);
+		return {
+			...category,
+			entries: systems
+				.filter((system) => system.data.category === category.id)
+				.sort((left, right) => left.data.title.localeCompare(right.data.title) || left.id.localeCompare(right.id)),
+		};
+	}).filter((category) => category.entries.length > 0),
+}));
+---
+
+<StarlightPage frontmatter={{ title: 'Features & systems', description: 'OpenTS gameplay, interface, presentation, multiplayer, and runtime behavior.', tableOfContents: false }}>
+	<p class="ots-lede">Runtime behavior and the settings, formats, and commands that control it.</p>
+	{groups.map((group) => (
+		<section class="ots-system-group ots-hub-section">
+			<h2 id={group.id}>{group.title}</h2>
+			<p class="ots-compact">{group.description}</p>
+			<div class="ots-category-grid">
+				{group.categories.map((category) => (
+					<section class="ots-category-card" aria-labelledby={`category-${category.id}`}>
+						<h3 id={`category-${category.id}`}>{category.title}</h3>
+						<p>{category.description}</p>
+						{category.entries.length > 0 && (
+							<ul>
+								{category.entries.map((entry) => (
+									<li>
+										<a href={withBase(`/systems/${entry.id}/`)}>{entry.data.title}</a>
+										<span>{entry.data.summary}</span>
+									</li>
+								))}
+							</ul>
+						)}
+					</section>
+				))}
+			</div>
+		</section>
+	))}
+</StarlightPage>

@@ -1,0 +1,53 @@
+/*******************************************************************************
+ *                                O P E N  T S
+ *******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2025 Electronic Arts Inc.
+ * Copyright 2026 OpenTS contributors
+ *
+ * Contains material derived from Electronic Arts source code.
+ * Modified by OpenTS contributors, 2026.
+ * EA's GPLv3 Section 7 additional terms and supplemental warranty
+ * disclaimers apply; see LICENSE.md.
+ ******************************************************************************/
+
+/***********************************************************************************************
+ ***              C O N F I D E N T I A L  ---  W E S T W O O D  S T U D I O S               ***
+ ***********************************************************************************************
+ *                                                                                             *
+ *                 Project Name : Command & Conquer                                            *
+ *                                                                                             *
+ *                     $Archive:: /Commando/Library/RLE.H                                     $*
+ *                                                                                             *
+ *                      $Author:: Greg_h                                                      $*
+ *                                                                                             *
+ *                     $Modtime:: 7/22/97 11:37a                                              $*
+ *                                                                                             *
+ *                    $Revision:: 1                                                           $*
+ *                                                                                             *
+ *---------------------------------------------------------------------------------------------*
+ * Functions:                                                                                  *
+ * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
+
+#pragma once
+
+/*
+**	This class will RLE compress and decompress arbitrary blocks of data. This RLE compression
+**	is geared to compressing only runs of 0 bytes. This makes it useful for sprite encoding.
+*/
+class RLEEngine
+{
+	public:
+
+		/*
+		**	Codec for arbitrary blocks.
+		*/
+		int Compress(void const * source, void * dest, int length) const;
+		int Decompress(void const * source, void * dest, int length) const;
+
+		/*
+		**	Codec for length encoded blocks. This is useful for sprite storage.
+		*/
+		int Line_Compress(void const * source, void * dest, int length) const;
+		int Line_Decompress(void const * source, void * dest) const;
+};

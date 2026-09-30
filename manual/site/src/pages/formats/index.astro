@@ -1,0 +1,26 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { allFormats } from '../../lib/formats';
+import { UI } from '../../i18n/en.mjs';
+import { withBase } from '../../lib/paths';
+
+const formats = [...allFormats().values()];
+const groups = UI.formatKinds;
+---
+
+<StarlightPage frontmatter={{ title: 'Formats', description: 'OpenTS configuration, registration, record, and binary file formats.', tableOfContents: false }}>
+	<p class="ots-lede">File syntax, registration, record layout, and binary data.</p>
+	{groups.map((group) => {
+		const entries = formats.filter((format) => format.kind === group.id).sort((left, right) => left.title.localeCompare(right.title));
+		return entries.length > 0 && (
+			<section class="ots-hub-section">
+				<h2>{group.title}</h2>
+				<p>{group.description}</p>
+				<CardGrid>{entries.map((format) => (
+					<LinkCard title={format.title} href={withBase(format.route)} description={format.summary} />
+				))}</CardGrid>
+			</section>
+		);
+	})}
+</StarlightPage>

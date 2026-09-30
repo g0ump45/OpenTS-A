@@ -1,0 +1,22 @@
+---
+import { UI } from '../i18n/en.mjs';
+import {
+	imageSectionHasObjectFallback,
+	isImageSection,
+	sectionSelectorLabel,
+	type SectionSelector,
+} from '../lib/section-selector.mjs';
+
+interface Props {
+	selector: SectionSelector;
+	explainImage?: boolean;
+}
+
+const { selector, explainImage = false } = Astro.props;
+const imageDetail = imageSectionHasObjectFallback(selector)
+	? UI.specification.imageSelectorDetail
+	: UI.specification.imageSelectorDetailNoFallback;
+---
+
+<code>{sectionSelectorLabel(selector)}</code>
+{explainImage && isImageSection(selector) && <small>{imageDetail}</small>}

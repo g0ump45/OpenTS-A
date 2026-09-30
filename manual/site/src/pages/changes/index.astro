@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { Badge } from '@astrojs/starlight/components';
+import { UI } from '../../i18n/en.mjs';
+import { entityLabel, releases } from '../../lib/data';
+import { withBase } from '../../lib/paths';
+
+const fragments = await getCollection('changes');
+const groups = new Map<string, typeof fragments>();
+for (const fragment of fragments) {
+	groups.set(fragment.data.release, [...(groups.get(fragment.data.release) ?? []), fragment]);
+}
+const ordered = releases().map((release) => ({
+	release,
+	items: [...(groups.get(release.version) ?? [])].sort((left, right) =>
+		left.data.title.localeCompare(right.data.title) || left.id.localeCompare(right.id)),
+}));
+const labels = UI.changeCategories;
+---
+
+<StarlightPage frontmatter={{ title: 'Changes', description: 'Versioned OpenTS behavior and compatibility changes.', tableOfContents: false }}>
+	<p class="ots-lede">Versioned behavior and compatibility changes, newest release first.</p>
+	{ordered.map(({ release, items }) => (
+		<section class="ots-change-release" id={'release-' + release.version}>
+			<h2>
+				{release.version}
+				{release.status === 'development' && <Badge text="In development" variant="caution" size="small" class="ots-release-badge" />}
+				<small class="ots-release-count">{items.length} {items.length === 1 ? 'change' : 'changes'}</small>
+			</h2>
+			{release.date && <p class="ots-release-date"><time datetime={release.date}>{release.date}</time></p>}
+			<p class="ots-upgrade-link"><a href={withBase(`/changes/${release.version}/`)}>Upgrade to {release.version}</a></p>
+			<ul class="ots-change-list" data-change-list>
+				{items.map((item) => (
+					<li>
+						<span class="ots-change-kind" data-category={item.data.category}>
+							{labels[item.data.category]}
+						</span>
+						<div class="ots-change-summary">
+							<a class="ots-change-title" href={withBase(`/changes/${item.id}/`)}>
+								{item.data.title}
+							</a>
+							{item.data.breaking && <>{' '}<Badge text="Breaking" variant="danger" size="small" /></>}
+							{item.data.targets.length > 0 && (
+								<span class="ots-change-targets-inline">
+									<span aria-hidden="true">{' \u2014 '}</span>
+									{item.data.targets.map((target, index) => (
+										<>{index > 0 && ', '}<code>{entityLabel(target)}</code></>
+									))}
+								</span>
+							)}
+						</div>
+						<span class="ots-change-credit">
+							{item.data.credit.length > 0 ? `by ${item.data.credit.join(', ')}` : '\u2014'}
+						</span>
+					</li>
+				))}
+			</ul>
+		</section>
+	))}
+</StarlightPage>

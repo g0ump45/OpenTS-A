@@ -1,0 +1,49 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import Feedback from '../../components/Feedback.astro';
+import RelatedResources from '../../components/RelatedResources.astro';
+import { UI } from '../../i18n/en.mjs';
+import { relatedResourcesFor } from '../../lib/related';
+import { siteConfig, sourceFileUrl } from '../../lib/site-config.mjs';
+import { usingCategoryTitle } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+	return (await getCollection('using')).map((entry) => ({
+		params: { id: entry.id },
+		props: { entry },
+	}));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await render(entry);
+const related = await relatedResourcesFor(
+	{ type: 'using', id: entry.id },
+	entry.data.related,
+	`Using OpenTS page ${entry.id}`,
+);
+const pageHeadings = [
+	...headings,
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+	{ depth: 2, slug: 'authoritative-files', text: 'Authoritative files' },
+];
+---
+
+<StarlightPage frontmatter={{ title: entry.data.title, description: entry.data.summary }} headings={pageHeadings}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.using, href: '/using/' },
+		{ label: usingCategoryTitle(entry.data.category) },
+	]} />
+	<p class="ots-lede">{entry.data.summary}</p>
+	<Content />
+	<RelatedResources resources={related} />
+	<section class="ots-authoritative-files" aria-labelledby="authoritative-files">
+		<h2 id="authoritative-files">Authoritative files</h2>
+		<p class="ots-source-revision">Linked at revision <code data-pagefind-ignore>{siteConfig.revision.slice(0, 12)}</code>.</p>
+		<ul class="ots-source-files">
+			{entry.data.source_files.map((path) => <li><a href={sourceFileUrl(path)}><code>{path}</code></a></li>)}
+		</ul>
+	</section>
+	<Feedback title={entry.data.title} path={`/using/${entry.id}/`} />
+</StarlightPage>

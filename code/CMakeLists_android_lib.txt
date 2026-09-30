@@ -1,0 +1,12 @@
+if(ANDROID)
+    # For APK we build a shared library, not executable
+    add_library(OpenTS SHARED ${OPENTS_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/android_main.cpp")
+    # native_app_glue from NDK
+    add_library(native_app_glue STATIC
+        ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+    target_include_directories(OpenTS PRIVATE
+        ${ANDROID_NDK}/sources/android/native_app_glue)
+    target_link_libraries(OpenTS PRIVATE native_app_glue)
+else()
+    add_executable(OpenTS WIN32 ${OPENTS_SRC})
+endif()

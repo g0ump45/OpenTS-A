@@ -1,0 +1,649 @@
+fixed_controls:
+  - id: fixed:options-menu
+    title: Options menu
+    description: Opens the in-game options menu when no rebindable command claims the key.
+    audience: player
+    bindings: [Space]
+    context: In-game
+    availability: &all { builds: [release, debug] }
+    sites:
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_SPACE }
+  - id: fixed:map-zoom
+    title: Map zoom
+    description: Toggles the tactical map zoom mode.
+    audience: player
+    bindings: [Tab]
+    context: In-game
+    availability: *all
+    sites:
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_TAB }
+  - id: fixed:multiplayer-message
+    title: Multiplayer message recipient
+    description: Starts a private message to one connection, or a message to everyone.
+    audience: player
+    bindings: [F1 through the session player limit]
+    context: Multiplayer match
+    availability: *all
+    sites:
+      - { file: code/mainloop.cpp, function: Message_Input, expression: KN_F1 }
+  - id: fixed:cancel-multiplayer-message
+    title: Cancel multiplayer message
+    description: Cancels the active multiplayer message edit.
+    audience: player
+    bindings: [Escape]
+    context: Editing a multiplayer message
+    availability: *all
+    sites:
+      - { file: code/mainloop.cpp, function: Message_Input, expression: KN_ESC }
+  - id: fixed:debug-grant-money
+    title: Grant money to all houses
+    description: Adds 10,000 credits to every house.
+    audience: debug
+    bindings: [Shift+M, Alt+M, Ctrl+M]
+    context: In-game with Debug_Flag enabled
+    availability: &debug { builds: [debug] }
+    sites:
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_M+KN_SHIFT_BIT, guard: _DEBUG }
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_M+KN_ALT_BIT, guard: _DEBUG }
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_M+KN_CTRL_BIT, guard: _DEBUG }
+  - id: fixed:debug-force-win
+    title: Force victory
+    description: Clears the local player's blockage flag and marks the player as victorious.
+    audience: debug
+    bindings: [Alt+W]
+    context: In-game with Debug_Playtest enabled
+    availability: *debug
+    sites:
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_W+KN_ALT_BIT, guard: _DEBUG }
+  - id: fixed:debug-special-dialog
+    title: Debug special dialog
+    description: Opens nothing. Outside a normal session it requests a dialog that is not compiled and hangs the paused scenario; in a normal session it does nothing at all.
+    audience: debug
+    bindings: [/]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_SLASH, guard: _DEBUG }
+  - id: fixed:debug-motion-capture
+    title: Enable motion capture
+    description: Enables the debug motion-capture flag.
+    audience: debug
+    bindings: [J]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_J, guard: _DEBUG }
+  - id: fixed:debug-flash-interface
+    title: Flash power and credits
+    description: Flashes the power and credit displays.
+    audience: debug
+    bindings: [I]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_I, guard: _DEBUG }
+  - id: fixed:debug-spawn-orca
+    title: Spawn ORCA
+    description: Creates an ORCA owned by the local player at the cursor cell.
+    audience: debug
+    bindings: [O, B]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_O, guard: _DEBUG }
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_B, guard: _DEBUG }
+  - id: fixed:debug-map-bounds
+    title: Toggle map bounds
+    description: Switches the playable map rectangle between its scenario value and the full map grid.
+    audience: debug
+    bindings: [Alt+Z]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_Z+KN_ALT_BIT, guard: _DEBUG }
+  - id: fixed:debug-monochrome
+    title: Toggle monochrome output
+    description: Enables or disables the monochrome debug display.
+    audience: debug
+    bindings: [M]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_M, guard: _DEBUG }
+  - id: fixed:debug-delete-object
+    title: Delete selected object
+    description: Detaches and removes the first selected object; buildings use the sell-back path.
+    audience: debug
+    bindings: [Delete]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_DELETE, guard: _DEBUG }
+  - id: fixed:debug-damage-object
+    title: Damage selected object
+    description: Applies 50 damage with the SA warhead to the first selected object.
+    audience: debug
+    bindings: [Shift+Delete]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_DELETE+KN_SHIFT_BIT, guard: _DEBUG }
+  - id: fixed:debug-clone-object
+    title: Clone selected object type
+    description: Starts placement of a new object with the first selected object's type and owner.
+    audience: debug
+    bindings: [Insert]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_INSERT, guard: _DEBUG }
+  - id: fixed:debug-previous-page
+    title: Previous monochrome page
+    description: Selects the previous monochrome debug page.
+    audience: debug
+    bindings: ['[', F11]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_LBRACKET, guard: _DEBUG }
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_F11, guard: _DEBUG }
+  - id: fixed:debug-next-page
+    title: Next monochrome page
+    description: Selects the next monochrome debug page.
+    audience: debug
+    bindings: [']', F12]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_RBRACKET, guard: _DEBUG }
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_F12, guard: _DEBUG }
+  - id: fixed:debug-icon-overlay
+    title: Toggle debug icon overlay
+    description: Toggles the debug icon overlay.
+    audience: debug
+    bindings: [V, F3]
+    context: In-game with Debug_Flag enabled
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_V, guard: _DEBUG }
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_F3, guard: _DEBUG }
+  - id: fixed:debug-range-circles
+    title: Draw sight and weapon ranges
+    description: Draws the selected TechnoType's sight and primary-weapon ranges once.
+    audience: debug
+    bindings: [F7]
+    context: In-game with Debug_Flag enabled and a Techno selected
+    availability: *debug
+    sites:
+      - { file: code/debug.cpp, function: Debug_Key, expression: KN_F7, guard: _DEBUG }
+
+  - id: fixed:debug-map-editor-options
+    title: Map editor options
+    description: Opens the options menu from the debug map editor.
+    audience: debug
+    bindings: [Escape, Space]
+    context: Debug map editor
+    availability: *debug
+    sites:
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_ESC, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_SPACE, guard: _DEBUG }
+  - id: fixed:debug-unshroud
+    title: Toggle map shroud
+    description: Toggles full-map visibility in a single-player debug or playtest session.
+    audience: debug
+    bindings: [F4]
+    context: In-game with Debug_Flag or Debug_Playtest enabled
+    availability: *debug
+    sites:
+      - { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_F4, guard: _DEBUG }
+  - id: fixed:preserve-selection
+    title: Add to box selection
+    description: Keeps the current selection when a drag-selection box is released.
+    audience: player
+    bindings: [Shift]
+    context: Releasing a tactical-map drag-selection box
+    availability: *all
+    sites:
+      - { file: code/display.cpp, function: DisplayClass::Mouse_Left_Release, expression: KN_LSHIFT }
+  - id: fixed:dropship-accept
+    title: Accept dropship loadout
+    description: Accepts the current dropship loadout and closes the pre-mission screen.
+    audience: player
+    bindings: [Space]
+    context: Dropship loadout screen
+    availability: *all
+    sites:
+      - { file: code/dropship.cpp, function: Dropship_Screen, expression: KN_SPACE }
+  - id: fixed:dismiss-multiplayer-score
+    title: Dismiss multiplayer score
+    description: Closes the multiplayer score screen after its prompt appears.
+    audience: player
+    bindings: [Left mouse button, Escape, Space]
+    context: Multiplayer score screen
+    availability: *all
+    sites:
+      - { file: code/mpscore.cpp, function: MultiScore::User_Input, expression: VK_LBUTTON }
+      - { file: code/mpscore.cpp, function: MultiScore::User_Input, expression: VK_ESCAPE }
+      - { file: code/mpscore.cpp, function: MultiScore::User_Input, expression: VK_SPACE }
+  - id: fixed:main-menu-version
+    title: Open version information
+    description: Opens the version dialog from the classic main menu.
+    audience: player
+    bindings: [Ctrl+V]
+    context: Classic main menu
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Main_Menu, expression: KN_V+KN_CTRL_BIT }
+  - id: fixed:main-menu-credits
+    title: Open credits
+    description: Opens the credits from the classic main menu.
+    audience: player
+    bindings: [Ctrl+Alt+C]
+    context: Classic main menu
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Main_Menu, expression: VK_C+KN_CTRL_BIT+KN_ALT_BIT }
+  - id: fixed:skip-credits
+    title: Exit credits
+    description: Stops the credits and returns to the menu.
+    audience: player
+    bindings: [Escape]
+    context: Credits
+    availability: *all
+    sites:
+      - { file: code/egos.cpp, function: Show_Who_Was_Responsible, expression: KN_ESC }
+  - id: fixed:dismiss-mission-restatement
+    title: Dismiss mission restatement
+    description: Closes the current mission-restatement page without selecting its video button.
+    audience: player
+    bindings: [Space, Escape]
+    context: Mission restatement
+    availability: *all
+    sites:
+      - { file: code/restate.cpp, function: RestateMission::User_Input, expression: KN_SPACE }
+      - { file: code/restate.cpp, function: RestateMission::User_Input, expression: KN_ESC }
+  - id: fixed:skip-vqa
+    title: Skip video
+    description: Stops a VQA when the caller permits user breakout; in a game against other machines it casts this machine's vote to stop it.
+    audience: player
+    bindings: [Escape]
+    context: VQA playback
+    availability: *all
+    sites:
+      - { file: code/movieskip.cpp, function: Idle, expression: KN_ESC }
+  - id: fixed:skip-campaign-presentation
+    title: Skip campaign presentation
+    description: Stops the current World Domination Tour map presentation.
+    audience: player
+    bindings: [Escape]
+    context: World Domination Tour campaign map
+    availability: *all
+    sites:
+      - { file: code/wdtsel.cpp, function: Selection::Check_For_Breakout, expression: VK_ESCAPE }
+
+fixed_exclusions:
+  - site: { file: code/debug.cpp, function: Debug_Key, expression: KN_BUTTON, guard: _DEBUG }
+    reason: Filters mouse-button events before the debug key switch; it is not a control.
+  - site: { file: code/debug.cpp, function: Debug_Key, expression: KN_BACKSPACE, guard: _DEBUG }
+    reason: The active case has no behavior.
+  - site: { file: code/debug.cpp, function: Debug_Key, expression: KN_K, guard: _DEBUG && OBSOLETE }
+    reason: The PCX capture branch is excluded from current builds by OBSOLETE.
+  - site: { file: code/debug.cpp, function: Debug_Key, expression: KN_GRAVE, guard: _DEBUG }
+    reason: The active case has no behavior; its former explosion code is commented out.
+  - site: { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_NONE }
+    reason: Input sentinel, not a player control.
+  - site: { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_ESC }
+    reason: Escape is represented by the forced Options command binding.
+  - site: { file: code/mainloop.cpp, function: Keyboard_Process, expression: KN_RLSE_BIT, guard: _DEBUG }
+    reason: Filters key-release events before Debug_Key; it is not a control.
+
+  - sites:
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_LEFT }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_RIGHT }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_UP }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_DOWN }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_UPLEFT }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_UPRIGHT }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_DOWNLEFT }
+      - { file: code/conquer.cpp, function: KN_To_Facing, expression: KN_DOWNRIGHT }
+    reason: Converts directional key numbers to FacingType; the cases do not dispatch user actions.
+  - site: { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_NONE, guard: _DEBUG }
+    reason: The map-editor loop uses this as its no-input sentinel.
+  - sites:
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_E_LEFT, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_E_RIGHT, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_E_UP, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_E_DOWN, guard: _DEBUG }
+    reason: Synthetic edge-scroll directions produced by map input, not physical fixed bindings.
+  - sites:
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_LEFT, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_RIGHT, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_UP, guard: _DEBUG }
+      - { file: code/conquer.cpp, function: Map_Edit_Loop, expression: KN_DOWN, guard: _DEBUG }
+    reason: These cases deliberately discard arrow events before the map-editor gadgets receive them.
+  - site: { file: code/dropship.cpp, function: Dropship_Screen, expression: KN_BUTTON }
+    reason: KN_BUTTON marks gadget IDs returned by the button list; it is not a physical binding.
+  - sites:
+      - { file: code/edit.cpp, function: EditClass::Action, expression: KN_ESC }
+      - { file: code/edit.cpp, function: EditClass::Action, expression: KN_BACKSPACE }
+      - { file: code/edit.cpp, function: EditClass::Action, expression: KN_RETURN }
+    reason: Reusable text-edit widget navigation, not a top-level command.
+  - sites:
+      - { file: code/egos.cpp, function: Show_Who_Was_Responsible, expression: KN_Z, guard: "(0)" }
+      - { file: code/egos.cpp, function: Show_Who_Was_Responsible, expression: KN_X, guard: "(0)" }
+    reason: Credits speed controls are inside a disabled preprocessor branch.
+  - sites:
+      - { file: code/ending.cpp, function: Nod_Ending, expression: KN_LMOUSE, guard: NEVER }
+      - { file: code/ending.cpp, function: Nod_Ending, expression: KN_RLSE_BIT, guard: NEVER }
+    reason: Mouse breakout handling is inside a NEVER branch and is absent from current builds.
+  - sites:
+      - { file: code/gadget.cpp, function: GadgetClass::Input, expression: KN_LMOUSE }
+      - { file: code/gadget.cpp, function: GadgetClass::Input, expression: KN_RMOUSE }
+      - { file: code/gadget.cpp, function: GadgetClass::Input, expression: KN_LMOUSE+KN_RLSE_BIT }
+      - { file: code/gadget.cpp, function: GadgetClass::Input, expression: KN_RMOUSE+KN_RLSE_BIT }
+    reason: Core gadget input translation; callers own the resulting button actions.
+  - sites:
+      - { file: code/grphmenu.cpp, function: GraphicMenu::Presentation, expression: KN_NONE }
+      - { file: code/grphmenu.cpp, function: GraphicMenu::Presentation, expression: KN_LMOUSE }
+      - { file: code/grphmenu.cpp, function: GraphicMenu::Presentation, expression: KN_RETURN }
+    reason: Generic graphic-menu polling and activation, not a named application control.
+  - site: { file: code/grphmsct.cpp, function: GM_Build_Key, expression: VK_NONE }
+    reason: Sentinel used while translating a menu accelerator into a virtual key.
+  - site: { file: code/init.cpp, function: Main_Menu, expression: KN_RLSE_BIT }
+    reason: Filters release events before the classic main-menu cheat handler.
+  - sites:
+      - { file: code/init.cpp, function: Init_Commands, expression: KN_DELETE }
+      - { file: code/init.cpp, function: Init_Commands, expression: KN_ESC }
+    reason: Initialization removes conflicting mappings before assigning the two forced bindings.
+  - sites:
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Is_Mouse_Key, expression: VK_LBUTTON }
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Is_Mouse_Key, expression: VK_MBUTTON }
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Is_Mouse_Key, expression: VK_RBUTTON }
+    reason: Keyboard-backend classification of mouse virtual keys.
+  - sites:
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Put_Key_Message, expression: VK_SHIFT }
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Put_Key_Message, expression: VK_CONTROL }
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Put_Key_Message, expression: VK_MENU }
+    reason: Keyboard-backend modifier-state encoding, not separate controls.
+  - sites:
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Down, expression: VK_LBUTTON }
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Down, expression: VK_RBUTTON }
+      - { file: code/keyboard.cpp, function: WWKeyboardClass::Down, expression: VK_LBUTTON+VK_RBUTTON }
+    reason: Keyboard-backend normalization for the Windows swapped-button setting.
+  - site: { file: code/keyboard.cpp, function: WWKeyboardClass::Message_Handler, expression: VK_SCROLL }
+    reason: Synchronizes the backend Scroll Lock state; it does not dispatch a game command.
+  - sites:
+      - { file: code/list.cpp, function: ListClass::Action, expression: KN_UP }
+      - { file: code/list.cpp, function: ListClass::Action, expression: KN_DOWN }
+      - { file: code/list.h, function: Action, expression: KN_UP }
+      - { file: code/list.h, function: Action, expression: KN_DOWN }
+    reason: Reusable list-widget navigation, not a top-level command.
+  - site: { file: code/mapsel.cpp, function: MapSelect::Process_Input, expression: KN_LMOUSE }
+    reason: Hit-testing for the map-selection screen, not a named fixed control.
+  - sites:
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_NONE }
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_RLSE_BIT+KN_LMOUSE }
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_RLSE_BIT+KN_RMOUSE }
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_BUTTON }
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_RETURN }
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_BACKSPACE }
+      - { file: code/msglist.cpp, function: MessageListClass::Input, expression: KN_ESC }
+    reason: Message editor polling, cursor placement, and text-edit termination.
+  - site: { file: code/ownrdraw.cpp, function: CtrlProc_Internal, expression: VK_TAB }
+    reason: Windows dialog focus traversal handled by the shared control procedure.
+  - sites:
+      - { file: code/ownrdraw.cpp, function: EditBoxCtrlProc, expression: VK_TAB }
+      - { file: code/ownrdraw.cpp, function: EditBoxCtrlProc, expression: VK_RETURN }
+    reason: Windows edit-control navigation handled by the shared dialog procedure.
+  - sites:
+      - { file: code/ownrdraw.cpp, function: Build_Hotkey_String, expression: VK_MENU }
+      - { file: code/ownrdraw.cpp, function: Build_Hotkey_String, expression: VK_CONTROL }
+      - { file: code/ownrdraw.cpp, function: Build_Hotkey_String, expression: VK_SHIFT }
+    reason: Converts modifier virtual keys to display names; it does not consume input.
+  - sites:
+      - { file: code/restate.cpp, function: RestateMission::User_Input, expression: KN_NONE }
+      - { file: code/restate.cpp, function: RestateMission::User_Input, expression: KN_BUTTON }
+    reason: Input sentinel and encoded button IDs surrounding the documented dismissal keys.
+  - sites:
+      - { file: code/score.cpp, function: ScoreClass::Input_Name, expression: KN_BACKSPACE }
+      - { file: code/score.cpp, function: ScoreClass::Input_Name, expression: KN_KEYPAD_RETURN }
+      - { file: code/score.cpp, function: ScoreClass::Input_Name, expression: KN_SPACE }
+      - { file: code/score.cpp, function: ScoreClass::Input_Name, expression: KN_RETURN }
+    reason: Hall-of-fame name-field editing, not application-level commands.
+  - sites:
+      - { file: code/scroll.cpp, function: ScrollClass::Scroll_Edge, expression: KN_RMOUSE }
+      - { file: code/scroll.cpp, function: ScrollClass::Scroll_AI, expression: KN_LMOUSE }
+      - { file: code/scroll.cpp, function: ScrollClass::Scroll_AI, expression: KN_RMOUSE }
+    reason: Continuous tactical-map pointer state, not discrete command dispatch.
+  - sites:
+      - { file: code/sidebar.cpp, function: SidebarClass::AI, expression: KN_BUTTON }
+      - { file: code/sidebar.cpp, function: SidebarClass::StripClass::AI, expression: KN_BUTTON }
+      - { file: code/sidebar.cpp, function: SidebarClass::StripClass::AI, expression: KN_UNK }
+    reason: Encoded sidebar gadget IDs and input flags, not physical bindings.
+  - site: { file: code/tab.cpp, function: TabClass::AI, expression: KN_LMOUSE }
+    reason: Tactical-tab hit-testing handled as pointer input.
+  - sites:
+      - { file: code/wdtsel.cpp, function: Selection::Pick_Territory, expression: KN_NONE }
+      - { file: code/wdtsel.cpp, function: Selection::Pick_Territory, expression: KN_LMOUSE }
+    reason: World Domination Tour territory-screen polling and hit-testing.
+  - site: { file: code/winstub.cpp, function: Create_Main_Window, expression: VK_M }
+    reason: Registers a Windows hotkey that has no WM_HOTKEY handler in the current source tree.
+
+launch_options:
+  - id: launch:help
+    title: Command-line help
+    syntax: "-?"
+    aliases: ["/?", "-h", "/h"]
+    description: Prints the built-in command-line summary and exits startup.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-?' }
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:/?' }
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-h' }
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:/h' }
+  - id: launch:playtest
+    title: Playtest mode
+    syntax: PLAYTEST
+    description: Enables the debug playtest flag.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'obfuscated:PARM_PLAYTEST', guard: _DEBUG }
+  - id: launch:from-install
+    title: Installer launch
+    syntax: FROMINSTALL
+    description: Marks startup as launched by the installer.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'obfuscated:PARM_INSTALL' }
+  - id: launch:check-map
+    title: Map checking
+    syntax: -CHECKMAP
+    description: Runs the map check every frame; the routine it calls has no body and always reports success, so no map is examined.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-CHECKMAP', guard: _DEBUG }
+  - id: launch:data-directory
+    title: Game data directory
+    syntax: -DATADIR=<path>
+    description: Reads the game's data from the directory named, which the game never writes to.
+    audience: player
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-DATADIR=' }
+  - id: launch:user-directory
+    title: User data directory
+    syntax: -USERDIR=<path>
+    description: Keeps the settings, saved games and other files the game writes in the directory named, creating it when it is not there.
+    audience: player
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-USERDIR=' }
+  - id: launch:spawn
+    title: Client launch
+    syntax: -SPAWN
+    description: Launches the game SPAWN.INI describes, in place of the startup movies and the menu.
+    audience: player
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-SPAWN' }
+  - id: launch:tournament-time
+    title: Tournament time limit
+    syntax: -TIME=<minutes>
+    description: Sets the tournament time limit.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-TIME=' }
+  - id: launch:multiplayer-debug
+    title: Internet debug display
+    syntax: -MPDEBUG
+    description: Enables the Internet debug display.
+    audience: debug
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-MPDEBUG' }
+  - id: launch:stealth
+    title: Network stealth mode
+    syntax: -STEALTH
+    description: Enables network stealth mode.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-STEALTH' }
+  - id: launch:attract
+    title: Attract mode
+    syntax: -ATTRACT
+    description: Enables attract mode.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-ATTRACT' }
+  - id: launch:resolution
+    title: Resolution
+    syntax: -<width>X<height>
+    description: Sets the initial screen width and height.
+    audience: player
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'pattern:-<width>X<height>' }
+  - id: launch:height-480
+    title: 480-pixel width
+    syntax: "-480"
+    description: Sets the initial screen width to 480 pixels and leaves the height alone; the resolution branch claims the argument before the case named after it is reached.
+    audience: player
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-480' }
+  - id: launch:windowed
+    title: Windowed mode
+    syntax: -WIN
+    description: Enables windowed mode.
+    audience: player
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-WIN' }
+  - id: launch:exception-test
+    title: Exception reporting test
+    syntax: -EXCEPTIONTEST=<fault>
+    description: >-
+      Raises a chosen fault on purpose so that crash reporting can be checked without waiting
+      for a real crash. Accepts av-read, av-write, stack, purecall, terminate, invalidparam,
+      fatal, worker, sectionfault, wndproc, and timer.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-EXCEPTIONTEST=' }
+  - id: launch:desync-test
+    title: Out-of-sync test
+    syntax: -DESYNCTEST=<frame>
+    description: >-
+      Corrupts this machine's own game checksum once, on the first frame at or after the one
+      given, so that the out-of-sync report can be checked without waiting for a real
+      divergence. The corruption waits for the checksum comparison to start, so a frame inside
+      the first 256 fires as soon as it does.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-DESYNCTEST=' }
+  - id: launch:seed
+    title: Random seed
+    syntax: -SEED<number>
+    description: Selects a custom random seed; the current parser does not advance past the option name and resolves the suffix to zero.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-SEED', guard: _DEBUG }
+  - id: launch:monochrome
+    title: Monochrome debug display
+    syntax: -XM
+    description: Enables the monochrome debug display.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XM', guard: _DEBUG }
+  - id: launch:inert
+    title: Inert weapons
+    syntax: -XI
+    description: Enables inert weapons so units take no damage.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XI', guard: _DEBUG }
+  - id: launch:speed-build
+    title: Accelerated timers
+    syntax: -XH
+    description: Enables accelerated recharge and construction timers.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XH', guard: _DEBUG }
+  - id: launch:record
+    title: Multiplayer recording
+    syntax: -XX
+    description: Enables multiplayer recording.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XX', guard: _DEBUG }
+  - id: launch:playback
+    title: Recording playback
+    syntax: -XY
+    description: Enables multiplayer recording playback.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XY', guard: _DEBUG }
+  - id: launch:console-debug
+    title: Console debug output
+    syntax: -XC
+    description: Opens the debug output console. Debug builds always open it; this option opens it in release builds.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XC' }
+  - id: launch:event-debug
+    title: Event and packet debug
+    syntax: -XP
+    description: Enables event and packet debug output.
+    audience: debug
+    availability: *debug
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XP', guard: _DEBUG }
+  - id: launch:quiet
+    title: Quiet mode
+    syntax: -XQ
+    description: Enables quiet mode.
+    audience: developer
+    availability: *all
+    sites:
+      - { file: code/init.cpp, function: Parse_Command_Line, expression: 'compact:-XQ' }
+
+launch_exclusions:
+  - site: { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-O' }
+    reason: Supplies the comparison length for the -X branch and is not itself accepted.
+  - site: { file: code/init.cpp, function: Parse_Command_Line, expression: 'literal:-X' }
+    reason: Container for the individually documented compact -X controls; it has no behavior without a following code.

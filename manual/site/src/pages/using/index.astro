@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { withBase } from '../../lib/paths';
+import { USING_CATEGORIES } from '../../lib/taxonomy';
+
+const entries = await getCollection('using');
+const categories = USING_CATEGORIES.map((category) => ({
+	...category,
+	entries: entries
+		.filter((entry) => entry.data.category === category.id)
+		.sort((left, right) => left.data.title.localeCompare(right.data.title) || left.id.localeCompare(right.id)),
+})).filter((category) => category.entries.length > 0);
+---
+
+<StarlightPage frontmatter={{ title: 'Using OpenTS', description: 'Current developer-build setup, local data, configuration, compatibility, and troubleshooting.', tableOfContents: false }}>
+	<p class="ots-lede">Developer-build setup, local data, configuration, and save-game behavior.</p>
+	{categories.map((category) => (
+		<section class="ots-hub-section">
+			<h2 id={category.id}>{category.title}</h2>
+			<p class="ots-compact">{category.description}</p>
+			<CardGrid>
+				{category.id === 'getting-started' && (
+					<LinkCard
+						title="Command line options"
+						href={withBase('/using/command-line/')}
+						description="Options accepted on the OpenTS command line."
+					/>
+				)}
+				{category.entries.map((entry) => (
+					<LinkCard
+						title={entry.data.title}
+						href={withBase(`/using/${entry.id}/`)}
+						description={entry.data.summary}
+					/>
+				))}
+			</CardGrid>
+		</section>
+	))}
+</StarlightPage>

@@ -1,0 +1,149 @@
+# Exceptional literal INI reads that do not belong in the flat key catalog.
+# Ordinary Class::Read_INI methods are discovered automatically. Every site
+# rule names exact keys so a newly introduced literal can never be absorbed by
+# an existing broad exclusion. An `excluded` rule keeps its read out of the
+# catalog even where an enrolled reader owns the site, so one rule settles a
+# non-public read wherever it is found.
+version: 1
+
+reader_exclusions:
+  - path: code/preview.cpp
+    function: MapPreviewClass::Read_INI
+    reason: The Preview section is generated compressed map artwork, not an authored modder setting.
+  - path: code/overlay.cpp
+    function: OverlayClass::Read_INI
+    reason: The overlay pack fields are compressed scenario payloads, not authored scalar settings.
+
+site_exclusions:
+  - path: code/preview.cpp
+    function: MapPreviewClass::Read_INI
+    keys: [Size]
+    classification: excluded
+    reason: Preview dimensions describe generated compressed map artwork and are not an authored setting.
+
+  - path: code/techtype.cpp
+    function: TechnoTypeClass::Post_Load
+    keys: [Cameo]
+    classification: duplicate
+    canonical_key: Cameo
+    reason: Save-game restoration re-reads the same Cameo art setting already extracted from the type reader.
+
+  # The map digest is written into the tail of a map file by the editor and read
+  # back only to check that two players hold the same scenario. Its entry name is
+  # the numeral 1, which is why no rule could name it until the key-name contract
+  # stopped requiring a leading letter.
+  - path: code/session.cpp
+    function: SessionClass::Read_Scenario_Descriptions
+    keys: ["1"]
+    classification: excluded
+    reason: The map digest is an editor-written checksum used to match scenarios between players, not an authored setting.
+  - path: code/session.cpp
+    function: MultiMission::MultiMission
+    keys: ["1"]
+    classification: excluded
+    reason: The map digest is an editor-written checksum used to match scenarios between players, not an authored setting.
+  - path: code/sendfile.cpp
+    function: Find_Local_Scenario
+    keys: ["1"]
+    classification: excluded
+    reason: The map digest is an editor-written checksum used to match scenarios between players, not an authored setting.
+
+  - path: code/grphmimg.cpp
+    function: GM_Read_Image_Item
+    keys: [ActiveRect, Disabled, HighlightSound, Highlighted, ID, Image, Origin, SelectVQ]
+    classification: excluded
+    reason: These fields configure an internal graphic-menu resource format rather than game or mod data.
+  - path: code/grphmitm.cpp
+    function: GM_Create_Item_From_INI
+    keys: [SelectSound, Type]
+    classification: excluded
+    reason: These fields configure an internal graphic-menu resource format rather than game or mod data.
+  - path: code/grphmsct.cpp
+    function: GM_Read_Shortcut_Item
+    keys: [ID, Keys]
+    classification: excluded
+    reason: These fields configure an internal graphic-menu resource format rather than game or mod data.
+  - path: code/grphmver.cpp
+    function: GM_Read_Version_Item
+    keys: [ID]
+    classification: excluded
+    reason: This field configures an internal graphic-menu resource format rather than game or mod data.
+  - path: code/grphmenu.cpp
+    function: _Graphic_Menu
+    keys: [Background, ItemMax, Theme]
+    classification: excluded
+    reason: These fields configure an internal graphic-menu resource format rather than game or mod data.
+
+  - path: code/mschoice.cpp
+    function: MapStage::MapStage
+    keys: [ClickMap, Description, MapVQ, Overlays, Scenario, Targets, VoiceOver]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI resource, not scenario gameplay data.
+  - path: code/mschoice.cpp
+    function: MapChoice::Initialize
+    keys: [Anims, Palette, Sounds, TextRect]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI resource, not scenario gameplay data.
+  - path: code/wdtcampaign.cpp
+    function: Campaign::Campaign
+    keys: [CampaignID, PlayerFaction, Previous]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI resource, not scenario gameplay data.
+  - path: code/wdtcampaign.cpp
+    function: WDT_Get_Campaign_ID
+    keys: [CampaignID]
+    classification: excluded
+    reason: This lookup belongs to the legacy campaign-selection UI resource parser.
+  - path: code/wdtsel.cpp
+    function: Selection::Init_Dimensions
+    keys: [CancelButtonRectangle, MapOrigin, Size, TextRect]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI layout, not game or mod data.
+  - path: code/wdtsel.cpp
+    function: Selection::Init_Voices
+    keys: [LosingThreshold, MegaLosingThreshold, MegaWinningThreshold, WinningThreshold]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI voice thresholds, not game or mod data.
+  - path: code/wdtsel.cpp
+    function: Selection::Init_Regions
+    keys: [ClickMap, RegionName, RegionPrefix]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI regions, not game or mod data.
+  - path: code/wdtsel.cpp
+    function: Selection::Init_Logo
+    keys: [Logo]
+    classification: excluded
+    reason: This field configures the legacy campaign-selection UI logo, not game or mod data.
+  - path: code/wdtterr.cpp
+    function: Territory::Territory
+    keys: [Name, Origin, Target]
+    classification: excluded
+    reason: These fields configure the legacy campaign-selection UI territory map, not game or mod data.
+
+  - path: code/winfix.cpp
+    function: read_views_from_ini
+    keys: [X, Y]
+    classification: excluded
+    reason: These coordinates restore private diagnostic window positions and are not player-facing settings.
+  - path: code/init.cpp
+    function: Rules_Choice_Dialog_Proc
+    keys: [Name]
+    classification: excluded
+    reason: This lookup reads an internal rules-choice dialog label rather than an engine setting.
+
+  - path: code/deploymentconfig.cpp
+    function: DeploymentConfigClass::Read_INI
+    keys: [SearchPaths, CarryScenarioFile, Rules, RulesExpansion, Art, ArtExpansion, AI, AIExpansion, Sound, SoundExpansion, Theme, ThemeExpansion, Battle, BattleExpansion, LanguageRules, LanguageRulesExpansion, Tutorial, UI, Settings, Scheme, Game]
+    classification: excluded
+    reason: Each is a setting of the deployment's own file, documented as that format rather than as game data.
+
+  - path: code/spawnerconfig.cpp
+    function: SpawnerConfigClass::Read_Slots
+    keys: [Color, Side, Port]
+    classification: excluded
+    reason: Each names one seat of a match inside a section the CnCNet client numbers per seat, not an authored game-data setting.
+  - path: code/spawnerconfig.cpp
+    function: SpawnerConfigClass::Read_INI
+    keys: [AIDifficulty, AIPlayers, AlliesAllowed, AttackNeutralUnits, AutoDeployMCV, AutoSaveGame, AutoSurrender, Bases, BridgeDestroy, BuildOffAlly, CampaignID, CoachMode, ConnTimeout, Crates, Credits, DifficultyBasedAINames, DifficultyModeComputer, DifficultyModeHuman, Firestorm, FogOfWar, GameID, GameSpeed, HarvesterTruce, Host, IsSinglePlayer, LoadSaveGame, MCVRedeploy, MultiEngineer, NextSPAutoSaveId, NextSkirmishAutoSaveId, PlayMoviesInMultiplayer, Port, QuickMatch, ReconnectTimeout, ScrapMetal, Seed, ShortGame, SkipScoreScreen, TechLevel, Tournament, UnitCount, WriteStatistics]
+    classification: excluded
+    reason: The CnCNet client writes these per launch to describe one match, so they are not part of the authored game-data key catalog.

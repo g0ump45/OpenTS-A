@@ -1,0 +1,70 @@
+---
+import { UI } from '../i18n/en.mjs';
+import type { TriggerParameter } from '../lib/data';
+
+interface Row {
+	index: number;
+	name: string;
+	summary: string;
+	parameters: TriggerParameter[];
+	href: string;
+}
+interface Props { rows: Row[]; noun: string }
+const { rows, noun } = Astro.props;
+---
+
+<div class="ots-reference ots-filter-table" data-scripting-table>
+	<div class="ots-reference-controls">
+		<label><span>{UI.scripting.filter(noun)}</span><input type="search" data-filter placeholder={UI.scripting.placeholder} autocomplete="off" /></label>
+		<p class="ots-result-count" aria-live="polite"><strong data-visible-count>{rows.length}</strong> {UI.scripting.of} {rows.length}</p>
+	</div>
+	<div class="ots-tablewrap">
+		<table>
+			<thead><tr>{UI.scripting.headings.map((heading) => <th>{heading}</th>)}</tr></thead>
+			<tbody>
+				{rows.map((row) => (
+					<tr data-row data-search={`${row.index} ${row.name} ${row.summary} ${row.parameters.flatMap((parameter) => [parameter.name, parameter.type]).join(' ')}`.toLowerCase()}>
+						<td class="num" data-label={UI.scripting.headings[0]}>{row.index}</td>
+						<td data-label={UI.scripting.headings[1]}><a href={row.href}>{row.name}</a></td>
+						<td data-label={UI.scripting.headings[2]}>{row.summary}</td>
+						<td data-label={UI.scripting.headings[3]}>{row.parameters.length ? row.parameters.map((parameter) => parameter.name).join(' + ') : UI.scripting.none}</td>
+					</tr>
+				))}
+			</tbody>
+		</table>
+	</div>
+	<p class="ots-empty" data-empty hidden>{UI.scripting.noMatches(noun)}</p>
+</div>
+
+<script>
+	function initializeScriptingTables() {
+		for (const root of document.querySelectorAll('[data-scripting-table]')) {
+			if (root.hasAttribute('data-ready')) continue;
+			root.setAttribute('data-ready', '');
+			const input = root.querySelector('[data-filter]');
+			const rows = [...root.querySelectorAll('[data-row]')];
+			const count = root.querySelector('[data-visible-count]');
+			const empty = root.querySelector('[data-empty]');
+			const params = new URLSearchParams(location.search);
+			if (input instanceof HTMLInputElement) input.value = params.get('q') ?? '';
+			const apply = () => {
+				const query = input instanceof HTMLInputElement ? input.value.trim().toLowerCase() : '';
+				let visible = 0;
+				for (const row of rows) {
+					const show = !query || row.getAttribute('data-search')?.includes(query);
+					row.toggleAttribute('hidden', !show);
+					if (show) visible++;
+				}
+				if (count) count.textContent = String(visible);
+				if (empty instanceof HTMLElement) empty.hidden = visible !== 0;
+				const next = new URLSearchParams(location.search);
+				query ? next.set('q', query) : next.delete('q');
+				history.replaceState(null, '', `${location.pathname}${next.size ? `?${next}` : ''}${location.hash}`);
+			};
+			input?.addEventListener('input', apply);
+			apply();
+		}
+	}
+	document.addEventListener('astro:page-load', initializeScriptingTables);
+	initializeScriptingTables();
+</script>

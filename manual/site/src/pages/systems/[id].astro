@@ -1,0 +1,132 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../components/Breadcrumb.astro';
+import Feedback from '../../components/Feedback.astro';
+import LifecycleHistory from '../../components/LifecycleHistory.astro';
+import ReferenceTable from '../../components/ReferenceTable.astro';
+import RelatedResources from '../../components/RelatedResources.astro';
+import TombstoneDetail from '../../components/TombstoneDetail.astro';
+import { UI } from '../../i18n/en.mjs';
+import {
+	allKeys,
+	applicabilitySummary,
+	effectForKey,
+	requireKey,
+	summarizeWhenOmitted,
+	tombstones,
+	type TombstoneRecord,
+} from '../../lib/data';
+import { historyHeading } from '../../lib/lifecycle';
+import { requireRouteTail, withBase } from '../../lib/paths';
+import { relatedResourcesFor } from '../../lib/related';
+import { systemCategoryTitle, systemGroupForCategory } from '../../lib/taxonomy';
+
+export async function getStaticPaths() {
+	const systems = await getCollection('systems');
+	const keys = allKeys();
+	const errors: string[] = [];
+	for (const system of systems) {
+		for (const key of system.data.keys) {
+			if (!keys.has(key)) errors.push(`${system.id}: unknown key ${key}`);
+		}
+		for (const reference of system.data.related) {
+			if (reference.type === 'key' && !reference.scope && system.data.keys.includes(reference.id)) {
+				errors.push(`${system.id}: related duplicates key shortcut ${reference.id}`);
+			}
+		}
+	}
+	if (errors.length) throw new Error(`System validation failed:\n${errors.join('\n')}`);
+	const active = systems.map((system) => ({
+		params: { id: system.id },
+		props: { kind: 'active' as const, system },
+	}));
+	const removed = tombstones()
+		.filter((record) => record.type === 'system' && record.route.startsWith('/systems/'))
+		.map((record) => ({
+			params: { id: requireRouteTail(record.route, `System tombstone ${record.id}`) },
+			props: { kind: 'removed' as const, record },
+		}));
+	return [...active, ...removed];
+}
+
+async function prepareSystem(system: CollectionEntry<'systems'>) {
+	const { Content, headings } = await render(system);
+	const prose = await getCollection('keyprose');
+	const summaries = new Map<string, string>(prose.flatMap((entry) =>
+		!entry.data.scope && entry.data.summary ? [[entry.data.key, entry.data.summary]] : [],
+	));
+	const rows = system.data.keys.map((key) => {
+		const record = requireKey(key, `System ${system.id}`);
+		const [scope] = record.scopes;
+		if (!scope) throw new Error(`System ${system.id}: INI key "${key}" has no scopes`);
+		return {
+			key,
+			href: withBase(`/keys/${record.route_id}/`),
+			summary: summaries.get(key),
+			value: scope.value_type,
+			whenOmitted: summarizeWhenOmitted(prose, record),
+			effect: effectForKey(prose, record),
+			context: applicabilitySummary(
+				record.scopes.flatMap((item) => item.applies_to),
+				record.scopes.length === 1 ? scope.level : '',
+			),
+			searchContext: record.scopes.flatMap((item) => item.applies_to).join(' '),
+		};
+	});
+	const related = await relatedResourcesFor(
+		{ type: 'system', id: system.id },
+		system.data.related,
+		`System ${system.id}`,
+	);
+	const pageHeadings = [
+		...headings,
+		...(rows.length > 0 ? [{ depth: 2, slug: 'related-settings', text: 'Related settings' }] : []),
+		...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+		...historyHeading(await getCollection('changes'), { type: 'system', id: system.id }),
+	];
+	return {
+		system,
+		Content,
+		rows,
+		related,
+		group: systemGroupForCategory(system.data.category),
+		pageHeadings,
+	};
+}
+
+type Props =
+	| { kind: 'active'; system: CollectionEntry<'systems'> }
+	| { kind: 'removed'; record: TombstoneRecord };
+const props = Astro.props as Props;
+const page = props.kind === 'active'
+	? { kind: 'active' as const, ...(await prepareSystem(props.system)) }
+	: { kind: 'removed' as const, record: props.record };
+const ActiveContent = page.kind === 'active' ? page.Content : undefined;
+---
+
+{page.kind === 'removed' ? (
+	<TombstoneDetail record={page.record} />
+) : (
+	<StarlightPage
+		frontmatter={{ title: page.system.data.title, description: page.system.data.summary }}
+		headings={page.pageHeadings}
+	>
+		<Breadcrumb class="ots-system-breadcrumb" crumbs={[
+			{ label: UI.navigation.systems, href: '/systems/' },
+			...(page.group ? [{ label: page.group.title }] : []),
+			{ label: systemCategoryTitle(page.system.data.category) },
+		]} />
+		<LifecycleHistory reference={{ type: 'system', id: page.system.id }} showHistory={false} />
+		{ActiveContent && <ActiveContent />}
+		{page.rows.length > 0 && (
+			<>
+				<h2 id="related-settings">Related settings</h2>
+				<ReferenceTable rows={page.rows} />
+			</>
+		)}
+		<RelatedResources resources={page.related} />
+		<LifecycleHistory reference={{ type: 'system', id: page.system.id }} showBadges={false} />
+		<Feedback title={page.system.data.title} path={`/systems/${page.system.id}/`} />
+	</StarlightPage>
+)}

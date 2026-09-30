@@ -1,0 +1,2 @@
+# Resource scripts are UTF-8 and must retain their legacy CRLF line endings.
+*.[Rr][Cc] text eol=crlf

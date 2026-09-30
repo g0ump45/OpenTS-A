@@ -1,0 +1,19 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import CommandIndex from '../../components/CommandIndex.astro';
+import Feedback from '../../components/Feedback.astro';
+import { allCommands } from '../../lib/commands';
+
+const records = allCommands().filter((record) => record.kind === 'registered');
+---
+
+<StarlightPage frontmatter={{ title: 'Commands', description: 'Hotkey commands accepted by OpenTS and bound through KEYBOARD.INI.', tableOfContents: false }}>
+	<p class="ots-lede">Hotkey commands bound through <code>KEYBOARD.INI</code>.</p>
+	<CommandIndex
+		records={records}
+		audiences={['player', 'debug']}
+		invocationHeader="Binding"
+		searchPlaceholder="Command, key, description…"
+	/>
+	<Feedback title="Commands" path="/commands/" />
+</StarlightPage>

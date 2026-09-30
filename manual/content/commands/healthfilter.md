@@ -1,0 +1,5 @@
+---
+command_id: HealthFilter
+---
+
+Sorts the selected objects the player controls into three condition bands: red, at or below [`ConditionRed`](/keys/conditionred/); yellow, at or below [`ConditionYellow`](/keys/conditionyellow/); and green above that. On a mixed selection the first press keeps only the most damaged band present and remembers the whole selection. While the selection is still that remembered group, one of its bands, or two of them together, each further press moves to the next band of the group, wrapping from green back to red; the bands are worked out again on every press, so an object that has been repaired or damaged since moves with its current condition. A selection that matches none of those starts over, and a selection of one band alone does nothing. [`HealthFilterAddLower`](/commands/healthfilteraddlower/) grows the selection back instead of replacing it. The remembered group is forgotten when the scenario ends, and neither command acts while a structure is being placed.

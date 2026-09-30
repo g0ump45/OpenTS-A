@@ -1,0 +1,2913 @@
+trigger_actions:
+- id: TACTION_NONE
+  kind: trigger-action
+  index: 0
+  editor_name: -No Action-
+  editor_description: This is a null action. It will do nothing and is equivalent to not having an action
+    at all. Why use it?
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,0,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_WIN
+  kind: trigger-action
+  index: 1
+  editor_name: Winner is...
+  editor_description: The winner will be forced to be the house specified. The game will end immediately.
+    Typically, the player's house is specified.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,1,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_LOSE
+  kind: trigger-action
+  index: 2
+  editor_name: Loser is...
+  editor_description: The loser will be force to be the house specified. The game will end immediately.
+    Typically, the player's house is specified.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,2,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_BEGIN_PRODUCTION
+  kind: trigger-action
+  index: 3
+  editor_name: Production Begins...
+  editor_description: The computer's house (as specified) will begin production of units and structures.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,3,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CREATE_TEAM
+  kind: trigger-action
+  index: 4
+  editor_name: Create Team...
+  editor_description: Creates a team of the type specified (owned by the house of this trigger). The team
+    member are NOT automatically created however.
+  need: NEED_TEAM
+  parameters:
+  - name: Team
+    type: team
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,4,1,<Team>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DESTROY_TEAM
+  kind: trigger-action
+  index: 5
+  editor_name: Destroy Team...
+  editor_description: Destroys all instances of the team type specified. The units in those existing teams
+    will remain and be available for recruiting into other teams.
+  need: NEED_TEAM
+  parameters:
+  - name: Team
+    type: team
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,5,1,<Team>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ALL_HUNT
+  kind: trigger-action
+  index: 6
+  editor_name: All to Hunt...
+  editor_description: Forces all units, of the house specified, into 'hunt' mode. They will seek out and
+    destroy their enemies.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,6,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_REINFORCEMENTS
+  kind: trigger-action
+  index: 7
+  editor_name: Reinforcement (team)...
+  editor_description: Create a reinforcement of the specified team. The members of the team WILL be created
+    magically by this action.
+  need: NEED_TEAM
+  parameters:
+  - name: Team
+    type: team
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,7,1,<Team>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DZ
+  kind: trigger-action
+  index: 8
+  editor_name: Drop Zone Flare (waypoint)...
+  editor_description: Display a drop zone flair at the waypoint specified. The map will also be reaveald
+    around that location.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,8,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_FIRE_SALE
+  kind: trigger-action
+  index: 9
+  editor_name: Fire Sale...
+  editor_description: Cause all buildings of the specified house to be sold (for cash and prizes). Typically
+    this is used in the final assault by the computer.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,9,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_MOVIE
+  kind: trigger-action
+  index: 10
+  editor_name: Play Movie...
+  editor_description: Displays the specified movie (full screen). The game is paused while this occurs
+    and resumes normally after it completes.
+  need: NEED_MOVIE
+  parameters:
+  - name: Movie
+    type: movie
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,10,0,<Movie>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_TEXT_TRIGGER
+  kind: trigger-action
+  index: 11
+  editor_name: Text Trigger...
+  editor_description: Display the text identified by the string file <label>.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,11,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DESTROY_TRIGGER
+  kind: trigger-action
+  index: 12
+  editor_name: Destroy Trigger...
+  editor_description: Destroy all current instances of the trigger type specified. This does not prevent
+    future instances of that trigger >from being created.
+  need: NEED_TRIGGER
+  parameters:
+  - name: Trigger
+    type: trigger
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,12,2,<Trigger>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_AUTOCREATE
+  kind: trigger-action
+  index: 13
+  editor_name: Autocreate Begins...
+  editor_description: Initiates autocreate for the house specified. This will cause the computer's house
+    to build autocreate teams as it sees fit.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,13,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CHANGE_HOUSE
+  kind: trigger-action
+  index: 14
+  editor_name: Change House...
+  editor_description: Changes owning house to the one specified for attached objects.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,14,0,<House>,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_ALLOWWIN
+  kind: trigger-action
+  index: 15
+  editor_name: Allow Win
+  editor_description: Removes one 'blockage' from allowing the player to win. The blockage number is equal
+    the number of triggers created that have this action.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,15,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_REVEAL_ALL
+  kind: trigger-action
+  index: 16
+  editor_name: Reveal all map
+  editor_description: Reveals the entire map to the player.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,16,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_REVEAL_SOME
+  kind: trigger-action
+  index: 17
+  editor_name: Reveal around waypoint...
+  editor_description: Reveals a region of the map to the player around the waypoint specified.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,17,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_REVEAL_ZONE
+  kind: trigger-action
+  index: 18
+  editor_name: Reveal zone of waypoint...
+  editor_description: Reveals all cells that share the same zone as the waypoing specified. This yields
+    some wierd results. Use with caution.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,18,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_SOUND
+  kind: trigger-action
+  index: 19
+  editor_name: Play sound effect...
+  editor_description: Plays the sound effect specified.
+  need: NEED_SOUND
+  parameters:
+  - name: Sound
+    type: sound
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,19,0,<Sound>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_MUSIC
+  kind: trigger-action
+  index: 20
+  editor_name: Play music theme...
+  editor_description: Plays the music theme specified.
+  need: NEED_THEME
+  parameters:
+  - name: Theme
+    type: theme
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,20,0,<Theme>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_SPEECH
+  kind: trigger-action
+  index: 21
+  editor_name: Play speech...
+  editor_description: Plays the speech sound specified.
+  need: NEED_SPEECH
+  parameters:
+  - name: EVA speech
+    type: eva-speech
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,21,0,<EVA speech>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_FORCE_TRIGGER
+  kind: trigger-action
+  index: 22
+  editor_name: Force Trigger...
+  editor_description: Force all triggers of this specified type to spring regardless of what it's event
+    flags may indicate.
+  need: NEED_TRIGGER
+  parameters:
+  - name: Trigger
+    type: trigger
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,22,2,<Trigger>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_START_TIMER
+  kind: trigger-action
+  index: 23
+  editor_name: Timer Start
+  editor_description: Start the global mission timer.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,23,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_STOP_TIMER
+  kind: trigger-action
+  index: 24
+  editor_name: Timer Stop
+  editor_description: Stop the global mission timer.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,24,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ADD_TIMER
+  kind: trigger-action
+  index: 25
+  editor_name: Timer Extend...
+  editor_description: Extend the global mission timer by the time specified.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,25,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SUB_TIMER
+  kind: trigger-action
+  index: 26
+  editor_name: Timer Shorten...
+  editor_description: Short the global mission timer by the time specified. It can never be reduced below
+    'zero' time.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,26,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_TIMER
+  kind: trigger-action
+  index: 27
+  editor_name: Timer Set...
+  editor_description: Set the global mission timer to the value specified.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,27,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_GLOBAL
+  kind: trigger-action
+  index: 28
+  editor_name: Global Set...
+  editor_description: Set the global flag. Global flags are named in the file Globals.INI. Global flags
+    can be either 'on/set/true' or 'off/clear/false'.
+  need: NEED_GLOBAL
+  parameters:
+  - name: Global variable
+    type: global-variable
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,28,0,<Global variable>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CLEAR_GLOBAL
+  kind: trigger-action
+  index: 29
+  editor_name: Global Clear...
+  editor_description: Clear the global flag. Global flags are named in the file Globals.INI. Global flags
+    can either be 'on/set/true' or 'off/clear/false'.
+  need: NEED_GLOBAL
+  parameters:
+  - name: Global variable
+    type: global-variable
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,29,0,<Global variable>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_BASE_BUILDING
+  kind: trigger-action
+  index: 30
+  editor_name: Auto Base Building...
+  editor_description: Initialize the computer skirmish mode build control to either 'on' or 'off' state.
+    When 'on', the computer takes over as if it were in skirmish mode. (gs make sure he has a con yard)
+  need: NEED_BOOL
+  parameters:
+  - name: Boolean
+    type: boolean
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,30,0,<Boolean>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CREEP_SHADOW
+  kind: trigger-action
+  index: 31
+  editor_name: Grow shroud one 'step'
+  editor_description: Increase the shroud darkness by one step (cell).
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,31,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DESTROY_OBJECT
+  kind: trigger-action
+  index: 32
+  editor_name: Destroy attached building
+  editor_description: Destroy any buildings, bridges, or units that this trigger is attached to.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,32,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_1_SPECIAL
+  kind: trigger-action
+  index: 33
+  editor_name: Add 1-time special weapon...
+  editor_description: Add a one-shot special weapon (as indicated) to the trigger's house.
+  need: NEED_SPECIAL
+  parameters:
+  - name: Superweapon
+    type: superweapon
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,33,0,<Superweapon>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_FULL_SPECIAL
+  kind: trigger-action
+  index: 34
+  editor_name: Add repeating special weapon...
+  editor_description: Add a permanent special weapon (as indicated) to the trigger's house.
+  need: NEED_SPECIAL
+  parameters:
+  - name: Superweapon
+    type: superweapon
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,34,0,<Superweapon>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PREFERRED_TARGET
+  kind: trigger-action
+  index: 35
+  editor_name: Preferred target...
+  editor_description: Specify what the trigger's house should use as its preferred target when using special
+    weapon attacks.
+  need: NEED_QUARRY
+  parameters:
+  - name: Target category
+    type: quarry
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,35,0,<Target category>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ALL_CHANGE_HOUSE
+  kind: trigger-action
+  index: 36
+  editor_name: All change house...
+  editor_description: All objects of one house change ownership to specified house.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,36,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_MAKE_ALLY
+  kind: trigger-action
+  index: 37
+  editor_name: Make ally...
+  editor_description: Cause this trigger's house to ally with the house specified.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,37,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_MAKE_ENEMY
+  kind: trigger-action
+  index: 38
+  editor_name: Make enemy...
+  editor_description: Cause this trigger's house to un-ally (declare war) with the house specified.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,38,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CHANGE_ZOOM
+  kind: trigger-action
+  index: 39
+  editor_name: Change Zoom Level...
+  editor_description: Changes the zoom out level of the player's radar map.  Use 1 for normal view, 2
+    for zoomed out.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,39,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_RESIZE_PLAYER_VIEW
+  kind: trigger-action
+  index: 40
+  editor_name: Resize Player View...
+  editor_description: 'Changes the player''s viewing rectangle into the map.  Enter as:   x,y,w,h   where
+    x,y gives the upper left corner and w,h give the width and height.'
+  need: NEED_RECT
+  parameters:
+  - name: Rectangle
+    type: rectangle
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,40,0,0,<Rectangle X>,<Rectangle Y>,<Rectangle width>,<Rectangle height>,
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_ANIM
+  kind: trigger-action
+  index: 41
+  editor_name: Play Anim At...
+  editor_description: Plays the specified anim in the specified cell.
+  need: NEED_ANIM_AND_LOCATION
+  parameters:
+  - name: Animation
+    type: animation
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,41,0,<Animation>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_DO_EXPLOSION
+  kind: trigger-action
+  index: 42
+  editor_name: Do Explosion At...
+  editor_description: Creates an explosion in the specified cell, using the specified warhead.
+  need: NEED_WEAPON_AND_LOCATION
+  parameters:
+  - name: Weapon
+    type: weapon
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,42,0,<Weapon>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_METEOR_IMPACT
+  kind: trigger-action
+  index: 43
+  editor_name: Meteor Impact At...
+  editor_description: Sends a meteor at the specified cell.
+  need: NEED_METEOR_AND_LOCATION
+  parameters:
+  - name: Meteor size
+    type: meteor-size
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,43,0,<Meteor size>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_ION_STORM_START
+  kind: trigger-action
+  index: 44
+  editor_name: Ion Storm start...
+  editor_description: Starts an ion storm sequence to run for the specified number of game frames.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,44,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ION_STORM_STOP
+  kind: trigger-action
+  index: 45
+  editor_name: Ion Storm stop...
+  editor_description: End an Ion storm in progress.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,45,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_LOCK_INPUT
+  kind: trigger-action
+  index: 46
+  editor_name: Lock input
+  editor_description: Disables user input.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,46,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_UNLOCK_INPUT
+  kind: trigger-action
+  index: 47
+  editor_name: Unlock input
+  editor_description: Enables user input.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,47,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CENTER_VIEWPOINT
+  kind: trigger-action
+  index: 48
+  editor_name: Center Camera at Waypoint...
+  editor_description: Moves the tactical view to a specified waypoint.
+  need: NEED_SPEED_AND_LOCATION
+  parameters:
+  - name: Speed
+    type: camera-speed
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,48,0,<Speed>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_ZOOM_IN
+  kind: trigger-action
+  index: 49
+  editor_name: Zoom in
+  editor_description: Zooms the tactical map in.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,49,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ZOOM_OUT
+  kind: trigger-action
+  index: 50
+  editor_name: Zoom out
+  editor_description: Zooms the tactical map out.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,50,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_RESHROUD
+  kind: trigger-action
+  index: 51
+  editor_name: Reshroud Map
+  editor_description: Reshrouds the entire map.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,51,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CHANGE_SPOTLIGHT_BEHAVIOR
+  kind: trigger-action
+  index: 52
+  editor_name: Change Light Behavior
+  editor_description: Changes the way a building spotlight behaves. Attach this trigger to a building
+    that casts a spotlight.
+  need: NEED_LIGHT_BEHAVIOR
+  parameters:
+  - name: Spotlight behavior
+    type: spotlight-behavior
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,52,0,<Spotlight behavior>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ENABLE_TRIGGER
+  kind: trigger-action
+  index: 53
+  editor_name: Enable Trigger
+  editor_description: Enables the target trigger.
+  need: NEED_TRIGGER
+  parameters:
+  - name: Trigger
+    type: trigger
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,53,2,<Trigger>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DISABLE_TRIGGER
+  kind: trigger-action
+  index: 54
+  editor_name: Disable Trigger
+  editor_description: Disables the target trigger.
+  need: NEED_TRIGGER
+  parameters:
+  - name: Trigger
+    type: trigger
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,54,2,<Trigger>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_RADAR_EVENT
+  kind: trigger-action
+  index: 55
+  editor_name: Create Radar Event
+  editor_description: Creates a radar event at the specified waypoint
+  need: NEED_EVENT_AND_LOCATION
+  parameters:
+  - name: Radar event
+    type: radar-event
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,55,0,<Radar event>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_LOCAL
+  kind: trigger-action
+  index: 56
+  editor_name: Local Set...
+  editor_description: Set the local flag. Local flags can be either 'on/set/true' or 'off/clear/false'.
+  need: NEED_LOCAL
+  parameters:
+  - name: Local variable
+    type: local-variable
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,56,0,<Local variable>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CLEAR_LOCAL
+  kind: trigger-action
+  index: 57
+  editor_name: Local Clear...
+  editor_description: Clear the local flag. Local flags can either be 'on/set/true' or 'off/clear/false'.
+  need: NEED_LOCAL
+  parameters:
+  - name: Local variable
+    type: local-variable
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,57,0,<Local variable>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_METEOR_SHOWER
+  kind: trigger-action
+  index: 58
+  editor_name: Meteor Shower At...
+  editor_description: Creates a meteor shower around the specified waypoint.
+  need: NEED_SHOWER_AND_LOCATION
+  parameters:
+  - name: Meteor shower
+    type: meteor-shower
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,58,0,<Meteor shower>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_REDUCE_TIBERIUM
+  kind: trigger-action
+  index: 59
+  editor_name: Reduce Tiberium At...
+  editor_description: Reduces Tiberium around the specified waypoint.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,59,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_SELL_ATTACHED
+  kind: trigger-action
+  index: 60
+  editor_name: Sell building
+  editor_description: Sells the building attached to this trigger.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,60,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_TURN_OFF_ATTACHED
+  kind: trigger-action
+  index: 61
+  editor_name: Turn off building
+  editor_description: Turn off building attached to this trigger.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,61,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_TURN_ON_ATTACHED
+  kind: trigger-action
+  index: 62
+  editor_name: Turn on building
+  editor_description: Turn on building attached to this trigger.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,62,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_DAMAGE
+  kind: trigger-action
+  index: 63
+  editor_name: Apply 100 damage at...
+  editor_description: Applies 100 points of HE damage at location.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,63,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_LIGHT_SMALL
+  kind: trigger-action
+  index: 64
+  editor_name: Light flash (small) at...
+  editor_description: Shows a small light flash at location.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,64,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_LIGHT_MEDIUM
+  kind: trigger-action
+  index: 65
+  editor_name: Light flash (medium) at...
+  editor_description: Shows a medium light flash at location.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,65,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_LIGHT_LARGE
+  kind: trigger-action
+  index: 66
+  editor_name: Light flash (large) at...
+  editor_description: Shows a large light flash at location.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,66,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_ANNOUNCE_WIN
+  kind: trigger-action
+  index: 67
+  editor_name: Announce Win
+  editor_description: Announce that player has won.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,67,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ANNOUNCE_LOSE
+  kind: trigger-action
+  index: 68
+  editor_name: Announce Lose
+  editor_description: Announce that player has lost.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,68,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_FORCE_END
+  kind: trigger-action
+  index: 69
+  editor_name: Force end
+  editor_description: Force end of scenario.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,69,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DESTROY_TAG
+  kind: trigger-action
+  index: 70
+  editor_name: Destroy Tag...
+  editor_description: Destroy tag and all attached triggers.
+  need: NEED_TAG
+  parameters:
+  - name: Tag
+    type: tag
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,70,3,<Tag>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_AMBIENT_STEP
+  kind: trigger-action
+  index: 71
+  editor_name: Set ambient step...
+  editor_description: Sets ambient light fade step value.
+  need: NEED_FLOAT
+  parameters:
+  - name: Number
+    type: floating-point
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,71,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_AMBIENT_RATE
+  kind: trigger-action
+  index: 72
+  editor_name: Set ambient rate...
+  editor_description: Sets ambient light fade rate.
+  need: NEED_FLOAT
+  parameters:
+  - name: Number
+    type: floating-point
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,72,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_AMBIENT_LIGHT
+  kind: trigger-action
+  index: 73
+  editor_name: Set ambient light...
+  editor_description: Fades ambient light to new lighting level.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,73,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_BEGIN_AI_TRIGGERS
+  kind: trigger-action
+  index: 74
+  editor_name: AI triggers begin...
+  editor_description: Start AI triggers for specified house.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,74,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_STOP_AI_TRIGGERS
+  kind: trigger-action
+  index: 75
+  editor_name: AI triggers stop...
+  editor_description: Stop AI triggers for specified house.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,75,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_AI_TRIGGER_TEAM_RATIO
+  kind: trigger-action
+  index: 76
+  editor_name: Ratio of AI trigger teams...
+  editor_description: AI percentage of teams created for AI triggers (100 = all for AI trigger teams,
+    0 = all for regular teams)
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,76,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_TEAM_AIRCRAFT_RATIO
+  kind: trigger-action
+  index: 77
+  editor_name: Ratio of team aircraft...
+  editor_description: AI percentage of aircraft created for teams (100 = all for teams, 0 = all random)
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,77,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_TEAM_INFANTRY_RATIO
+  kind: trigger-action
+  index: 78
+  editor_name: Ratio of team infantry...
+  editor_description: AI percentage of infantry created for teams (100 = all for teams, 0 = all random)
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,78,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_TEAM_UNIT_RATIO
+  kind: trigger-action
+  index: 79
+  editor_name: Ratio of team units...
+  editor_description: AI percentage of units created for teams (100 = all for teams, 0 = all random)
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,79,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_REINFORCEMENTS_SPECIAL
+  kind: trigger-action
+  index: 80
+  editor_name: Reinforcement (team) [at waypoint]...
+  editor_description: Create reinforcement team at special waypoint location.
+  need: NEED_TEAM_AND_LOCATION
+  parameters:
+  - name: Team
+    type: team
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,80,1,<Team>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_WAKEUP_SELF
+  kind: trigger-action
+  index: 81
+  editor_name: Wakeup self
+  editor_description: Breaks out of sleep or harmless mode so as to enter guard mode.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,81,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_WAKEUP_ALL_SLEEP
+  kind: trigger-action
+  index: 82
+  editor_name: Wakeup all sleepers
+  editor_description: Breaks all units out of sleep mode.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,82,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_WAKEUP_ALL_HARMLESS
+  kind: trigger-action
+  index: 83
+  editor_name: Wakeup all harmless
+  editor_description: Breaks all out of harmless mode.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,83,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_WAKEUP_GROUP
+  kind: trigger-action
+  index: 84
+  editor_name: Wakeup group...
+  editor_description: Wakeup all units of specified group.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,84,0,<Number>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_VEIN_GROWTH
+  kind: trigger-action
+  index: 85
+  editor_name: Vein growth...
+  editor_description: Control if veins grow or not.
+  need: NEED_BOOL
+  parameters:
+  - name: Boolean
+    type: boolean
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,85,0,<Boolean>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_TIB_GROWTH
+  kind: trigger-action
+  index: 86
+  editor_name: Tiberium growth...
+  editor_description: Control if Tiberium grows or not.
+  need: NEED_BOOL
+  parameters:
+  - name: Boolean
+    type: boolean
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,86,0,<Boolean>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ICE_GROWTH
+  kind: trigger-action
+  index: 87
+  editor_name: Ice growth...
+  editor_description: Control if ice grows or not.
+  need: NEED_BOOL
+  parameters:
+  - name: Boolean
+    type: boolean
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,87,0,<Boolean>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PARTICLE_ANIM
+  kind: trigger-action
+  index: 88
+  editor_name: Particle Anim at...
+  editor_description: Show particle animation at location.
+  need: NEED_PARTICLE_AND_LOCATION
+  parameters:
+  - name: Particle system
+    type: particle-system
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,88,0,<Particle system>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_REMOVE_PARTICLE_ANIM
+  kind: trigger-action
+  index: 89
+  editor_name: Remove Particle Anim at...
+  editor_description: Delete particle anims at specified location.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,89,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_ION_LIGHTNING_STRIKE
+  kind: trigger-action
+  index: 90
+  editor_name: Lightning strike at...
+  editor_description: A single Ion Storm lightning strike.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,90,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_GO_BERZERK
+  kind: trigger-action
+  index: 91
+  editor_name: Go Berzerk
+  editor_description: Attached object (cyborg) goes berzerk.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,91,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_ACTIVATE_FIRESTORM
+  kind: trigger-action
+  index: 92
+  editor_name: Activate Firestorm Defense
+  editor_description: Turns on a house's firestorm defense.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,92,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DEACTIVATE_FIRESTORM
+  kind: trigger-action
+  index: 93
+  editor_name: Deactivate Firestorm Defense
+  editor_description: Turns off a house's firestorm defense.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,93,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ION_CANNON
+  kind: trigger-action
+  index: 94
+  editor_name: Ion-cannon strike...
+  editor_description: Fires Ion-Cannon at waypoint specified.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,94,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_MULTI_MISSILE
+  kind: trigger-action
+  index: 95
+  editor_name: Nuke strike...
+  editor_description: Fires Nuke at waypoint specified from nearest edge.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,95,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_CHEM_MISSILE
+  kind: trigger-action
+  index: 96
+  editor_name: Chem-missile strike...
+  editor_description: Fires Chemical missile at waypoint specified.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,96,0,0,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_TOGGLE_TRAIN_CARGO
+  kind: trigger-action
+  index: 97
+  editor_name: Toggle Train Cargo
+  editor_description: Toggles state of cargo train dropping crate.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,97,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_SOUND_RANDOM
+  kind: trigger-action
+  index: 98
+  editor_name: Play Sound Effect (Random)...
+  editor_description: Plays sound effect at random waypoint.
+  need: NEED_SOUND
+  parameters:
+  - name: Sound
+    type: sound
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,98,0,<Sound>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_SOUND_AT
+  kind: trigger-action
+  index: 99
+  editor_name: Play Sound Effect At...
+  editor_description: 'Plays sound effect specified at waypoint specified. '
+  need: NEED_SOUND_AND_LOCATION
+  parameters:
+  - name: Sound
+    type: sound
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,99,0,<Sound>,0,0,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_PLAY_INGAME_MOVIE
+  kind: trigger-action
+  index: 100
+  editor_name: Play Ingame Movie...
+  editor_description: Displays the specified movie ingame. Player still has control of interface and units.
+  need: NEED_MOVIE
+  parameters:
+  - name: Movie
+    type: movie
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,100,0,<Movie>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_FLASH_TEAM
+  kind: trigger-action
+  index: 101
+  editor_name: Flash Team...
+  editor_description: Flashes the specified team for the specified number of frames
+  need: NEED_TEAM_AND_TIME
+  parameters:
+  - name: Team
+    type: team
+  - name: Duration
+    type: frames
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,101,4,<Team>,0,0,0,0,<Duration>
+  attaches_to: null
+  status: generated
+- id: TACTION_DISABLE_SPEECH
+  kind: trigger-action
+  index: 102
+  editor_name: Disable Speech
+  editor_description: Disables EVA speech.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,102,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ENABLE_SPEECH
+  kind: trigger-action
+  index: 103
+  editor_name: Enable Speech
+  editor_description: Enables EVA speech.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,103,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_SET_GROUP_ID
+  kind: trigger-action
+  index: 104
+  editor_name: Set Group ID...
+  editor_description: Sets the group ID of the attached object.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,104,0,<Number>,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_TALK_BUBBLE
+  kind: trigger-action
+  index: 105
+  editor_name: Talk Bubble...
+  editor_description: Displays talk bubble over unit
+  need: NEED_TEAM
+  parameters:
+  - name: Team
+    type: team
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,105,1,<Team>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_GIVE_CREDITS
+  kind: trigger-action
+  index: 106
+  editor_name: Give Credits...
+  editor_description: Gives or removes credits from the specified house. A positive amount gives money,
+    a negative amount subtracts it.
+  need: NEED_HOUSE_AND_CREDITS
+  parameters:
+  - name: House
+    type: house
+  - name: Credits
+    type: integer
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,106,0,<House>,<Credits>,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_ENABLE_SHORT_GAME
+  kind: trigger-action
+  index: 107
+  editor_name: Enable Short Game
+  editor_description: 'Turns the short game rule on: a house is defeated once it has no structures and
+    no base unit left.'
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,107,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DISABLE_SHORT_GAME
+  kind: trigger-action
+  index: 108
+  editor_name: Disable Short Game
+  editor_description: 'Turns the short game rule off: a house is defeated only once it has nothing left.'
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,108,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CREATE_BUILDING_AT
+  kind: trigger-action
+  index: 109
+  editor_name: Create Building At...
+  editor_description: Places a building of the specified type for the specified house at the waypoint.
+    Forced placement ignores the placement rules.
+  need: NEED_STRUCTURE_PLACEMENT
+  parameters:
+  - name: House
+    type: house
+  - name: Building type
+    type: building-type
+  - name: Force placement
+    type: boolean
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,109,0,<House>,<Building type>,<Force placement>,0,0,<Waypoint>
+  attaches_to: null
+  status: generated
+- id: TACTION_HOUSE_DESTROY_ALL
+  kind: trigger-action
+  index: 110
+  editor_name: Destroy all of...
+  editor_description: Kills everything of the specified house and marks it as defeated.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,110,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_MAKE_ELITE
+  kind: trigger-action
+  index: 111
+  editor_name: Make Elite
+  editor_description: All objects attached to this trigger are promoted to elite status.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,111,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_ENABLE_ALLY_REVEAL
+  kind: trigger-action
+  index: 112
+  editor_name: Enable Ally Reveal
+  editor_description: Turns ally reveal on, so allied players see the terrain each other reveals.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,112,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DISABLE_ALLY_REVEAL
+  kind: trigger-action
+  index: 113
+  editor_name: Disable Ally Reveal
+  editor_description: Turns ally reveal off, so allied players no longer see the terrain each other reveals.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,113,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_CREATE_AUTOSAVE
+  kind: trigger-action
+  index: 114
+  editor_name: Create Autosave
+  editor_description: Saves the game once the current frame has finished.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,114,0,0,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_DELETE_OBJECT
+  kind: trigger-action
+  index: 115
+  editor_name: Delete Attached Objects
+  editor_description: Removes every object attached to this trigger from the map silently, without destroying
+    it.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,115,0,0,0,0,0,0,
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TACTION_ALL_ASSIGN_MISSION
+  kind: trigger-action
+  index: 116
+  editor_name: All Assign Mission...
+  editor_description: Gives every infantry, vehicle and aircraft of the trigger's house the specified
+    mission.
+  need: NEED_MISSION
+  parameters:
+  - name: Mission
+    type: mission
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,116,0,<Mission>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_MAKE_ALLY_ONE_WAY
+  kind: trigger-action
+  index: 117
+  editor_name: Make Ally (One-Way)...
+  editor_description: Cause this trigger's house to ally with the specified house, without the reverse
+    alliance.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,117,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+- id: TACTION_MAKE_ENEMY_ONE_WAY
+  kind: trigger-action
+  index: 118
+  editor_name: Make Enemy (One-Way)...
+  editor_description: Cause this trigger's house to declare war on the specified house.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Actions]'
+    line: <TriggerID>=1,118,0,<House>,0,0,0,0,
+  attaches_to: null
+  status: generated
+trigger_action_orphan_texts: []
+trigger_events:
+- id: TEVENT_NONE
+  kind: trigger-event
+  index: 0
+  editor_name: -No Event-
+  editor_description: This is a null event. There is no need to ever use this in a real trigger.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,0,0,0
+  attaches_to: ATTACH_CELL|ATTACH_OBJECT
+  status: generated
+- id: TEVENT_PLAYER_ENTERED
+  kind: trigger-event
+  index: 1
+  editor_name: Entered by...
+  editor_description: Triggers when an infantry or vehicle enters the attached object (building) or cell.
+    <THEM = House of entering unit>
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,1,0,<House>
+  attaches_to: ATTACH_CELL|ATTACH_OBJECT
+  status: generated
+- id: TEVENT_SPIED
+  kind: trigger-event
+  index: 2
+  editor_name: Spied upon
+  editor_description: Detects when a spy has entered the attached building.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,2,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_THIEVED
+  kind: trigger-event
+  index: 3
+  editor_name: Thieved by...
+  editor_description: Triggers when a thief steals money from the specified house.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,3,0,<House>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_DISCOVERED
+  kind: trigger-event
+  index: 4
+  editor_name: Discovered by player
+  editor_description: Detects when the attached object has been discovered by the player. Discovered means
+    reavealed from under the shroud.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,4,0,0
+  attaches_to: ATTACH_CELL|ATTACH_OBJECT
+  status: generated
+- id: TEVENT_HOUSE_DISCOVERED
+  kind: trigger-event
+  index: 5
+  editor_name: House Discovered...
+  editor_description: Triggers when the specified house has any of its units or buildings discovered by
+    the player.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,5,0,<House>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_ATTACKED
+  kind: trigger-event
+  index: 6
+  editor_name: Attacked by any house
+  editor_description: Triggers when the attached unit is attacked in some manner. Incidental damage or
+    friendly fire does not count.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,6,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_DESTROYED
+  kind: trigger-event
+  index: 7
+  editor_name: Destroyed by any house
+  editor_description: Triggers when the attached object has been destroyed. Destroyed by incidental damage
+    or friendly fire doesn't count.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,7,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ANY
+  kind: trigger-event
+  index: 8
+  editor_name: Any Event
+  editor_description: When used alone, it will force the trigger to spring immediately.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,8,0,0
+  attaches_to: ATTACH_CELL|ATTACH_OBJECT|ATTACH_MAP|ATTACH_HOUSE|ATTACH_GENERAL
+  status: generated
+- id: TEVENT_UNITS_DESTROYED
+  kind: trigger-event
+  index: 9
+  editor_name: Destroyed, Units, All...
+  editor_description: Triggers when all units of the specified house have been destroyed. Typically used
+    for end of game conditions.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,9,0,<House>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_BUILDINGS_DESTROYED
+  kind: trigger-event
+  index: 10
+  editor_name: Destroyed, Buildings, All...
+  editor_description: Triggers when all buildings of the specified side have been destroyed. Typically
+    used for end of game conditions.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,10,0,<House>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_ALL_DESTROYED
+  kind: trigger-event
+  index: 11
+  editor_name: Destroyed, All...
+  editor_description: Triggers when all objects owned by the specified house have been destroyed. This
+    is the normal (destroy everyone) trigger condition for end of game.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,11,0,<House>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_CREDITS
+  kind: trigger-event
+  index: 12
+  editor_name: Credits exceed...
+  editor_description: Triggers when the house (for this trigger) credit total exceeds this specified amount.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,12,0,<Number>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_TIME
+  kind: trigger-event
+  index: 13
+  editor_name: Elapsed Time...
+  editor_description: Triggers when the elapsed time has expired. This time is initialized when the trigger
+    is created. Timer is reset whenever trigger is sprung when trigger is 'persistant'. This is in 15
+    frame units.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,13,0,<Number>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_MISSION_TIMER_EXPIRED
+  kind: trigger-event
+  index: 14
+  editor_name: Mission Timer Expired
+  editor_description: Triggers when the global mission timer (as displayed on the screen) has reached
+    zero.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,14,0,0
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_NBUILDINGS_DESTROYED
+  kind: trigger-event
+  index: 15
+  editor_name: 'Destroyed, Buildings, #...'
+  editor_description: Triggers when the number of buildings, owned by the trigger's specified house, have
+    been destroyed.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,15,0,<Number>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_NUNITS_DESTROYED
+  kind: trigger-event
+  index: 16
+  editor_name: 'Destroyed, Units, #...'
+  editor_description: Triggers when the number of units, owned by the trigger's specified house, have
+    been destroyed.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,16,0,<Number>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_NOFACTORIES
+  kind: trigger-event
+  index: 17
+  editor_name: No Factories left
+  editor_description: Triggers when there are no factories left for the house specified in the trigger.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,17,0,0
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_EVAC_CIVILIAN
+  kind: trigger-event
+  index: 18
+  editor_name: Civilians Evacuated
+  editor_description: Triggers when civilians have been evacuated (left the map).
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,18,0,0
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_BUILD
+  kind: trigger-event
+  index: 19
+  editor_name: Build Building Type...
+  editor_description: When the trigger's house builds the building type specified, then this event will
+    spring.
+  need: NEED_STRUCTURE
+  parameters:
+  - name: Building type
+    type: building-type
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,19,0,<Building type>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_BUILD_UNIT
+  kind: trigger-event
+  index: 20
+  editor_name: Build Unit Type...
+  editor_description: When the trigger's house builds the unit type specified, then this event will spring.
+  need: NEED_UNIT
+  parameters:
+  - name: Unit type
+    type: unit-type
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,20,0,<Unit type>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_BUILD_INFANTRY
+  kind: trigger-event
+  index: 21
+  editor_name: Build Infantry Type...
+  editor_description: When the trigger's house builds the infantry type specified, then this event will
+    spring.
+  need: NEED_INFANTRY
+  parameters:
+  - name: Infantry type
+    type: infantry-type
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,21,0,<Infantry type>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_BUILD_AIRCRAFT
+  kind: trigger-event
+  index: 22
+  editor_name: Build Aircraft Type...
+  editor_description: When the trigger's house builds the aircraft type specified, then this event will
+    spring.
+  need: NEED_AIRCRAFT
+  parameters:
+  - name: Aircraft type
+    type: aircraft-type
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,22,0,<Aircraft type>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_LEAVES_MAP
+  kind: trigger-event
+  index: 23
+  editor_name: Leaves map (team)...
+  editor_description: Triggers when the specified team leaves the map. If the team is destroyed, it won't
+    trigger. If all but one member is destroyed and that last member leaves the map, it WILL spring.
+  need: NEED_TEAM
+  parameters:
+  - name: Team
+    type: team
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,23,1,<Team>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_ENTERS_ZONE
+  kind: trigger-event
+  index: 24
+  editor_name: Zone Entry by...
+  editor_description: Triggers when a unit of the specified house enters the same zone that this trigger
+    is located in. This trigger must be located in a cell and only a cell. <THEM = House of entering unit>
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,24,0,<House>
+  attaches_to: ATTACH_CELL|ATTACH_MAP
+  status: generated
+- id: TEVENT_CROSS_HORIZONTAL
+  kind: trigger-event
+  index: 25
+  editor_name: Crosses Horizontal Line...
+  editor_description: Triggers when a unit of the specified house crosses the horizontal line as indicated
+    by the location of this trigger. This trigger must be placed in a cell. <THEM = House of entering
+    unit>
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,25,0,<House>
+  attaches_to: ATTACH_CELL
+  status: generated
+- id: TEVENT_CROSS_VERTICAL
+  kind: trigger-event
+  index: 26
+  editor_name: Crosses Vertical Line...
+  editor_description: Triggers when a unit of the specified house crosses the vertical line as indicated
+    by the location of this trigger. This trigger must be placed in a cell. <THEM = House of entering
+    unit>
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,26,0,<House>
+  attaches_to: ATTACH_CELL
+  status: generated
+- id: TEVENT_GLOBAL_SET
+  kind: trigger-event
+  index: 27
+  editor_name: Global is set...
+  editor_description: Triggers when the specifed global (named in Globals.INI) is turned on.
+  need: NEED_GLOBAL
+  parameters:
+  - name: Global variable
+    type: global-variable
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,27,0,<Global variable>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_GLOBAL_CLEAR
+  kind: trigger-event
+  index: 28
+  editor_name: Global is clear...
+  editor_description: Triggers when the specified global (named in Globals.INI) is turned off.
+  need: NEED_GLOBAL
+  parameters:
+  - name: Global variable
+    type: global-variable
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,28,0,<Global variable>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_DESTROYED_ANY_X
+  kind: trigger-event
+  index: 29
+  editor_name: Destroyed by anything [not infiltrate]
+  editor_description: Triggers when attached object is destroyed, but not if it infiltrates a building/unit.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,29,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_LOW_POWER
+  kind: trigger-event
+  index: 30
+  editor_name: Power Low...
+  editor_description: Triggers when the specified house's power falls below 100% level.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,30,0,<House>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_BRIDGE_DESTROYED
+  kind: trigger-event
+  index: 31
+  editor_name: Bridge destroyed
+  editor_description: Triggers when the attached bridge is destroyed. A bridge is considered destroyed
+    when an impassable gap is created in the bridge.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,31,0,0
+  attaches_to: ATTACH_CELL
+  status: generated
+- id: TEVENT_BUILDING_EXISTS
+  kind: trigger-event
+  index: 32
+  editor_name: Building exists...
+  editor_description: Triggers when the building (owned by the house of this trigger) specified exists
+    on the map. This works for buildings that are preexisting or constructed by deploying.
+  need: NEED_STRUCTURE
+  parameters:
+  - name: Building type
+    type: building-type
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,32,0,<Building type>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_SELECTED
+  kind: trigger-event
+  index: 33
+  editor_name: Selected by player
+  editor_description: Triggers when the unit is selected by the player.  Use in single-player only.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,33,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_NEAR_WAYPOINT
+  kind: trigger-event
+  index: 34
+  editor_name: Comes near waypoint...
+  editor_description: Triggers when the object comes near the specified waypoint.
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,34,0,<Waypoint>
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ENEMY_IN_SPOTLIGHT
+  kind: trigger-event
+  index: 35
+  editor_name: Enemy In Spotlight...
+  editor_description: Triggers when an enemy unit enters the spotlight cast by the attached building.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,35,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_LOCAL_SET
+  kind: trigger-event
+  index: 36
+  editor_name: Local is set...
+  editor_description: Triggers when the specifed local is turned on.
+  need: NEED_LOCAL
+  parameters:
+  - name: Local variable
+    type: local-variable
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,36,0,<Local variable>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_LOCAL_CLEAR
+  kind: trigger-event
+  index: 37
+  editor_name: Local is clear...
+  editor_description: Triggers when the specified local is turned off.
+  need: NEED_LOCAL
+  parameters:
+  - name: Local variable
+    type: local-variable
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,37,0,<Local variable>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_FIRST_DAMAGED
+  kind: trigger-event
+  index: 38
+  editor_name: First damaged (combat only)
+  editor_description: Triggers when first suffering from combat damage from combat damage only.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,38,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ENTER_YELLOW
+  kind: trigger-event
+  index: 39
+  editor_name: Half health (combat only)
+  editor_description: Triggers when damaged to half health >from combat damage only.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,39,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ENTER_RED
+  kind: trigger-event
+  index: 40
+  editor_name: Quarter health (combat only)
+  editor_description: Triggers when damaged to quarter health from combat damage only.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,40,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_FIRST_DAMAGED_ANY
+  kind: trigger-event
+  index: 41
+  editor_name: First damaged (any source)
+  editor_description: Triggers when first suffering from combat damage from any source.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,41,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ENTER_YELLOW_ANY
+  kind: trigger-event
+  index: 42
+  editor_name: Half health (any source)
+  editor_description: Triggers when damaged to half health >from any source.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,42,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ENTER_RED_ANY
+  kind: trigger-event
+  index: 43
+  editor_name: Quarter health (any source)
+  editor_description: Triggers when damaged to quarter health from any source.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,43,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ATTACKED_BY
+  kind: trigger-event
+  index: 44
+  editor_name: Attacked by (house)...
+  editor_description: When attacked by some unit of specified house.
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,44,0,<House>
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_AMBIENT_LESS_THAN
+  kind: trigger-event
+  index: 45
+  editor_name: Ambient light <= ...
+  editor_description: Triggers when the ambient light drops below a certain level.  Use numbers between
+    0 and 100.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,45,0,<Number>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_AMBIENT_GREATER_THAN
+  kind: trigger-event
+  index: 46
+  editor_name: Ambient light >= ...
+  editor_description: Triggers when the ambient light rises above a certain level.  Use numbers between
+    0 and 100.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,46,0,<Number>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_GAME_TIME
+  kind: trigger-event
+  index: 47
+  editor_name: Elapsed Scenario Time...
+  editor_description: When time has elapsed since start of scenario.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,47,0,<Number>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_DESTROYED_ANY
+  kind: trigger-event
+  index: 48
+  editor_name: Destroyed by anything
+  editor_description: Triggers when destroyed by anything what-so-ever.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,48,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_PICKUP_CRATE
+  kind: trigger-event
+  index: 49
+  editor_name: Pickup Crate
+  editor_description: When crate is picked up object the trigger is attached to.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,49,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_PICKUP_CRATE_ANY
+  kind: trigger-event
+  index: 50
+  editor_name: Pickup Crate (any)
+  editor_description: When crate is picked up by any unit.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,50,0,0
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_RANDOM_TIME
+  kind: trigger-event
+  index: 51
+  editor_name: Random delay...
+  editor_description: Delays a random time between 50 and 150 percent of time specified.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,51,0,<Number>
+  attaches_to: ATTACH_GENERAL
+  status: generated
+- id: TEVENT_CREDITS_BELOW
+  kind: trigger-event
+  index: 52
+  editor_name: Credits below...
+  editor_description: Triggers when the house (for this trigger) credit total is below this specified
+    amount.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,52,0,<Number>
+  attaches_to: ATTACH_HOUSE
+  status: generated
+- id: TEVENT_PARALYZED
+  kind: trigger-event
+  index: 53
+  editor_name: Paralyzed
+  editor_description: Triggers when a object is paralyzed under EMP effect or web.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,53,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_ENEMY_IN_SPOTLIGHT_REPEATING
+  kind: trigger-event
+  index: 54
+  editor_name: Enemy In Spotlight... (repeating)
+  editor_description: Triggers when an enemy unit enters the spotlight cast by the attached building.
+    Unlike the other spotlight event, this one is re-tested every time the trigger is polled instead of
+    staying satisfied once it has fired.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,54,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+- id: TEVENT_LIMPED
+  kind: trigger-event
+  index: 55
+  editor_name: Limped
+  editor_description: Triggers when a object has been limped by a limpet drone.
+  need: NEED_NONE
+  parameters: []
+  ini_example:
+    section: '[Events]'
+    line: <TriggerID>=1,55,0,0
+  attaches_to: ATTACH_OBJECT
+  status: generated
+team_missions:
+- id: TMISSION_ATTACK
+  kind: team-mission
+  index: 0
+  editor_name: Attack...
+  editor_description: Attack some general target
+  need: NEED_QUARRY
+  parameters:
+  - name: Target category
+    type: quarry
+  status: generated
+- id: TMISSION_ATT_WAYPT
+  kind: team-mission
+  index: 1
+  editor_name: Attack Waypoint...
+  editor_description: Attack anything nearby the specified waypoint
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  status: generated
+- id: TMISSION_BERZERK
+  kind: team-mission
+  index: 2
+  editor_name: Go Berzerk
+  editor_description: Cyborg members of the team will go berzerk.
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_MOVE
+  kind: team-mission
+  index: 3
+  editor_name: Move to waypoint...
+  editor_description: Orders the team to move to a waypoint on the map
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  status: generated
+- id: TMISSION_MOVECELL
+  kind: team-mission
+  index: 4
+  editor_name: Move to Cell...
+  editor_description: Orders the team to move to a specific cell on the map
+  need: NEED_HEX_NUMBER
+  parameters:
+  - name: Cell offset
+    type: hex-number
+  status: generated
+- id: TMISSION_GUARD
+  kind: team-mission
+  index: 5
+  editor_name: Guard area (timer ticks)...
+  editor_description: Guard an area for a specified amount of time
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  status: generated
+- id: TMISSION_LOOP
+  kind: team-mission
+  index: 6
+  editor_name: 'Jump to line #...'
+  editor_description: Move to a new line number in the script.  Used for loops.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  status: generated
+- id: TMISSION_WIN
+  kind: team-mission
+  index: 7
+  editor_name: Player wins
+  editor_description: Duh
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_UNLOAD
+  kind: team-mission
+  index: 8
+  editor_name: Unload...
+  editor_description: Unloads all loaded units.  The command parameter specifies which units should stay
+    a part of the team, and which should be severed from the team.
+  need: NEED_SPLIT
+  parameters:
+  - name: Group
+    type: split-group
+  status: generated
+- id: TMISSION_DEPLOY
+  kind: team-mission
+  index: 9
+  editor_name: Deploy
+  editor_description: Causes all deployable units in the team to deploy
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_HOUND_DOG
+  kind: team-mission
+  index: 10
+  editor_name: Follow friendlies
+  editor_description: Causes the team to follow the nearest friendly unit
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_DO
+  kind: team-mission
+  index: 11
+  editor_name: Do this...
+  editor_description: Give all team members the specified mission
+  need: NEED_MISSION
+  parameters:
+  - name: Mission
+    type: mission
+  status: generated
+- id: TMISSION_SET_GLOBAL
+  kind: team-mission
+  index: 12
+  editor_name: Set global...
+  editor_description: Sets a global variable
+  need: NEED_GLOBAL
+  parameters:
+  - name: Global variable
+    type: global-variable
+  status: generated
+- id: TMISSION_IDLE_ANIM
+  kind: team-mission
+  index: 13
+  editor_name: Idle Anim...
+  editor_description: Causes team members to enter their idle animation
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  status: generated
+- id: TMISSION_LOAD
+  kind: team-mission
+  index: 14
+  editor_name: Load onto Transport
+  editor_description: Causes all units to load into transports, if able
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_SPY
+  kind: team-mission
+  index: 15
+  editor_name: Spy on bldg @ waypt...
+  editor_description: '**OBSOLETE**'
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  status: generated
+- id: TMISSION_PATROL
+  kind: team-mission
+  index: 16
+  editor_name: Patrol to waypoint...
+  editor_description: Move to a waypoint while scanning for enemies
+  need: NEED_WAYPOINT
+  parameters:
+  - name: Waypoint
+    type: waypoint
+  status: generated
+- id: TMISSION_SCRIPT
+  kind: team-mission
+  index: 17
+  editor_name: Change script...
+  editor_description: Causes the team to start using a new script
+  need: NEED_SCRIPT
+  parameters:
+  - name: Script
+    type: script
+  status: generated
+- id: TMISSION_TEAMCHANGE
+  kind: team-mission
+  index: 18
+  editor_name: Change team...
+  editor_description: Causes the team to switch team types
+  need: NEED_TEAM
+  parameters:
+  - name: Team
+    type: team
+  status: generated
+- id: TMISSION_PANIC
+  kind: team-mission
+  index: 19
+  editor_name: Panic
+  editor_description: Causes all units in the team to panic
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_CHANGE_HOUSE
+  kind: team-mission
+  index: 20
+  editor_name: Change house...
+  editor_description: All units in the team switch houses
+  need: NEED_HOUSE
+  parameters:
+  - name: House
+    type: house
+  status: generated
+- id: TMISSION_SCATTER
+  kind: team-mission
+  index: 21
+  editor_name: Scatter
+  editor_description: Tells all units to scatter
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_GOTO_SHROUD
+  kind: team-mission
+  index: 22
+  editor_name: Goto nearby shroud
+  editor_description: Causes units to flee to a shrouded cell
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_LOSE
+  kind: team-mission
+  index: 23
+  editor_name: Player loses
+  editor_description: Causes the player to lose
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_PLAY_SPEECH
+  kind: team-mission
+  index: 24
+  editor_name: Play speech...
+  editor_description: Plays the specified voice file
+  need: NEED_SPEECH
+  parameters:
+  - name: EVA speech
+    type: eva-speech
+  status: generated
+- id: TMISSION_PLAY_SOUND
+  kind: team-mission
+  index: 25
+  editor_name: Play sound...
+  editor_description: Plays the specified sound file
+  need: NEED_SOUND
+  parameters:
+  - name: Sound
+    type: sound
+  status: generated
+- id: TMISSION_PLAY_MOVIE
+  kind: team-mission
+  index: 26
+  editor_name: Play movie...
+  editor_description: Plays the specified movie file
+  need: NEED_MOVIE
+  parameters:
+  - name: Movie
+    type: movie
+  status: generated
+- id: TMISSION_PLAY_MUSIC
+  kind: team-mission
+  index: 27
+  editor_name: Play music...
+  editor_description: Plays the specified theme
+  need: NEED_THEME
+  parameters:
+  - name: Theme
+    type: theme
+  status: generated
+- id: TMISSION_REDUCE_TIBERIUM
+  kind: team-mission
+  index: 28
+  editor_name: Reduce tiberium
+  editor_description: Reduces the amount of tiberium around team members
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_BEGIN_PRODUCTION
+  kind: team-mission
+  index: 29
+  editor_name: Begin production
+  editor_description: Signals the owning house to begin production
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_FIRE_SALE
+  kind: team-mission
+  index: 30
+  editor_name: Fire sale
+  editor_description: Causes an AI house to sell all of its buildings and do a Braveheart
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_SELF_DESTRUCT
+  kind: team-mission
+  index: 31
+  editor_name: Self destruct
+  editor_description: Causes all team members to self destruct
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_ION_STORM_START
+  kind: team-mission
+  index: 32
+  editor_name: Ion storm start in...
+  editor_description: Causes an ion storm to begin at the specified time
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  status: generated
+- id: TMISSION_ION_STORM_END
+  kind: team-mission
+  index: 33
+  editor_name: Ion storn end
+  editor_description: Causes an ion storm to end
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_CENTER_VIEWPOINT
+  kind: team-mission
+  index: 34
+  editor_name: Center view on team (speed)...
+  editor_description: Center view on team (speed)...
+  need: NEED_VELOCITY
+  parameters:
+  - name: Velocity
+    type: camera-speed
+  status: generated
+- id: TMISSION_RESHROUD
+  kind: team-mission
+  index: 35
+  editor_name: Reshroud map
+  editor_description: Reshrouds the map
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_REVEAL
+  kind: team-mission
+  index: 36
+  editor_name: Reveal map
+  editor_description: Reveals the map
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_DESTROY_MEMBERS
+  kind: team-mission
+  index: 37
+  editor_name: Delete team members
+  editor_description: Delete all members from the team
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_CLEAR_GLOBAL
+  kind: team-mission
+  index: 38
+  editor_name: Clear global...
+  editor_description: Clears the specified global variable
+  need: NEED_GLOBAL
+  parameters:
+  - name: Global variable
+    type: global-variable
+  status: generated
+- id: TMISSION_SET_LOCAL
+  kind: team-mission
+  index: 39
+  editor_name: Set local...
+  editor_description: Sets the specified local variable
+  need: NEED_LOCAL
+  parameters:
+  - name: Local variable
+    type: local-variable
+  status: generated
+- id: TMISSION_CLEAR_LOCAL
+  kind: team-mission
+  index: 40
+  editor_name: Clear local...
+  editor_description: Clears the specified local variable
+  need: NEED_LOCAL
+  parameters:
+  - name: Local variable
+    type: local-variable
+  status: generated
+- id: TMISSION_UNPANIC
+  kind: team-mission
+  index: 41
+  editor_name: Unpanic
+  editor_description: Causes all team members to stop panicking
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_FORCE_FACING
+  kind: team-mission
+  index: 42
+  editor_name: Force facing...
+  editor_description: Forces team members to face a certain direction
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  status: generated
+- id: TMISSION_FULLY_LOADED
+  kind: team-mission
+  index: 43
+  editor_name: Wait till fully loaded
+  editor_description: Waits until all transports are full
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_UNLOAD_TRUCK
+  kind: team-mission
+  index: 44
+  editor_name: Truck unload
+  editor_description: Causes all trucks to unload their crates (ie, change imagery)
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_LOAD_TRUCK
+  kind: team-mission
+  index: 45
+  editor_name: Truck load
+  editor_description: Causes all trucks to load crates (ie, change imagery)
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_ATTACK_BUILDING_WITH_PROPERTY
+  kind: team-mission
+  index: 46
+  editor_name: Attack enemy building
+  editor_description: Attack a specific type of building with the specified property
+  need: NEED_BUILDING_ATTACK
+  parameters:
+  - name: Building type
+    type: building-type
+  - name: Target property
+    type: target-property
+  status: generated
+- id: TMISSION_MOVETO_BUILDING_WITH_PROPERTY
+  kind: team-mission
+  index: 47
+  editor_name: Moveto enemy building
+  editor_description: Move to a specific type of building with the specified property
+  need: NEED_BUILDING_ATTACK
+  parameters:
+  - name: Building type
+    type: building-type
+  - name: Target property
+    type: target-property
+  status: generated
+- id: TMISSION_SCOUT
+  kind: team-mission
+  index: 48
+  editor_name: Scout
+  editor_description: The team will scout the bases of the players that have not been scouted
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_SUCCESS
+  kind: team-mission
+  index: 49
+  editor_name: Success
+  editor_description: Record a team as having successfully accomplished its mission.  Used for AI trigger
+    weighting.  Put this at the end of every AITrigger script.
+  need: NEED_NONE
+  parameters: []
+  status: generated
+- id: TMISSION_FLASH
+  kind: team-mission
+  index: 50
+  editor_name: Flash
+  editor_description: Flashes a team for a period of team.
+  need: NEED_NUMBER
+  parameters:
+  - name: Number
+    type: integer
+  status: generated
+- id: TMISSION_PLAY_ANIM
+  kind: team-mission
+  index: 51
+  editor_name: Play Anim
+  editor_description: Plays an anim over every unit in the team.
+  need: NEED_ANIM
+  parameters:
+  - name: Animation
+    type: animation
+  - name: Loop count
+    type: integer
+  status: generated
+- id: TMISSION_TALK_BUBBLE
+  kind: team-mission
+  index: 52
+  editor_name: Talk Bubble
+  editor_description: Displays talk bubble over first unit in the team.
+  need: NEED_TALK_BUBBLE
+  parameters:
+  - name: Talk bubble
+    type: talk-bubble
+  status: generated

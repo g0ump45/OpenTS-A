@@ -1,0 +1,16 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import CompactIndexList from '../../../components/CompactIndexList.astro';
+import { scenarioSections } from '../../../lib/data';
+import { withBase } from '../../../lib/paths';
+const groups = scenarioSections();
+---
+
+<StarlightPage frontmatter={{ title: 'Scenario format', description: 'Named map sections and the OpenTS INI keys they accept.', tableOfContents: false }}>
+	<p class="ots-lede">Named sections and keys read from map files.</p>
+	<CompactIndexList items={groups.map((group) => ({
+		label: group.title,
+		href: withBase(`/mapping/scenario/${group.slug}/`),
+		code: true,
+	}))} />
+</StarlightPage>

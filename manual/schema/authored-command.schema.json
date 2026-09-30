@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/authored-command.schema.json",
+  "title": "Authored OpenTS command overlay",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["command_id"],
+  "properties": {
+    "command_id": { "type": "string", "minLength": 1 }
+  }
+}

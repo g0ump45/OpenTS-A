@@ -1,0 +1,216 @@
+# Removed settings live here only after source history establishes their removal.
+# They remain searchable and directly addressable, but active indexes omit them.
+- type: command
+  id: fixed:cancel-modem-operation
+  route: /commands/fixed-cancel-modem-operation/
+  search_aliases:
+    - Cancel modem operation
+  summary: Cancelled a dial, answer, or modem-command wait. Removed with modem and null-modem play.
+- type: command
+  id: launch:cd-path
+  route: /using/command-line/cd-path/
+  search_aliases:
+    - Local data path
+    - -CD
+  summary: Added the path following -CD to the local file-search list. The directories the game searches are now named by the data and user directory options and by the deployment's own search folders.
+  replacement:
+    type: format
+    id: opents-ini
+- type: key
+  id: ModemName
+  route: /keys/modemname/
+  search_aliases:
+    - ModemName
+  summary: Named the modem the serial connection used. Removed with modem and null-modem play.
+- type: key
+  id: Port
+  route: /keys/port/
+  search_aliases:
+    - Port
+  summary: Set the serial port address the modem answered on. Removed with modem and null-modem play.
+- type: key
+  id: IRQ
+  route: /keys/irq/
+  search_aliases:
+    - IRQ
+  summary: Set the interrupt the serial port used. Removed with modem and null-modem play.
+- type: key
+  id: Baud
+  route: /keys/baud/
+  search_aliases:
+    - Baud
+  summary: Set the speed of the serial connection. Removed with modem and null-modem play.
+- type: key
+  id: Compression
+  route: /keys/compression/
+  search_aliases:
+    - Compression
+  summary: Switched modem data compression on. Removed with modem and null-modem play.
+- type: key
+  id: ErrorCorrection
+  route: /keys/errorcorrection/
+  search_aliases:
+    - ErrorCorrection
+  summary: Switched modem error correction on. Removed with modem and null-modem play.
+- type: key
+  id: DialMethod
+  route: /keys/dialmethod/
+  search_aliases:
+    - DialMethod
+  summary: Chose tone or pulse dialing. Removed with modem and null-modem play.
+- type: key
+  id: InitStringIndex
+  route: /keys/initstringindex/
+  search_aliases:
+    - InitStringIndex
+  summary: Picked which stored initialization string the modem was sent. Removed with modem and null-modem play.
+- type: key
+  id: CallWaitStringIndex
+  route: /keys/callwaitstringindex/
+  search_aliases:
+    - CallWaitStringIndex
+  summary: Picked which call-waiting prefix was dialed. Removed with modem and null-modem play.
+- type: key
+  id: CallWaitString
+  route: /keys/callwaitstring/
+  search_aliases:
+    - CallWaitString
+  summary: Held the custom call-waiting prefix. Removed with modem and null-modem play.
+- type: key
+  id: PhoneIndex
+  route: /keys/phoneindex/
+  search_aliases:
+    - PhoneIndex
+  summary: Remembered the last phone book entry dialed. Removed with modem and null-modem play.
+- type: key
+  id: Socket
+  route: /keys/socket/
+  search_aliases:
+    - Socket
+  summary: Chose the IPX socket the game communicated over. Removed with IPX network play.
+- type: key
+  id: NetCard
+  route: /keys/netcard/
+  search_aliases:
+    - NetCard
+  summary: Chose which network adapter an IPX game played over. Removed with IPX network play.
+- type: key
+  id: DestNet
+  route: /keys/destnet/
+  search_aliases:
+    - DestNet
+  summary: Named a network across a bridge for IPX broadcasts to reach. Removed with IPX network play.
+- type: command
+  id: launch:destination-network
+  route: /using/command-line/destination-network/
+  search_aliases:
+    - -DESTNET
+    - IPX destination network
+  summary: Set the IPX bridge destination network at launch. Removed with IPX network play.
+- type: command
+  id: launch:socket
+  route: /using/command-line/socket/
+  search_aliases:
+    - -SOCKET
+    - IPX socket offset
+  summary: Selected an IPX socket offset at launch. Removed with IPX network play.
+- type: key
+  id: VideoBackBuffer
+  route: /keys/videobackbuffer/
+  search_aliases:
+    - VideoBackBuffer
+  summary: Stored a back buffer preference that nothing read. Removed with DirectDraw.
+- type: key
+  id: AllowHiResModes
+  route: /keys/allowhiresmodes/
+  search_aliases:
+    - AllowHiResModes
+  summary: Allowed resolutions above 800 pixels wide to be offered. Removed when the display options screen began offering every resolution the display reports.
+- type: key
+  id: AllowModeToggle
+  route: /keys/allowmodetoggle/
+  search_aliases:
+    - AllowModeToggle
+  summary: Switched resolution between the menus and play. Removed when the picture began being scaled into the window instead.
+- type: command
+  id: launch:high-color
+  route: /using/command-line/high-color/
+  search_aliases:
+    - "-16"
+    - High color
+  summary: Set a high-color flag at launch. Removed when it lost its last reader; the game always renders in high color.
+- type: command
+  id: launch:no-exception-trap
+  route: /using/command-line/no-exception-trap/
+  search_aliases:
+    - "-XE"
+    - Disable exception trap
+  summary: Left a crash to the debugger instead of the engine's own handler. Removed because a debugger now takes a crash first without being asked.
+- type: command
+  id: PageUser
+  route: /commands/pageuser/
+  search_aliases:
+    - Page User
+    - PageUser
+  summary: Paged another player through the Westwood Online chat service while a match was running. Removed with the online client.
+- type: key
+  id: AllowFind
+  route: /keys/allowfind/
+  search_aliases:
+    - AllowFind
+  summary: Let other Westwood Online players locate the account. Removed with the online client.
+- type: key
+  id: AllowPage
+  route: /keys/allowpage/
+  search_aliases:
+    - AllowPage
+  summary: Let other Westwood Online players page the account. Removed with the online client.
+- type: key
+  id: LangFilter
+  route: /keys/langfilter/
+  search_aliases:
+    - LangFilter
+  summary: Asked the Westwood Online chat service to filter offensive words out of the messages it delivered. Removed with the online client.
+- type: key
+  id: LobMusic
+  route: /keys/lobmusic/
+  search_aliases:
+    - LobMusic
+  summary: Played music while the player waited in the Westwood Online lobby. Removed with the online client.
+- type: key
+  id: ShowAll
+  route: /keys/showall/
+  search_aliases:
+    - ShowAll
+  summary: Listed games from every Westwood Online lobby rather than the player's own. Removed with the online client.
+- type: key
+  id: LastNickSlot
+  route: /keys/lastnickslot/
+  search_aliases:
+    - LastNickSlot
+  summary: Recorded which stored Westwood Online login slot a new login would overwrite. Removed with the online client.
+- type: key
+  id: Locale
+  route: /keys/locale/
+  search_aliases:
+    - Locale
+  summary: Named the Westwood Online location the player chatted from. Removed with the online client.
+- type: key
+  id: PreferredServer
+  route: /keys/preferredserver/
+  search_aliases:
+    - PreferredServer
+  summary: Named the Westwood Online server the login dialog opened on. Removed with the online client.
+- type: key
+  id: StoreNick
+  route: /keys/storenick/
+  search_aliases:
+    - StoreNick
+  summary: Kept the Westwood Online nickname and password between runs. Removed with the online client.
+- type: command
+  id: launch:messages
+  route: /using/command-line/messages/
+  search_aliases:
+    - "-MESSAGES"
+    - Disable network protection
+  summary: Let in-game chat from outside the match through. Removed when a line began to be accepted only from a seat of the match.

@@ -1,0 +1,14 @@
+---
+key: CrushSound
+scope: animtype
+label: Crushed sound
+no_effect: true
+see_also: [Crushable, Report]
+when_omitted:
+  kind: value
+  value: none
+---
+
+The sound is played by a crusher as it flattens its victim, and only after that victim has passed a [`Crushable`](/keys/crushable/#scope-animtype) test that an animation can never reach — an animation is never entered into a cell's occupier list, which is where every crush path looks for something to run over. No gameplay path reads the sound.
+
+An animation's own sound is [`Report`](/keys/report/#scope-animtype), read from the same `art.ini` section.

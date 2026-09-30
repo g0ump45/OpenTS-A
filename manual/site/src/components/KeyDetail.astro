@@ -1,0 +1,123 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Feedback from './Feedback.astro';
+import LifecycleHistory from './LifecycleHistory.astro';
+import RelatedResources from './RelatedResources.astro';
+import SpecBlock from './SpecBlock.astro';
+import {
+	allKeys,
+	applicabilitySummary,
+	requireKey,
+	whenOmittedForScope,
+	type KeyRecord,
+} from '../lib/data';
+import { historyHeading } from '../lib/lifecycle';
+import { withBase } from '../lib/paths';
+import { relatedResourcesFor } from '../lib/related';
+import { UI } from '../i18n/en.mjs';
+
+interface Props { record: KeyRecord }
+const { record } = Astro.props;
+const prose = (await getCollection('keyprose')).filter((entry) => entry.data.key === record.key);
+const keyLevel = prose.find((entry) => !entry.data.scope);
+const scopeProse = new Map<string, (typeof prose)[number]>();
+for (const entry of prose) if (entry.data.scope) scopeProse.set(entry.data.scope, entry);
+const KeyContent = keyLevel ? (await render(keyLevel)).Content : null;
+
+const scopeParts = await Promise.all(record.scopes.map(async (scope) => {
+	const entry = scopeProse.get(scope.route_id);
+	return {
+		scope,
+		entry,
+		label: entry?.data.label,
+		noEffect: entry?.data.no_effect ?? false,
+		whenOmitted: whenOmittedForScope(prose, record, scope),
+		Content: entry ? (await render(entry)).Content : null,
+		heading: entry?.data.label ?? `On ${applicabilitySummary(scope.applies_to, scope.level)}`,
+	};
+}));
+
+const multi = record.scopes.length > 1;
+const noEffect = (keyLevel?.data.no_effect ?? false) || (!multi && scopeParts.some((part) => part.noEffect));
+const seeAlso: string[] = Array.from(
+	new Set<string>(prose.flatMap((entry) => entry.data.see_also as string[])),
+);
+const keys = allKeys();
+const keyHref = (name: string, context: string) => withBase(`/keys/${requireKey(name, context).route_id}/`);
+const related = await relatedResourcesFor(
+	{ type: 'key', id: record.key },
+	[],
+	`INI key ${record.key}`,
+);
+const headings = [
+	...(multi ? scopeParts.map((part) => ({ depth: 2, slug: `scope-${part.scope.route_id}`, text: part.heading })) : []),
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: UI.related.title }] : []),
+	...historyHeading(await getCollection('changes'), { type: 'key', id: record.key }),
+];
+---
+
+<StarlightPage
+	frontmatter={{
+		title: record.key,
+		description: keyLevel?.data.summary ?? UI.key.pageDescription(record.key),
+		tableOfContents: headings.length > 0 ? undefined : false,
+	}}
+	headings={headings}
+>
+	<LifecycleHistory reference={{ type: 'key', id: record.key }} showHistory={false} />
+	{keyLevel?.data.summary && <p class="ots-lede">{keyLevel.data.summary}</p>}
+
+	{noEffect && (
+		<div class="ots-aside ots-aside-danger">
+			<div class="ots-aside-title">{UI.key.noEffectTitle}</div>
+			<p>{UI.key.noEffectBody}</p>
+		</div>
+	)}
+
+	{record.case_collides_with && (
+		<div class="ots-aside ots-aside-warn">
+			<div class="ots-aside-title">{UI.key.caseTitle}</div>
+			<p>
+				{UI.key.caseIntro}{' '}
+				{record.case_collides_with.map((other, index) => (
+					<>{index > 0 && ', '}<a href={keyHref(other, `Case collision for ${record.key}`)}><code>{other}</code></a></>
+				))}{' '}
+				{record.case_collides_with.length === 1 ? 'is a different setting' : 'are different settings'}.
+			</p>
+		</div>
+	)}
+
+	{scopeParts.map((part) => (
+		<section class="ots-key-scope">
+			{multi && <h2 id={`scope-${part.scope.route_id}`}>{part.heading}</h2>}
+			<SpecBlock scope={part.scope} label={multi ? part.label : undefined} noEffect={noEffect || part.noEffect} whenOmitted={part.whenOmitted} />
+			{part.Content && <part.Content />}
+		</section>
+	))}
+
+	{KeyContent && <KeyContent />}
+
+	<RelatedResources resources={related} />
+
+
+	{seeAlso.length > 0 && (
+		<div class="ots-seealso">
+			<strong>{UI.key.seeAlso}</strong>{' \u2014 '}{' '}
+			{seeAlso.map((reference, index) => (
+				<>{index > 0 && ', '}{keys.has(reference)
+					? <a href={keyHref(reference, `See-also link from ${record.key}`)}><code>{reference}</code></a>
+					: reference.startsWith('guide:')
+						? <a href={withBase(`/guides/${reference.slice(6)}/`)}>{reference.slice(6)}</a>
+						: <a href={withBase(`/systems/${reference.slice(7)}/`)}>{reference.slice(7)}</a>}</>
+			))}
+		</div>
+	)}
+
+	<LifecycleHistory reference={{ type: 'key', id: record.key }} showBadges={false} />
+	<Feedback title={record.key} path={`/keys/${record.route_id}/`} />
+</StarlightPage>
+
+<style is:global>
+	main h1 { font-family: var(--sl-font-system-mono, ui-monospace, Consolas, monospace); letter-spacing: -0.01em; }
+</style>

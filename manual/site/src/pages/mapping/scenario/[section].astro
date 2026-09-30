@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Feedback from '../../../components/Feedback.astro';
+import ReferenceTable from '../../../components/ReferenceTable.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { scenarioSections } from '../../../lib/data';
+import { referenceTableRows } from '../../../lib/reference-rows';
+
+export function getStaticPaths() {
+	return scenarioSections().map((group) => ({ params: { section: group.slug }, props: { group } }));
+}
+const { group } = Astro.props;
+const prose = await getCollection('keyprose');
+const rows = referenceTableRows(group.rows, prose, {
+	context: `Scenario section ${group.title}`,
+	searchContext: (row) => row.scope.applies_to.join(' '),
+});
+---
+
+<StarlightPage frontmatter={{ title: group.title, description: `INI keys accepted in the ${group.title} map section.`, tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.mapping, href: '/mapping/' },
+		{ label: UI.navigation.scenario, href: '/mapping/scenario/' },
+		{ label: group.file ?? group.title, code: group.file !== undefined },
+	]} />
+	<p class="ots-lede">Keys read from {group.title}.</p>
+	<ReferenceTable rows={rows} />
+	<Feedback title={`Scenario ${group.title}`} path={`/mapping/scenario/${group.slug}/`} />
+</StarlightPage>

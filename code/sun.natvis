@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+
+    <Type Name="VectorClass&lt;*&gt;">
+        <!-- $T1 = T. Every slot up to VectorMax is live. -->
+        <Intrinsic Name="size" Expression="Vector == 0 ? 0 : VectorMax" />
+        <DisplayString>{{ size={size()} }}</DisplayString>
+        <Expand>
+            <Item Name="[data_ptr]" ExcludeView="simple">Vector</Item>
+            <ArrayItems>
+                <Size>size()</Size>
+                <ValuePointer>Vector</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+    <Type Name="DynamicVectorClass&lt;*&gt;">
+        <!-- $T1 = T. Live elements occupy [0, ActiveCount); VectorMax is capacity. -->
+        <Intrinsic Name="size" Expression="Vector == 0 ? 0 : ActiveCount" />
+        <Intrinsic Name="capacity" Expression="Vector == 0 ? 0 : VectorMax" />
+        <DisplayString>{{ size={size()} }}</DisplayString>
+        <Expand>
+            <Item Name="[capacity]" ExcludeView="simple">capacity()</Item>
+            <Item Name="[growth_step]" ExcludeView="simple">GrowthStep</Item>
+            <Item Name="[data_ptr]" ExcludeView="simple">Vector</Item>
+            <!-- iterate only the active prefix, not the full VectorMax capacity -->
+            <ArrayItems>
+                <Size>size()</Size>
+                <ValuePointer>Vector</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+    <Type Name="TPoint2D&lt;*&gt;">
+        <DisplayString>{{ X={X}, Y={Y} }}</DisplayString>
+        <Expand>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="TPoint3D&lt;*&gt;">
+        <DisplayString>{{ X={X}, Y={Y}, Z={Z} }}</DisplayString>
+        <Expand>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+            <Item Name="[Z]">Z</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="TRect&lt;*&gt;">
+        <Intrinsic Name="isValid" Expression="Width &gt; 0 &amp;&amp; Height &gt; 0" />
+        <DisplayString>{{ X={X}, Y={Y}, Width={Width}, Height={Height} }}</DisplayString>
+        <Expand>
+            <Item Name="IsValid">isValid()</Item>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+            <Item Name="[W]">Width</Item>
+            <Item Name="[H]">Height</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="xCell">
+        <DisplayString>{{ X={X}, Y={Y} }}</DisplayString>
+        <Expand>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="xCoordinate">
+        <DisplayString>{{ X={X}, Y={Y}, Z={Z} }}</DisplayString>
+        <Expand>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+            <Item Name="[Z]">Z</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="Cell">
+        <!-- X,Y inherited from TPoint2D<short> -->
+        <DisplayString>{{ X={X}, Y={Y} }}</DisplayString>
+        <Expand>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="Coord">
+        <!-- X,Y,Z inherited from Point3D (TPoint3D<int>) -->
+        <DisplayString>{{ X={X}, Y={Y}, Z={Z} }}</DisplayString>
+        <Expand>
+            <Item Name="[X]">X</Item>
+            <Item Name="[Y]">Y</Item>
+            <Item Name="[Z]">Z</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="GenericNode">
+        <!-- sentinel/unlinked when either link is null (Is_Valid requires both non-null) -->
+        <DisplayString Condition="NextNode == 0 || PrevNode == 0">{{ sentinel/unlinked }}</DisplayString>
+        <DisplayString>{{ node }}</DisplayString>
+        <Expand>
+            <Item Name="[next]">NextNode</Item>
+            <Item Name="[prev]">PrevNode</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="GenericList">
+        <!-- empty when head sentinel links directly to tail sentinel -->
+        <DisplayString Condition="FirstNode.NextNode == &amp;LastNode">{{ empty }}</DisplayString>
+        <DisplayString>{{ GenericList }}</DisplayString>
+        <Expand>
+            <CustomListItems MaxItemsPerView="200">
+                <Variable Name="it" InitialValue="FirstNode.NextNode" />
+                <Variable Name="size" InitialValue="0" />
+                <!-- count pass: stop at tail sentinel (NextNode==0) or corrupt node -->
+                <Loop>
+                    <Break Condition="it == 0 || it->NextNode == 0 || it->PrevNode == 0" />
+                    <Break Condition="size > 100000" />
+                    <Exec>size++</Exec>
+                    <Exec>it = it->NextNode</Exec>
+                </Loop>
+                <Item Name="[size]">size</Item>
+                <!-- display pass: reset iterator, walk real nodes only -->
+                <Exec>it = FirstNode.NextNode</Exec>
+                <Loop>
+                    <Break Condition="it == 0 || it->NextNode == 0 || it->PrevNode == 0" />
+                    <Item>it</Item>
+                    <Exec>it = it->NextNode</Exec>
+                </Loop>
+            </CustomListItems>
+        </Expand>
+    </Type>
+
+    <Type Name="Node&lt;*&gt;">
+        <!-- $T1 is the pointer type T per the interface casts -->
+        <DisplayString Condition="NextNode == 0 || PrevNode == 0">{{ sentinel/unlinked }}</DisplayString>
+        <DisplayString>{{ node }}</DisplayString>
+        <Expand>
+            <Item Name="[next]">($T1)NextNode</Item>
+            <Item Name="[prev]">($T1)PrevNode</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="List&lt;*&gt;">
+        <DisplayString Condition="FirstNode.NextNode == &amp;LastNode">{{ empty }}</DisplayString>
+        <DisplayString>{{ List }}</DisplayString>
+        <Expand>
+            <CustomListItems MaxItemsPerView="200">
+                <Variable Name="it" InitialValue="FirstNode.NextNode" />
+                <Variable Name="size" InitialValue="0" />
+                <!-- count pass -->
+                <Loop>
+                    <Break Condition="it == 0 || it->NextNode == 0 || it->PrevNode == 0" />
+                    <Break Condition="size > 100000" />
+                    <Exec>size++</Exec>
+                    <Exec>it = it->NextNode</Exec>
+                </Loop>
+                <Item Name="[size]">size</Item>
+                <!-- display pass: cast each node to T to match List<T>::First semantics -->
+                <Exec>it = FirstNode.NextNode</Exec>
+                <Loop>
+                    <Break Condition="it == 0 || it->NextNode == 0 || it->PrevNode == 0" />
+                    <Item>($T1)it</Item>
+                    <Exec>it = it->NextNode</Exec>
+                </Loop>
+            </CustomListItems>
+        </Expand>
+    </Type>
+
+    <Type Name="IndexClass&lt;*,*&gt;">
+        <!-- $T1 = INDEX, $T2 = T. Valid entries occupy IndexTable[0..IndexCount). -->
+        <DisplayString Condition="IndexCount == 0">{{ empty }}</DisplayString>
+        <DisplayString>{{ count={IndexCount}{IsSorted ? L"" : L" (unsorted)",sb} }}</DisplayString>
+        <Expand>
+            <Item Name="[count]">IndexCount</Item>
+            <Item Name="[capacity]" ExcludeView="simple">IndexSize</Item>
+            <Item Name="[sorted]" ExcludeView="simple">IsSorted</Item>
+            <Item Name="[archive]" ExcludeView="simple">Archive</Item>
+            <!-- each entry is a NodeElement{ ID, Data }; show the array of live nodes -->
+            <ArrayItems>
+                <Size>IndexCount</Size>
+                <ValuePointer>IndexTable</ValuePointer>
+            </ArrayItems>
+        </Expand>
+    </Type>
+
+    <Type Name="IndexClass&lt;*,*&gt;::NodeElement">
+        <!-- $T1 = INDEX, $T2 = T per the enclosing template -->
+        <DisplayString>{{ {ID} =&gt; {Data} }}</DisplayString>
+        <Expand>
+            <Item Name="[id]">ID</Item>
+            <Item Name="[data]">Data</Item>
+        </Expand>
+    </Type>
+
+    <Type Name="Wstring">
+        <DisplayString Condition="str == 0">{{ null }}</DisplayString>
+        <DisplayString>{str,s}</DisplayString>
+        <StringView Condition="str != 0">str,s</StringView>
+        <Expand>
+            <Item Name="[value]" Condition="str != 0">str,s</Item>
+            <Item Name="[ptr]" ExcludeView="simple">str</Item>
+            <!-- derive length by walking to the null terminator -->
+            <CustomListItems Condition="str != 0" MaxItemsPerView="1">
+                <Variable Name="len" InitialValue="0" />
+                <Variable Name="p" InitialValue="str" />
+                <!-- advance until null; cap guards against an unterminated buffer -->
+                <Loop>
+                    <Break Condition="*p == 0" />
+                    <Break Condition="len > 1000000" />
+                    <Exec>len++</Exec>
+                    <Exec>p++</Exec>
+                </Loop>
+                <Item Name="[length]">len</Item>
+            </CustomListItems>
+        </Expand>
+    </Type>
+
+</AutoVisualizer>

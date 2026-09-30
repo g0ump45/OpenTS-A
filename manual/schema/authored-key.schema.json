@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/authored-key.schema.json",
+  "title": "Authored INI key frontmatter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["key"],
+  "properties": {
+    "key": { "type": "string", "minLength": 1 },
+    "scope": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "label": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "see_also": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "no_effect": { "type": "boolean" },
+    "when_omitted": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value"],
+          "properties": {
+            "kind": { "const": "value" },
+            "value": { "type": "string" },
+            "note": { "type": "string", "minLength": 1 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "note"],
+          "properties": {
+            "kind": { "enum": ["computed", "inherited", "unchanged", "context-dependent"] },
+            "note": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Feedback from './Feedback.astro';
+import LifecycleHistory from './LifecycleHistory.astro';
+import {
+	entityHref,
+	entityLabel,
+	type TombstoneRecord,
+} from '../lib/data';
+import { withBase } from '../lib/paths';
+import { UI } from '../i18n/en.mjs';
+
+interface Props { record: TombstoneRecord }
+const { record } = Astro.props;
+const replacementHref = record.replacement ? entityHref(record.replacement) : undefined;
+---
+
+<StarlightPage frontmatter={{ title: record.id, description: record.summary, tableOfContents: false }}>
+	<LifecycleHistory reference={{ type: record.type, id: record.id }} showHistory={false} />
+	<p class="ots-lede">{record.summary}</p>
+
+	<div class="ots-aside ots-aside-danger">
+		<div class="ots-aside-title">{UI.tombstone.title}</div>
+		<p>{UI.tombstone.body}</p>
+	</div>
+
+	<div class="ots-spec">
+		<div class="ots-spec-head">Historical identity</div>
+		<dl>
+			<dt>Entity type</dt><dd>{record.type}</dd>
+			<dt>Stable ID</dt><dd><code>{record.id}</code></dd>
+			{record.search_aliases.length > 0 && (
+				<>
+					<dt>{UI.tombstone.aliases}</dt>
+					<dd>{record.search_aliases.map((alias) => <code>{alias}</code>)}</dd>
+				</>
+			)}
+			{record.replacement && (
+				<>
+					<dt>{UI.tombstone.replacement}</dt>
+					<dd>{replacementHref
+						? <a href={withBase(replacementHref)}><code>{entityLabel(record.replacement)}</code></a>
+						: <code>{entityLabel(record.replacement)}</code>}</dd>
+				</>
+			)}
+		</dl>
+	</div>
+
+	<LifecycleHistory reference={{ type: record.type, id: record.id }} showBadges={false} />
+	<Feedback title={`${record.id} (removed)`} path={record.route} />
+</StarlightPage>

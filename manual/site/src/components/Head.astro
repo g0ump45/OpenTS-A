@@ -1,0 +1,67 @@
+---
+import { getCollection } from 'astro:content';
+import DefaultHead from '@astrojs/starlight/components/Head.astro';
+import { commandByRoute } from '../lib/commands';
+import { effectForKey, keyByRoute, referenceFamily } from '../lib/data';
+import { allFormats } from '../lib/formats';
+import {
+	logicalSearchPath,
+	SEARCH_FILTERS,
+	searchScopesForPath,
+} from '../lib/search-scopes.mjs';
+import { UI } from '../i18n/en.mjs';
+
+const base = import.meta.env.BASE_URL;
+const pathname = logicalSearchPath(Astro.url.pathname, base);
+const detailId = (prefix: string) => {
+	const match = pathname.match(new RegExp(`^/${prefix}/([^/]+)/?$`));
+	return match ? decodeURIComponent(match[1]) : undefined;
+};
+
+const keyId = detailId('keys');
+const key = keyId ? keyByRoute(keyId) : undefined;
+const keyFamilies = key
+	? [...new Set(key.scopes.map((scope) => referenceFamily(scope)))]
+	: [];
+/* A key page's search result carries the same inert marker its reference rows
+   do, so a reader can tell a dead setting from a live one without opening it. */
+const keyEffect = key ? effectForKey(await getCollection('keyprose'), key) : 'used';
+const keyEffectMarker = keyEffect === 'partial'
+	? UI.noEffect.badgePartial
+	: keyEffect === 'none' ? UI.noEffect.badge : undefined;
+
+const systemId = detailId('systems');
+const guideId = detailId('guides');
+const usingId = detailId('using');
+const internalId = detailId('internals');
+const [system, guide, using, internal] = await Promise.all([
+	systemId ? getCollection('systems').then((rows) => rows.find((row) => row.id === systemId)) : undefined,
+	guideId ? getCollection('guides').then((rows) => rows.find((row) => row.id === guideId)) : undefined,
+	usingId ? getCollection('using').then((rows) => rows.find((row) => row.id === usingId)) : undefined,
+	internalId ? getCollection('internals').then((rows) => rows.find((row) => row.id === internalId)) : undefined,
+]);
+
+/* /commands/fixed-controls/ is an index page, not a command detail route. */
+const commandDetailId = detailId('commands');
+const commandId = (commandDetailId !== 'fixed-controls' ? commandDetailId : undefined)
+	?? pathname.match(/^\/using\/command-line\/([^/]+)\/?$/)?.[1];
+const command = commandId ? commandByRoute(decodeURIComponent(commandId)) : undefined;
+const format = (pathname.startsWith('/formats/') || pathname.startsWith('/mapping/'))
+	? [...allFormats().values()].find((record) => record.route === pathname)
+	: undefined;
+const scopes = searchScopesForPath(pathname, {
+	keyFamilies,
+	systemCategory: system?.data.category,
+	guideCategory: guide?.data.category,
+	usingCategory: using?.data.category,
+	commandKind: command?.kind,
+	commandAudience: command?.audience,
+	formatKind: format?.kind,
+	internalCategory: internal?.data.category,
+});
+---
+
+<DefaultHead />
+{scopes.views.map((view) => <meta data-pagefind-filter={`${SEARCH_FILTERS.view}:${view}`} />)}
+{scopes.areas.map((area) => <meta data-pagefind-filter={`${SEARCH_FILTERS.area}:${area}`} />)}
+{keyEffectMarker && <meta data-pagefind-meta={`${UI.noEffect.searchMeta}:${keyEffectMarker}`} />}

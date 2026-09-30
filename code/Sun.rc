@@ -1,0 +1,201 @@
+/******************************************************************************
+ *                               O P E N  T S
+ ******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2025 Electronic Arts Inc.
+ * Copyright 2026 OpenTS contributors
+ *
+ * Contains material derived from Electronic Arts source code.
+ * Modified by OpenTS contributors, 2026.
+ * EA's GPLv3 Section 7 additional terms and supplemental warranty
+ * disclaimers apply; see LICENSE.md.
+ *****************************************************************************/
+
+//Microsoft Developer Studio generated resource script.
+//
+#include	"resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include	<winres.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+// The version resource reports the project version and the commit it was built from.
+#include	"opents_version.h"
+#include	"opents_build.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(65001)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE MOVEABLE PURE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE MOVEABLE PURE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE MOVEABLE PURE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION OPENTS_RC_FILEVERSION
+ PRODUCTVERSION OPENTS_RC_FILEVERSION
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG | OPENTS_RC_PRERELEASE_FLAG
+#else
+ FILEFLAGS OPENTS_RC_PRERELEASE_FLAG
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "Comments", "\0"
+            VALUE "CompanyName", "OpenTS contributors\0"
+            VALUE "FileDescription", "OpenTS engine for Command & Conquer: Tiberian Sun\0"
+            VALUE "FileVersion", OPENTS_VERSION "\0"
+            VALUE "InternalName", "Sun\0"
+            VALUE "LegalCopyright", "Copyright © 2000 Westwood Studios, © 2026 OpenTS contributors\0"
+            VALUE "LegalTrademarks", "Command & Conquer is a trademark of Westwood Studios\0"
+            VALUE "OriginalFilename", "Game.exe\0"
+            VALUE "PrivateBuild", OPENTS_BUILD_DESCRIPTION "\0"
+            VALUE "ProductName", "Command & Conquer : Tiberian Sun\0"
+            VALUE "ProductVersion", OPENTS_VERSION_DISPLAY "\0"
+            VALUE "SpecialBuild", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SUN                 ICON    DISCARDABLE     "resources/app-icon/opents.ico"
+IDI_CHECKED             ICON    DISCARDABLE     "checked.ico"
+IDI_UNCHECKED           ICON    DISCARDABLE     "unchecked.ico"
+IDI_GREYED              ICON    DISCARDABLE     "greyed.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TEMPLATE DIALOGEX 0, 0, 200, 100
+STYLE WS_POPUP
+EXSTYLE WS_EX_TRANSPARENT
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "This is a dialog of known size that is used to resize other dialogs.",
+                    IDC_STATIC,17,23,154,23,WS_DISABLED,WS_EX_TRANSPARENT
+    LTEXT           "Please don't change the size, and leave it as a popup, not a child!!!!",
+                    IDC_STATIC,14,60,157,25,WS_DISABLED,WS_EX_TRANSPARENT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MODE MENU DISCARDABLE 
+BEGIN
+    POPUP "&Mode"
+    BEGIN
+        MENUITEM "640 x 400",                   IDM_MODE_640X400, CHECKED
+        MENUITEM "640 x 480",                   IDM_MODE_640X480
+        MENUITEM "800 x 600",                   IDM_MODE_800X600
+        MENUITEM "1024 x 768",                  IDM_MODE_1024X768
+        MENUITEM "1280 x 1024",                 IDM_MODE_1280X1024
+        MENUITEM SEPARATOR
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_TEMPLATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 85
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CURSOR1             CURSOR  DISCARDABLE     "CURSOR1.cur"
+IDC_CURSOR2             CURSOR  DISCARDABLE     "CURSOR2.cur"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

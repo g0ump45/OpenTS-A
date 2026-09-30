@@ -1,0 +1,107 @@
+---
+import { getCollection, render } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Feedback from './Feedback.astro';
+import LifecycleHistory from './LifecycleHistory.astro';
+import RelatedResources from './RelatedResources.astro';
+import {
+	enumForParameterType,
+	type LifecycleEntityType,
+	triggersByKind,
+	type TriggerRecord,
+} from '../lib/data';
+import { historyHeading } from '../lib/lifecycle';
+import { withBase } from '../lib/paths';
+import { relatedResourcesFor } from '../lib/related';
+import { UI } from '../i18n/en.mjs';
+
+interface Props { record: TriggerRecord }
+const { record } = Astro.props;
+
+/* Caveats and valid values name keys, values and section headings constantly, so
+   they carry inline code. Nothing else in them is Markdown: a link belongs in the
+   body or in related, where a reader can see where it goes. */
+const codeSpans = (text: string) => text.split(/`([^`]+)`/g)
+	.map((part, index) => ({ code: index % 2 === 1, text: part }))
+	.filter((part) => part.text !== '');
+const entityType = record.kind.slice(0, -1) as Extract<LifecycleEntityType, 'action' | 'event' | 'mission'>;
+const authored = (await getCollection('scripting')).find(
+	(entry) => entry.data.type === entityType && entry.data.id === record.id,
+);
+const rendered = authored ? await render(authored) : null;
+const AuthoredContent = rendered?.Content ?? null;
+const title = `${record.index} \u2014 ${authored?.data.title ?? record.editor_name ?? record.id}`;
+const attachmentNames = typeof record.attaches_to === 'string'
+	? record.attaches_to.split('|')
+		.map((flag) => flag.trim().replace('ATTACH_', '').toLowerCase().replaceAll('_', ' '))
+		.filter((name) => name !== '')
+	: [];
+const attachment = attachmentNames.length > 1
+	? `${attachmentNames.slice(0, -1).join(', ')} or ${attachmentNames[attachmentNames.length - 1]}`
+	: attachmentNames[0] ?? 'none';
+const siblings = triggersByKind(record.kind);
+const position = siblings.findIndex((entry) => entry.id === record.id);
+const previous = position > 0 ? siblings[position - 1] : null;
+const next = position + 1 < siblings.length ? siblings[position + 1] : null;
+const summary = authored?.data.summary ?? record.editor_description;
+const description = summary ?? UI.scripting.pageDescription(record.index, record.id);
+const related = await relatedResourcesFor(
+	{ type: entityType, id: record.id },
+	authored?.data.related ?? [],
+	`${entityType} ${record.id}`,
+);
+const pageHeadings = [
+	...(rendered?.headings ?? []),
+	...(authored && authored.data.valid_values.length > 0 ? [{ depth: 2, slug: 'valid-values', text: 'Valid values' }] : []),
+	...(related.length > 0 ? [{ depth: 2, slug: 'related-resources', text: 'Related resources' }] : []),
+	...historyHeading(await getCollection('changes'), { type: entityType, id: record.id }),
+];
+---
+
+<StarlightPage frontmatter={{ title, description, tableOfContents: pageHeadings.length > 0 ? undefined : false }} headings={pageHeadings}>
+	<LifecycleHistory reference={{ type: entityType, id: record.id }} showHistory={false} />
+	{summary && <p class="ots-lede">{summary}</p>}
+	<div class="ots-spec"><div class="ots-spec-head">{UI.scripting.editorData}</div><dl>
+		<dt>Numeric ID</dt><dd><code>{record.index}</code></dd>
+		<dt>Engine ID</dt><dd data-pagefind-weight="10"><code>{record.id}</code></dd>
+		<dt>Editor name</dt><dd>{record.editor_name ?? <span class="ots-unknown">{UI.omission.notDocumented}</span>}</dd>
+		<dt>Need token</dt><dd><code>{record.need}</code></dd>
+		<dt>Parameters</dt><dd>
+			{record.parameters.length ? (
+				<ol class="ots-parameter-list">
+					{record.parameters.map((parameter) => {
+						const linkedEnum = enumForParameterType(parameter.type);
+						return <li><strong>{parameter.name}</strong>{linkedEnum ? <a href={withBase(`/reference/enums/${linkedEnum.slug}/`)}><code>{parameter.type}</code></a> : <code>{parameter.type}</code>}</li>;
+					})}
+				</ol>
+			) : UI.scripting.none}
+		</dd>
+		{record.kind !== 'missions' && <><dt>Attachment</dt><dd>{attachment}</dd></>}
+	</dl></div>
+
+	{record.ini_example && (
+		<div class="ots-spec ots-ini-example" aria-label={UI.scripting.iniExample}>
+			<div class="ots-spec-head">{UI.scripting.iniExample}</div>
+			<pre><code>{`${record.ini_example.section}\n${record.ini_example.line}`}</code></pre>
+		</div>
+	)}
+
+	{authored && (
+		<>
+			{AuthoredContent && <AuthoredContent />}
+			{authored.data.valid_values.length > 0 && <><h2 id="valid-values">Valid values</h2><ul class="ots-scripting-values">{authored.data.valid_values.map((value) => <li>{codeSpans(value).map((part) => part.code ? <code>{part.text}</code> : part.text)}</li>)}</ul></>}
+			{authored.data.caveats.length > 0 && <div class="ots-aside ots-aside-warn ots-scripting-caveats"><div class="ots-aside-title">Caveats</div><ul>{authored.data.caveats.map((caveat) => <li>{codeSpans(caveat).map((part) => part.code ? <code>{part.text}</code> : part.text)}</li>)}</ul></div>}
+
+		</>
+	)}
+
+	<RelatedResources resources={related} />
+	<LifecycleHistory reference={{ type: entityType, id: record.id }} showBadges={false} />
+
+	<nav class="ots-detail-nav" aria-label="Adjacent entries">
+		{previous ? <a href={withBase(`/mapping/${record.kind}/${previous.route_id}/`)}>&larr; {previous.index}: {previous.editor_name}</a> : <span />}
+		<a href={withBase(`/mapping/${record.kind}/`)}>All {record.kind}</a>
+		{next ? <a href={withBase(`/mapping/${record.kind}/${next.route_id}/`)}>{next.index}: {next.editor_name} &rarr;</a> : <span />}
+	</nav>
+	<Feedback title={title} path={`/mapping/${record.kind}/${record.route_id}/`} />
+</StarlightPage>

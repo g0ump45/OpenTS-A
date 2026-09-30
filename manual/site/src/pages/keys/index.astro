@@ -1,0 +1,17 @@
+---
+import { withBase } from '../../lib/paths';
+const destination = withBase('/reference/all/');
+---
+<!doctype html>
+<html lang="en" data-pagefind-ignore>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="robots" content="noindex" />
+		<meta http-equiv="refresh" content={`0; url=${destination}`} />
+		<link rel="canonical" href={destination} />
+		<title>All INI keys</title>
+	</head>
+	<body>
+		<p><a href={destination}>Browse all INI keys</a></p>
+	</body>
+</html>

@@ -1,0 +1,22 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkButton, LinkCard } from '@astrojs/starlight/components';
+import { UI } from '../../i18n/en.mjs';
+import { withBase } from '../../lib/paths';
+---
+
+<StarlightPage frontmatter={{ title: UI.navigation.reference, description: 'OpenTS INI settings grouped by name, file, section, and object type.', tableOfContents: false }}>
+	<p class="ots-lede">INI settings grouped by name, file, section, and object type.</p>
+	<div class="not-content ots-reference-primary-action">
+		<LinkButton href={withBase('/reference/all/')} icon="magnifier">{UI.navigation.allKeys}</LinkButton>
+	</div>
+	<h2>Files</h2>
+	<CardGrid>
+		<LinkCard title="Rules" href={withBase('/reference/rules/')} description="Gameplay object settings and named global sections." />
+		<LinkCard title="Art" href={withBase('/reference/art/')} description="Artwork and presentation settings." />
+		<LinkCard title="Other INI files" href={withBase('/reference/other/')} description="Options, campaign, sound, and music files." />
+		<LinkCard title="Map seed files" href={withBase('/reference/map-seeds/')} description="Random-map generation settings read from .SED files." />
+		<LinkCard title="Theater controls" href={withBase('/reference/theater-controls/')} description="Global terrain indexes and TileSet definitions." />
+		<LinkCard title="Enums" href={withBase('/reference/enums/')} description="Fixed values accepted by INI settings and scripting parameters." />
+	</CardGrid>
+</StarlightPage>

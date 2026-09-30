@@ -1,0 +1,85 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import CompactIndexList from '../../../components/CompactIndexList.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { OTHER_INI_FILES, REFERENCE_PAGES, referenceSections } from '../../../lib/data';
+import { withBase } from '../../../lib/paths';
+
+export async function getStaticPaths() {
+	return Object.keys(REFERENCE_PAGES).map((page) => ({ params: { page } }));
+}
+
+const requestedPage = Astro.params.page;
+if (!requestedPage || !(requestedPage in REFERENCE_PAGES)) {
+	throw new Error(`Unknown reference family: ${requestedPage ?? '<missing>'}`);
+}
+const page = requestedPage as keyof typeof REFERENCE_PAGES;
+const meta = REFERENCE_PAGES[page];
+const groups = referenceSections(page);
+const typeGroups = groups.filter((group) => !group.literal && !group.behavior);
+const behaviorGroups = groups.filter((group) => group.behavior);
+const sectionGroups = groups.filter((group) => group.literal);
+const otherFiles = page === 'other'
+	? OTHER_INI_FILES.map((file) => ({ ...file, groups: groups.filter((group) => group.fileId === file.id) }))
+	: [];
+---
+
+<StarlightPage frontmatter={{ title: meta.title, description: meta.blurb, tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: meta.title },
+	]} />
+	<p class="ots-lede">{meta.blurb}</p>
+
+	{page === 'other' ? (
+		<div class="ots-file-reference-list">
+			{otherFiles.map((file) => (
+				<section class="ots-file-reference">
+					<h2 id={file.id}><code>{file.label}</code>{' \u2014 '}{file.title}</h2>
+					<p class="ots-lede ots-compact">{file.purpose}</p>
+					<p class="ots-file-loading"><strong>Load behavior:</strong> {file.loadBehavior}</p>
+					<CompactIndexList items={file.groups.map((group) => ({
+						label: group.navTitle ?? group.title,
+						href: withBase(`/reference/${page}/${group.slug}/`),
+						code: group.literal,
+					}))} />
+				</section>
+			))}
+		</div>
+	) : (
+		<>
+			{typeGroups.length > 0 && (
+				<section class="ots-hub-section">
+					<h2 id="types">{UI.navigation.objectTypes}</h2>
+					<CompactIndexList items={typeGroups.map((group) => ({
+						label: group.title,
+						href: withBase(`/reference/${page}/${group.slug}/`),
+					}))} />
+				</section>
+			)}
+
+			{behaviorGroups.length > 0 && (
+				<section class="ots-hub-section">
+					<h2 id="behavior">{UI.navigation.behaviorSettings}</h2>
+					<p class="ots-compact">Settings grouped by difficulty level, mission behavior, and global rules rather than by object type.</p>
+					<CompactIndexList items={behaviorGroups.map((group) => ({
+						label: group.navTitle ?? group.title,
+						href: withBase(`/reference/${page}/${group.slug}/`),
+					}))} />
+				</section>
+			)}
+
+			{sectionGroups.length > 0 && (
+				<section class="ots-hub-section">
+					<h2 id="sections">{UI.navigation.namedSections}</h2>
+					<CompactIndexList items={sectionGroups.map((group) => ({
+						label: group.title,
+						href: withBase(`/reference/${page}/${group.slug}/`),
+						code: true,
+					}))} />
+				</section>
+			)}
+		</>
+	)}
+</StarlightPage>

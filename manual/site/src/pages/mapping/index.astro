@@ -1,0 +1,36 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+import { UI } from '../../i18n/en.mjs';
+import { withBase } from '../../lib/paths';
+---
+
+<StarlightPage frontmatter={{ title: 'Mapping', description: 'OpenTS map sections, trigger records, scripting, and AI team definitions.', tableOfContents: false }}>
+	<p class="ots-lede">Map sections, trigger records, and AI team definitions.</p>
+
+	<section class="ots-hub-section">
+		<h2>Scenario data</h2>
+		<CardGrid>
+			<LinkCard title={UI.navigation.scenario} href={withBase('/mapping/scenario/')} description="Named map sections and their accepted keys." />
+		</CardGrid>
+	</section>
+
+	<section class="ots-hub-section">
+		<h2>Triggers</h2>
+		<CardGrid>
+			<LinkCard title={UI.navigation.events} href={withBase('/mapping/events/')} description="Conditions observed by triggers." />
+			<LinkCard title={UI.navigation.actions} href={withBase('/mapping/actions/')} description="Actions executed by triggers." />
+		</CardGrid>
+	</section>
+
+	<section class="ots-hub-section">
+		<h2>AI teams</h2>
+		<CardGrid>
+			<LinkCard title={UI.navigation.teamTypes} href={withBase('/mapping/team-types/')} description="Ownership, recruitment, waypoints, and behavior flags." />
+			<LinkCard title={UI.navigation.taskForces} href={withBase('/mapping/task-forces/')} description="Reusable unit compositions." />
+			<LinkCard title={UI.navigation.scripts} href={withBase('/mapping/scripts/')} description="Ordered mission lists." />
+			<LinkCard title={UI.navigation.missions} href={withBase('/mapping/missions/')} description="Commands accepted by team scripts." />
+			<LinkCard title={UI.navigation.aiTriggers} href={withBase('/mapping/ai-triggers/')} description="Weighted conditions that create AI teams." />
+		</CardGrid>
+	</section>
+</StarlightPage>

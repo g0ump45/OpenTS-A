@@ -1,0 +1,34 @@
+---
+import type { CommandRecord } from '../lib/commands';
+import { commandAvailabilityLabel, commandKindLabel } from '../lib/commands';
+
+interface Props { record: CommandRecord }
+const { record } = Astro.props;
+---
+
+<div class="ots-spec">
+	<div class="ots-spec-head">Command</div>
+	<dl>
+		<dt>Type</dt><dd>{commandKindLabel(record.kind)}</dd>
+		{record.kind === 'registered' && <>
+			<dt>Identifier</dt><dd data-pagefind-weight="10"><code>{record.id}</code></dd>
+			<dt>Category</dt><dd>{record.category}</dd>
+			<dt>Binding</dt><dd>{record.forced_binding ? <><kbd>{record.forced_binding}</kbd> <small>Reclaimed after <code>KEYBOARD.INI</code> is loaded.</small></> : <>Configured in <code>KEYBOARD.INI</code></>}</dd>
+		</>}
+		{record.kind === 'fixed' && <>
+			<dt>Binding</dt><dd>{record.bindings.map((binding) => <kbd>{binding}</kbd>)}</dd>
+			<dt>Context</dt><dd>{record.context}</dd>
+		</>}
+		{record.kind === 'launch' && <>
+			<dt>Syntax</dt><dd><code>{record.syntax}</code></dd>
+			{record.aliases?.length && <><dt>Aliases</dt><dd>{record.aliases.map((alias) => <code>{alias}</code>)}</dd></>}
+		</>}
+		<dt>Audience</dt><dd>{record.audience[0].toUpperCase() + record.audience.slice(1)}</dd>
+		<dt>Availability</dt><dd>{commandAvailabilityLabel(record.availability)}</dd>
+	</dl>
+</div>
+
+<style>
+	.ots-spec dd :global(kbd),
+	.ots-spec dd :global(code) { margin-inline-end: 0.35rem; }
+</style>

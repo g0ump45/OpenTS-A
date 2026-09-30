@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import CompactIndexList from '../../../components/CompactIndexList.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { withBase } from '../../../lib/paths';
+
+const enums = (await getCollection('enums')).sort((a, b) => a.data.title.localeCompare(b.data.title));
+---
+
+<StarlightPage frontmatter={{ title: 'Enums', description: 'Fixed engine value sets accepted by INI settings and scripting parameters.', tableOfContents: false }}>
+	<Breadcrumb crumbs={[
+		{ label: UI.navigation.reference, href: '/reference/' },
+		{ label: UI.navigation.enums },
+	]} />
+	<p class="ots-lede">Fixed engine value sets used by INI settings and scripting parameters.</p>
+	<CompactIndexList items={enums.map((entry) => ({ label: entry.data.title, href: withBase(`/reference/enums/${entry.data.slug}/`) }))} />
+</StarlightPage>

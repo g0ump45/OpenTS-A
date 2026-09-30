@@ -1,0 +1,8 @@
+// Microsoft Developer Studio generated Help ID include file.
+// Used by Language.rc
+//
+#define HIDC_PREVIEW_FRAME              0x80bc0468    // IDD_MPLAYER_HOST
+#define HIDC_DROPSHIP_LIST              0x80d105c3    // IDD_DROPSHIP_LIMITS
+#define HIDC_IPX_NETCARD                0x80d705d4    // IDD_OPT_IPX
+#define HIDC_PROGRESS_BAR_FRAME         0x80e80639    // IDD_PROGRESS_WAIT
+#define HIDC_STOPMAKINGTHISFILE         0x0BADBEEF    // IDD_

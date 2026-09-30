@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://opents.example/manual/authored-system.schema.json",
+  "title": "Authored system frontmatter",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "title",
+    "summary",
+    "category",
+    "keys"
+  ],
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "enum": [
+        "combat-targeting",
+        "units-movement",
+        "buildings-economy",
+        "weapons-projectiles",
+        "superweapons-special",
+        "ai-teams",
+        "maps-scenarios",
+        "interface-controls",
+        "rendering-presentation",
+        "audio-speech",
+        "multiplayer-networking",
+        "tools-diagnostics"
+      ]
+    },
+    "keys": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "related": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/reference" }
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": { "enum": ["key", "action", "event", "mission", "format", "enum", "system", "command", "guide", "using", "internal"] },
+        "id": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "type": { "not": { "const": "key" } } } },
+          "then": { "not": { "required": ["scope"] } }
+        }
+      ]
+    }
+  }
+}

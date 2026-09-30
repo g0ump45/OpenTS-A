@@ -1,0 +1,310 @@
+/*******************************************************************************
+ *                                O P E N  T S
+ *******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2025 Electronic Arts Inc.
+ * Copyright 2026 OpenTS contributors
+ *
+ * Contains material derived from Electronic Arts source code.
+ * Modified by OpenTS contributors, 2026.
+ * EA's GPLv3 Section 7 additional terms and supplemental warranty
+ * disclaimers apply; see LICENSE.md.
+ ******************************************************************************/
+
+#pragma once
+
+/// Names and defines derived from FA2/FS
+
+/**********************************************************************
+**	The overlays are enumerated here. An overlay functions similarly to
+**	a transparent icon. It is placed over the terrain but usually falls
+**	"under" buildings, trees, and units.
+*/
+enum OverlayType {
+	OVERLAY_NONE=-1,
+
+	OVERLAY_SANDBAG_WALL,		// Piled sandbags.
+	OVERLAY_CYCLONE_WALL,		// Chain-link fence.
+	OVERLAY_BRICK_WALL,			// Solid concrete wall.
+	OVERLAY_BARBWIRE_WALL,		// Barbed-wire wall.
+	OVERLAY_WOOD_WALL,			// Wooden fence.
+	OVERLAY_GOLD1,
+	OVERLAY_GOLD2,
+	OVERLAY_GOLD3,
+	OVERLAY_GOLD4,
+	OVERLAY_GEMS1,
+	OVERLAY_GEMS2,
+	OVERLAY_GEMS3,
+	OVERLAY_GEMS4,
+	OVERLAY_V12,				// Haystacks
+	OVERLAY_V13,				// Haystack
+	OVERLAY_V14,				// Wheat field
+	OVERLAY_V15,				// Fallow field
+	OVERLAY_V16,				// Corn field
+	OVERLAY_V17,				// Celery field
+	OVERLAY_V18,				// Potato field
+	/// OVERLAY_FLAG_SPOT,		// Flag start location.
+	OVERLAY_WOOD_CRATE,			// Wooden goodie crate.
+	OVERLAY_STEEL_CRATE,		// Steel goodie crate.
+	OVERLAY_FENCE,				// New fangled fence.
+	OVERLAY_WATER_CRATE,		// Water goodie crate.
+
+	/*
+	 * TS additions here.
+	 */
+
+	OVERLAY_BRIDGE1,			/// These two are the same art.
+	OVERLAY_BRIDGE2,
+
+	OVERLAY_NOD_WALL,
+
+	OVERLAY_LARGE_TIBERIUM01,
+	OVERLAY_LARGE_TIBERIUM02,
+	OVERLAY_LARGE_TIBERIUM03,
+	OVERLAY_LARGE_TIBERIUM04,
+	OVERLAY_LARGE_TIBERIUM05,
+	OVERLAY_LARGE_TIBERIUM06,
+	OVERLAY_LARGE_TIBERIUM07,
+	OVERLAY_LARGE_TIBERIUM08,
+	OVERLAY_LARGE_TIBERIUM09,
+	OVERLAY_LARGE_TIBERIUM10,
+	OVERLAY_LARGE_TIBERIUM11,
+	OVERLAY_LARGE_TIBERIUM12,
+
+	OVERLAY_TRAIN_01,
+	OVERLAY_TRAIN_02,
+	OVERLAY_TRAIN_03,
+	OVERLAY_TRAIN_04,
+	OVERLAY_TRAIN_05,
+	OVERLAY_TRAIN_06,
+	OVERLAY_TRAIN_07,
+	OVERLAY_TRAIN_08,
+	OVERLAY_TRAIN_09,
+	OVERLAY_TRAIN_10,
+	OVERLAY_TRAIN_11,
+	OVERLAY_TRAIN_12,
+	OVERLAY_TRAIN_13,
+	OVERLAY_TRAIN_14,
+	OVERLAY_TRAIN_15,
+	OVERLAY_TRAIN_16,
+
+	OVERLAY_TRAIN_TUNNEL_01,
+	OVERLAY_TRAIN_TUNNEL_02,
+	OVERLAY_TRAIN_TUNNEL_03,
+	OVERLAY_TRAIN_TUNNEL_04,
+
+	OVERLAY_RAIL_BRIDGE1,
+	OVERLAY_RAIL_BRIDGE2,
+
+	OVERLAY_CRATE_01,
+	OVERLAY_CRATE_02,
+	OVERLAY_CRATE_03,
+	OVERLAY_CRATE_04,
+
+	OVERLAY_CRATE_0A,
+	OVERLAY_CRATE_0B,
+	OVERLAY_CRATE_0C,
+
+	OVERLAY_DRUM_01,
+	OVERLAY_DRUM_02,
+
+	OVERLAY_PALLET_01,
+	OVERLAY_PALLET_02,
+	OVERLAY_PALLET_03,
+	OVERLAY_PALLET_04,
+
+	OVERLAY_LOWBRIDGE_01,
+	OVERLAY_LOWBRIDGE_02,
+	OVERLAY_LOWBRIDGE_03,
+	OVERLAY_LOWBRIDGE_04,
+	OVERLAY_LOWBRIDGE_05,
+	OVERLAY_LOWBRIDGE_06,
+	OVERLAY_LOWBRIDGE_07,
+	OVERLAY_LOWBRIDGE_08,
+	OVERLAY_LOWBRIDGE_09,
+	OVERLAY_LOWBRIDGE_10,
+	OVERLAY_LOWBRIDGE_11,
+	OVERLAY_LOWBRIDGE_12,
+	OVERLAY_LOWBRIDGE_13,
+	OVERLAY_LOWBRIDGE_14,
+	OVERLAY_LOWBRIDGE_15,
+	OVERLAY_LOWBRIDGE_16,
+	OVERLAY_LOWBRIDGE_17,
+	OVERLAY_LOWBRIDGE_18,
+	OVERLAY_LOWBRIDGE_19,
+	OVERLAY_LOWBRIDGE_20,
+	OVERLAY_LOWBRIDGE_21,
+	OVERLAY_LOWBRIDGE_22,
+	OVERLAY_LOWBRIDGE_23,
+	OVERLAY_LOWBRIDGE_24,
+	OVERLAY_LOWBRIDGE_25,
+	OVERLAY_LOWBRIDGE_26,
+	OVERLAY_LOWBRIDGE_27,
+	OVERLAY_LOWBRIDGE_28,
+
+	OVERLAY_TIBERIUM01,
+	OVERLAY_TIBERIUM02,
+	OVERLAY_TIBERIUM03,
+	OVERLAY_TIBERIUM04,
+	OVERLAY_TIBERIUM05,
+	OVERLAY_TIBERIUM06,
+	OVERLAY_TIBERIUM07,
+	OVERLAY_TIBERIUM08,
+	OVERLAY_TIBERIUM09,
+	OVERLAY_TIBERIUM10,
+	OVERLAY_TIBERIUM11,
+	OVERLAY_TIBERIUM12,
+	OVERLAY_TIBERIUM13,
+	OVERLAY_TIBERIUM14,
+	OVERLAY_TIBERIUM15,
+	OVERLAY_TIBERIUM16,
+	OVERLAY_TIBERIUM17,
+	OVERLAY_TIBERIUM18,
+	OVERLAY_TIBERIUM19,
+	OVERLAY_TIBERIUM20,
+
+	OVERLAY_LOWBRIDGE_FAKE_END1,
+	OVERLAY_LOWBRIDGE_FAKE_END2,
+	OVERLAY_LOWBRIDGE_FAKE_END3,
+	OVERLAY_LOWBRIDGE_FAKE_END4,
+
+	OVERLAY_VEINS,
+
+	OVERLAY_TIBERIUM2_01,
+	OVERLAY_TIBERIUM2_02,
+	OVERLAY_TIBERIUM2_03,
+	OVERLAY_TIBERIUM2_04,
+	OVERLAY_TIBERIUM2_05,
+	OVERLAY_TIBERIUM2_06,
+	OVERLAY_TIBERIUM2_07,
+	OVERLAY_TIBERIUM2_08,
+	OVERLAY_TIBERIUM2_09,
+	OVERLAY_TIBERIUM2_10,
+	OVERLAY_TIBERIUM2_11,
+	OVERLAY_TIBERIUM2_12,
+	OVERLAY_TIBERIUM2_13,
+	OVERLAY_TIBERIUM2_14,
+	OVERLAY_TIBERIUM2_15,
+	OVERLAY_TIBERIUM2_16,
+	OVERLAY_TIBERIUM2_17,
+	OVERLAY_TIBERIUM2_18,
+	OVERLAY_TIBERIUM2_19,
+	OVERLAY_TIBERIUM2_20,
+
+	OVERLAY_TIBERIUM3_01,
+	OVERLAY_TIBERIUM3_02,
+	OVERLAY_TIBERIUM3_03,
+	OVERLAY_TIBERIUM3_04,
+	OVERLAY_TIBERIUM3_05,
+	OVERLAY_TIBERIUM3_06,
+	OVERLAY_TIBERIUM3_07,
+	OVERLAY_TIBERIUM3_08,
+	OVERLAY_TIBERIUM3_09,
+	OVERLAY_TIBERIUM3_10,
+	OVERLAY_TIBERIUM3_11,
+	OVERLAY_TIBERIUM3_12,
+	OVERLAY_TIBERIUM3_13,
+	OVERLAY_TIBERIUM3_14,
+	OVERLAY_TIBERIUM3_15,
+	OVERLAY_TIBERIUM3_16,
+	OVERLAY_TIBERIUM3_17,
+	OVERLAY_TIBERIUM3_18,
+	OVERLAY_TIBERIUM3_19,
+	OVERLAY_TIBERIUM3_20,
+
+	OVERLAY_VEINHOLE,
+
+	OVERLAY_SAND_ROCK_01,
+	OVERLAY_SAND_ROCK_02,
+	OVERLAY_SAND_ROCK_03,
+	OVERLAY_SAND_ROCK_04,
+	OVERLAY_SAND_ROCK_05,
+
+	OVERLAY_CLEAR_ROCK_01,
+	OVERLAY_CLEAR_ROCK_02,
+	OVERLAY_CLEAR_ROCK_03,
+	OVERLAY_CLEAR_ROCK_04,
+	OVERLAY_CLEAR_ROCK_05,
+
+	OVERLAY_VEINHOLE_DUMMY,
+
+	OVERLAY_CRATE,
+
+	OVERLAY_COUNT,
+	OVERLAY_FIRST=0,
+
+	/*
+	**	Misc.
+	*/
+	OVERLAY_GDI_WALL = OVERLAY_BRICK_WALL,
+
+	OVERLAY_TRAIN_FIRST = OVERLAY_TRAIN_01,
+	OVERLAY_TRAIN_LAST = OVERLAY_TRAIN_16,
+
+	OVERLAY_LOWBRIDGE_FIRST = OVERLAY_LOWBRIDGE_01,
+	OVERLAY_LOWBRIDGE_LAST = OVERLAY_LOWBRIDGE_28,
+};
+
+
+/*
+ *   OverlayData encodings.
+ *
+ *   CellClass::OverlayData is a single byte whose meaning depends on which
+ *   overlay currently occupies the cell:
+ *
+ *      Walls    -- The damage stage is stored in the high nibble and the
+ *                  connection frame (which neighboring walls this one links
+ *                  to) is stored in the low nibble.
+ *      Tiberium -- The growth stage. Zero is freshly seeded; the value grows
+ *                  up to OVERLAYDATA_TIBERIUM_MAX, at which point the tiberium
+ *                  is able to spread to adjacent cells.
+ *      Veins    -- Values below OVERLAYDATA_FIRST_SOLID_VEIN are growing (thin)
+ *                  veins; values at or above it are fully grown "solid" veins.
+ *      Bridges  -- A frame index into the bridge shape set (see the bridge
+ *                  data values below).
+ */
+
+/*
+ * Wall OverlayData: high nibble is the damage stage, low nibble is the
+ * connection frame. One full damage stage is OVERLAYDATA_WALL_DAMAGE_STAGE.
+ */
+#define OVERLAYDATA_WALL_FRAME_MASK		0x0F
+#define OVERLAYDATA_WALL_DAMAGE_SHIFT	4
+#define OVERLAYDATA_WALL_DAMAGE_STAGE	(1 << OVERLAYDATA_WALL_DAMAGE_SHIFT)
+
+/*
+ * Tiberium OverlayData: growth stage (0 = freshly seeded). At the maximum
+ * stage the tiberium is fully grown and eligible to spread.
+ */
+#define OVERLAYDATA_TIBERIUM_MAX		11
+
+/*
+ * Vein OverlayData. Below OVERLAYDATA_FIRST_SOLID_VEIN the vein is still
+ * growing (thin); at or above it the vein is fully grown ("solid"). The first
+ * solid values are flat veins; ramp veins begin at OVERLAYDATA_FIRST_RAMP_VEIN.
+ */
+#define OVERLAYDATA_FIRST_SOLID_VEIN	48
+#define OVERLAYDATA_FIRST_RAMP_VEIN		(OVERLAYDATA_FIRST_SOLID_VEIN + 3)
+
+/*
+ * Bridge OverlayData: a frame index into the bridge shape set. The east-west
+ * bridge frames occupy 0..8 and the north-south frames occupy 9..17.
+ */
+#define OVERLAYDATA_BRIDGE_EW_FULL1			0
+#define OVERLAYDATA_BRIDGE_EW_FULL2			1
+#define OVERLAYDATA_BRIDGE_EW_FULL3			2
+#define OVERLAYDATA_BRIDGE_EW_FULL4			3
+#define OVERLAYDATA_BRIDGE_EW_TRANSITION1	4
+#define OVERLAYDATA_BRIDGE_EW_TRANSITION2	5
+#define OVERLAYDATA_BRIDGE_EW_DAMAGED		6
+#define OVERLAYDATA_BRIDGE_EW_END1			7
+#define OVERLAYDATA_BRIDGE_EW_END2			8
+#define OVERLAYDATA_BRIDGE_NS_FULL1			9
+#define OVERLAYDATA_BRIDGE_NS_FULL2			10
+#define OVERLAYDATA_BRIDGE_NS_FULL3			11
+#define OVERLAYDATA_BRIDGE_NS_FULL4			12
+#define OVERLAYDATA_BRIDGE_NS_TRANSITION1	13
+#define OVERLAYDATA_BRIDGE_NS_TRANSITION2	14
+#define OVERLAYDATA_BRIDGE_NS_DAMAGED		15
+#define OVERLAYDATA_BRIDGE_NS_END1			16
+#define OVERLAYDATA_BRIDGE_NS_END2			17

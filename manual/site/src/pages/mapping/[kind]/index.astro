@@ -1,0 +1,51 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import Breadcrumb from '../../../components/Breadcrumb.astro';
+import Feedback from '../../../components/Feedback.astro';
+import FormatPage from '../../../components/FormatPage.astro';
+import ScriptingIndex from '../../../components/ScriptingIndex.astro';
+import TombstoneDetail from '../../../components/TombstoneDetail.astro';
+import { UI } from '../../../i18n/en.mjs';
+import { tombstones, triggersByKind, type TombstoneRecord } from '../../../lib/data';
+import { allFormats } from '../../../lib/formats';
+import { requireRouteParam, requireRouteTail, withBase } from '../../../lib/paths';
+
+export async function getStaticPaths() {
+	const tablePaths = ['actions', 'events', 'missions'].map((kind) => ({ params: { kind }, props: {} }));
+	const formats = await getCollection('formats');
+	const formatPaths = formats.flatMap((entry) => {
+		const format = allFormats().get(entry.data.format_id);
+		if (!format || !format.route.startsWith('/mapping/')) return [];
+		return [{ params: { kind: requireRouteTail(format.route, `Format ${format.format_id}`) }, props: { format: entry } }];
+	});
+	const removed = tombstones().filter((record) => record.type === 'format' && record.route.startsWith('/mapping/')).map((record) => ({
+		params: { kind: requireRouteTail(record.route, `Format tombstone ${record.id}`) },
+		props: { removed: record },
+	}));
+	return [...tablePaths, ...formatPaths, ...removed];
+}
+
+const kind = requireRouteParam(Astro.params.kind, 'kind');
+const { format, removed } = Astro.props as { format?: CollectionEntry<'formats'>; removed?: TombstoneRecord };
+const TABLES: Record<string, { title: string; noun: string; blurb: string }> = {
+	actions: { title: 'Trigger actions', noun: 'actions', blurb: 'Actions executed after a trigger\'s events are satisfied.' },
+	events: { title: 'Trigger events', noun: 'events', blurb: 'Conditions observed by triggers.' },
+	missions: { title: 'Team script missions', noun: 'missions', blurb: 'Commands accepted by numbered team-script lines.' },
+};
+const table = TABLES[kind];
+if (!table && !format && !removed) throw new Error(`Unknown Mapping route: ${kind}`);
+const triggerRows = table ? triggersByKind(kind) : [];
+---
+
+{removed ? <TombstoneDetail record={removed} /> : format ? <FormatPage entry={format} /> : table && (
+	<StarlightPage frontmatter={{ title: table.title, description: table.blurb, tableOfContents: false }}>
+		<Breadcrumb crumbs={[
+			{ label: UI.navigation.mapping, href: '/mapping/' },
+			{ label: table.title },
+		]} />
+		<p class="ots-lede">{table.blurb}</p>
+		<ScriptingIndex rows={triggerRows.map((row) => ({ index: row.index, name: row.editor_name ?? row.id, summary: row.editor_description ?? '', parameters: row.parameters, href: withBase(`/mapping/${kind}/${row.route_id}/`) }))} noun={table.noun} />
+		<Feedback title={table.title} path={`/mapping/${kind}/`} />
+	</StarlightPage>
+)}

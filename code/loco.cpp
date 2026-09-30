@@ -1,0 +1,555 @@
+/*******************************************************************************
+ *                                O P E N  T S
+ *******************************************************************************
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ * Copyright 2026 OpenTS contributors
+ *
+ * See LICENSE.md for applicable additional terms and warranty disclaimers.
+ ******************************************************************************/
+
+#include "always.h"
+
+#include "loco.h"
+
+#include "_map.h"
+#include "_tactica.h"
+#include "cell.h"
+#include "classfactory.h"
+#include "coord.h"
+#include "foot.h"
+#include "globals.h"
+#include "map.h"
+#include "saveload.h"
+#include "savestream.h"
+#include "swizzle.h"
+#include "tactical.h"
+
+#include "fire.hh"
+#include "move.hh"
+#include "visual.hh"
+#include "zgrad.hh"
+
+#include <cassert>
+#include <typeinfo>
+
+
+
+/// <summary>
+/// Constructs a locomotor that is not yet attached to anything.
+/// The locomotor comes up powered and with no object to drive.
+/// </summary>
+/// <remarks>Link_To_Object must be called before the locomotor can be asked to do anything
+/// useful.</remarks>
+LocomotionClass::LocomotionClass(void) :
+	LinkedTo(NULL),
+	IsPowered(true),
+	Dirty(true)
+{
+}
+
+
+/// <summary>
+/// Destroys the locomotor and severs the link to the object it drove.
+/// </summary>
+LocomotionClass::~LocomotionClass(void)
+{
+	LinkedTo = NULL;
+}
+
+
+/// <summary>
+/// Attaches this locomotor to the object it is to drive.
+/// This is called as the object is being created, and every other service the locomotor
+/// offers depends on it having been called first.
+/// </summary>
+/// <param name="pointer">Pointer to the foot class object this locomotor will carry about.</param>
+void LocomotionClass::Link_To_Object(void *pointer)
+{
+	LinkedTo = (FootClass *)pointer;
+}
+
+
+/// <summary>
+/// Builds the transform matrix to draw the object with.
+/// The base locomotor merely turns the object to its body facing, snapped to one of the
+/// facings the voxel art is drawn at. Locomotors that tilt, bank, or bob their object
+/// will override this routine.
+/// </summary>
+/// <param name="key">Optional cache key for the voxel renderer, which the facing is folded
+/// into. May be NULL, and a key of -1 means the drawing is not to be cached.</param>
+/// <returns>Returns with the matrix to transform the object by.</returns>
+Matrix3D LocomotionClass::Draw_Matrix(int *key)
+{
+	Matrix3D draw_matrix(true);
+
+	draw_matrix.Rotate_Z(LinkedTo->PrimaryFacing.Current().As_Radian32());
+
+	if (key && *key != -1) {
+		*key *= 32;
+		*key |= LinkedTo->PrimaryFacing.Current().As_Dir32();
+	}
+	return(draw_matrix);
+}
+
+
+/// <summary>
+/// Builds the transform matrix to draw the object's shadow with.
+/// A shadow lies flat on the ground, so the object's facing is applied on top of the
+/// slope of the cell it is currently over.
+/// </summary>
+/// <param name="key">Optional cache key for the voxel renderer, which the slope and facing are
+/// folded into. May be NULL, and a key of -1 means the shadow is not to be cached.</param>
+/// <returns>Returns with the matrix to transform the shadow by.</returns>
+Matrix3D LocomotionClass::Shadow_Matrix(int *key)
+{
+	int ramp = Map[LinkedTo->Get_Coord()].Ramp;
+
+	Matrix3D draw_matrix(Get_Slope_Matrix(ramp));
+	draw_matrix.Rotate_Z(LinkedTo->PrimaryFacing.Current().As_Radian32());
+
+	if (key && *key != -1) {
+		*key = 32 * (ramp + (*key << 6));
+		*key |= LinkedTo->PrimaryFacing.Current().As_Dir32();
+	}
+	return(draw_matrix);
+}
+
+
+/// <summary>
+/// Fetches the pixel offset to draw the object's shadow at.
+/// The shadow belongs on the ground rather than with the object, so the offset carries it
+/// down by however far the object is flying above the terrain.
+/// </summary>
+/// <returns>Returns with the pixel offset to shift the shadow by when drawing.</returns>
+Point2D LocomotionClass::Shadow_Point(void)
+{
+	Point2D pt;
+
+	pt.X = 0;
+	pt.Y = TacticalMap->Z_Lepton_To_Pixel(LinkedTo->HeightAGL);
+
+	return(pt);
+}
+
+
+/// <summary>
+/// Restores power to the locomotor.
+/// This undoes an earlier Power_Off and lets the object travel under its own means once
+/// more.
+/// </summary>
+/// <returns>bool; Is the locomotor powered after the change?</returns>
+bool LocomotionClass::Power_On(void)
+{
+	IsPowered = true;
+	return(Is_Powered());
+}
+
+
+/// <summary>
+/// Removes power from the locomotor.
+/// This routine is used to strand the object where it stands, such as when it is caught
+/// by an EMP pulse or its owner loses base power.
+/// </summary>
+/// <returns>bool; Is the locomotor powered after the change?</returns>
+bool LocomotionClass::Power_Off(void)
+{
+	IsPowered = false;
+	return(Is_Powered());
+}
+
+
+/// <summary>
+/// Does the locomotor currently have power?
+/// An unpowered locomotor will not carry its object anywhere, which is how an EMP or a
+/// loss of base power leaves a unit stranded.
+/// </summary>
+/// <returns>bool; Is the locomotor powered?</returns>
+bool LocomotionClass::Is_Powered(void)
+{
+	return(IsPowered);
+}
+
+
+/// <summary>
+/// Is this locomotor disrupted by an ion storm?
+/// Locomotors that rely on flight or some other fragile means of travel will override
+/// this routine so that a storm can bring their objects down.
+/// </summary>
+/// <returns>bool; Is the locomotor sensitive to ion storms?</returns>
+bool LocomotionClass::Is_Ion_Sensitive(void)
+{
+	return(false);
+}
+
+
+std::unique_ptr<ILocomotion> Create_Locomotor(ClassID const & classid)
+{
+	std::unique_ptr<IPersistent> object = Create_Object(classid);
+	ILocomotion * const locomotion = dynamic_cast<ILocomotion *>(object.get());
+	if (locomotion != nullptr) {
+		object.release();
+	}
+	return(std::unique_ptr<ILocomotion>(locomotion));
+}
+
+
+std::unique_ptr<ILocomotion> Load_Locomotor(SaveStreamClass & stream)
+{
+	return(Load_Object_As<ILocomotion>(stream));
+}
+
+
+ClassID Locomotion_Class_ID(ILocomotion * locomotion)
+{
+	IPersistent const * const persist = dynamic_cast<IPersistent const *>(locomotion);
+	return(persist != nullptr ? persist->Class_ID() : ClassID());
+}
+
+
+/// <summary>
+/// Saves the locomotor out to a save game stream.
+/// The locomotor's swizzle identity is written ahead of its data, which is what lets the
+/// swizzle manager remap every pointer to it when the game is loaded again.
+/// </summary>
+/// <param name="cleardirty">Should the locomotor be marked as no longer needing a save?</param>
+/// <returns>Returns with the result of the write.</returns>
+bool LocomotionClass::Save(SaveStreamClass & stream, bool cleardirty)
+{
+	return(Save_Members(stream, cleardirty));
+}
+
+
+bool LocomotionClass::Load(SaveStreamClass & stream)
+{
+	return(Load_Members(stream));
+}
+
+
+/// <summary>
+/// Writes the members this locomotor describes out to the save stream.
+/// The locomotor's swizzle identity goes out first, and the members follow
+/// in the order Serialize names them.
+/// </summary>
+/// <param name="stream">The stream to write to.</param>
+/// <param name="cleardirty">Should the locomotor be marked clean once it has been written?</param>
+/// <returns>bool; Was the record written whole?</returns>
+bool LocomotionClass::Save_Members(SaveStreamClass & stream, bool cleardirty)
+{
+	SwizzleIDType id = Swizzler.ID_Of(this);
+	stream.Serialize(id);
+	Serialize(stream);
+	if (!stream.Was_Error() && cleardirty) {
+		Dirty = false;
+	}
+	return(!stream.Was_Error());
+}
+
+
+bool LocomotionClass::Load_Members(SaveStreamClass & stream)
+{
+	SwizzleIDType id = 0;
+	stream.Serialize(id);
+	if (stream.Was_Error()) {
+		return(false);
+	}
+	assert(id != 0);
+	Swizzle_Here_I_Am(id, this);
+
+	char const * const outertype = stream.Context_Type();
+	SwizzleIDType const outerid = stream.Context_ID();
+	stream.Set_Context(typeid(*this).name(), id);
+	Serialize(stream);
+	stream.Set_Context(outertype, outerid);
+
+	return(!stream.Was_Error());
+}
+
+
+void LocomotionClass::Serialize(SaveStreamClass & stream)
+{
+	stream.Serialize(LinkedTo);
+	stream.Serialize(IsPowered);
+	stream.Serialize(Dirty);
+}
+
+
+/// <summary>
+/// Restores the state a locomotor could not carry in its record.
+/// The bare locomotor carries nothing of the sort, so there is nothing to do.
+/// </summary>
+void LocomotionClass::Post_Load(void)
+{
+}
+
+
+/// <summary>
+/// Asks the object to step out of the way in the direction specified.
+/// This routine is used when another object needs the cell this one happens to be
+/// occupying. The base locomotor cannot be moved and declines.
+/// </summary>
+/// <returns>bool; Did the object step out of the way?</returns>
+bool LocomotionClass::Push(DirType dir)
+{
+	return(false);
+}
+
+
+/// <summary>
+/// Shoves the object aside in the direction specified.
+/// This is the more forceful companion to Push, used when a loitering object must be
+/// displaced to clear the way. The base locomotor will not budge.
+/// </summary>
+/// <returns>bool; Was the object shoved out of the way?</returns>
+bool LocomotionClass::Shove(DirType dir)
+{
+	return(false);
+}
+
+
+/// <summary>
+/// Handles the per frame settling of the object's tilt and pitch.
+/// Locomotors that rock their object about -- over bumps, on landing, or when it takes a
+/// hit -- use this routine to ease the body back toward level.
+/// </summary>
+void LocomotionClass::Tilt_Pitch_AI(void)
+{
+}
+
+
+/// <summary>
+/// Fetches the depth bias to draw the object with.
+/// This nudges the object forward or back in the depth buffer so that it sorts correctly
+/// against the terrain it is traveling over. The base locomotor needs no such favor.
+/// </summary>
+/// <returns>Returns with the depth adjustment to apply when drawing the object.</returns>
+int LocomotionClass::Z_Adjust(void)
+{
+	return(0);
+}
+
+
+/// <summary>
+/// Fetches the Z gradient to draw the object with.
+/// The gradient tells the depth shaded renderer how the object's depth varies across its
+/// shape. The base locomotor reports the upright case.
+/// </summary>
+/// <returns>Returns with the Z gradient to render the object with.</returns>
+ZGradientType LocomotionClass::Z_Gradient(void)
+{
+	return(ZGRAD_90DEG);
+}
+
+
+/// <summary>
+/// Fetches the visual character to draw the object with.
+/// This is how a locomotor fades or hides its object as it burrows, submerges, or
+/// otherwise leaves plain sight. The base locomotor never alters the appearance.
+/// </summary>
+/// <returns>Returns with the visual character to render the object with.</returns>
+VisualType LocomotionClass::Visual_Character(bool flag)
+{
+	return(VISUAL_NORMAL);
+}
+
+
+/// <summary>
+/// Fetches the pixel offset to draw the object at.
+/// The render code adds this to the object's normal screen position, which is how a
+/// locomotor makes its object bob, hop, or sink. The base locomotor draws in place.
+/// </summary>
+/// <returns>Returns with the pixel offset to shift the object by when drawing.</returns>
+Point2D LocomotionClass::Draw_Point(void)
+{
+	Point2D pt;
+	pt.X = 0;
+	pt.Y = 0;
+	return(pt);
+}
+
+
+/// <summary>
+/// Should the object cast a shadow?
+/// Locomotors that take their object out of the light -- underground, submerged, or
+/// otherwise hidden -- will override this routine to suppress the shadow.
+/// </summary>
+/// <returns>bool; Should a shadow be drawn for the object?</returns>
+bool LocomotionClass::Is_To_Have_Shadow(void)
+{
+	return(true);
+}
+
+
+/// <summary>
+/// Determines if the object may move into the cell specified.
+/// The movement code asks the locomotor rather than the object, since what counts as
+/// passable depends entirely on how the object travels. The base locomotor is
+/// unrestricted and welcomes every cell.
+/// </summary>
+/// <returns>Returns with the move legality of the cell.</returns>
+MoveType LocomotionClass::Can_Enter_Cell(Cell cell)
+{
+	return(MOVE_OK);
+}
+
+
+/// <summary>
+/// Forces the object's immediate destination to the coordinate specified.
+/// This overrides whatever short term move the locomotor had in mind, and is used when
+/// outside code must dictate exactly where the object ends up next.
+/// </summary>
+/// <param name="coord">The coordinate the object should head to immediately.</param>
+void LocomotionClass::Force_Immediate_Destination(Coord coord)
+{
+}
+
+
+/// <summary>
+/// Forces the object onto a specific movement track.
+/// This routine is used when outside code must dictate the exact motion the object
+/// performs, rather than letting the locomotor plan one for itself.
+/// </summary>
+/// <param name="track">The track number the object should be placed onto.</param>
+/// <param name="coord">The coordinate to treat as the start of the track.</param>
+void LocomotionClass::Force_Track(int track, Coord coord)
+{
+}
+
+
+/// <summary>
+/// Notifies the locomotor that its object has been placed onto the map.
+/// This gives derived locomotors their chance to pick up a starting facing, slope, or
+/// altitude from the ground the object has just arrived on.
+/// </summary>
+void LocomotionClass::Unlimbo(void)
+{
+}
+
+
+/// <summary>
+/// Turns the object to face the direction specified.
+/// The base locomotor has no body of its own to rotate, so the request goes unheeded.
+/// </summary>
+/// <param name="coord">The direction that the object should come to face.</param>
+void LocomotionClass::Do_Turn(DirType coord)
+{
+}
+
+
+/// <summary>
+/// Halts the object's travel.
+/// This routine is called when the object must give up on wherever it was going. Derived
+/// locomotors use it to abandon their journey and bring the object to a legal rest.
+/// </summary>
+void LocomotionClass::Stop_Moving(void)
+{
+}
+
+
+/// <summary>
+/// Commands the locomotor to carry the object to the coordinate specified.
+/// This is how the object hands its locomotor a new place to go. The base locomotor
+/// cannot move anything, so the request is quietly ignored.
+/// </summary>
+void LocomotionClass::Move_To(Coord to)
+{
+}
+
+
+/// <summary>
+/// Performs one game frame of locomotion for the object.
+/// The linked object calls this from its own AI so that the locomotor can carry it
+/// further along its travel. The base locomotor has nothing to carry and reports that it
+/// is already at rest.
+/// </summary>
+/// <returns>bool; Is the locomotor at rest, with nothing further to do?</returns>
+bool LocomotionClass::Process(void)
+{
+	return(true);
+}
+
+
+/// <summary>
+/// Fetches the final destination of the object's travel.
+/// The base locomotor never has a journey pending, so it reports that there is no
+/// destination at all.
+/// </summary>
+/// <returns>Returns with the destination coordinate, or COORD_NONE if there is none.</returns>
+Coord LocomotionClass::Destination(void)
+{
+	Coord coord;
+	coord.X = COORD_NONE.X;
+	coord.Y = COORD_NONE.Y;
+	coord.Z = COORD_NONE.Z;
+	return(coord);
+}
+
+
+/// <summary>
+/// Fetches the coordinate the object is immediately heading toward.
+/// This is the next step of the journey rather than its end. Since the base locomotor
+/// has nowhere to go, it reports the object's own position.
+/// </summary>
+/// <returns>Returns with the coordinate currently being moved toward.</returns>
+Coord LocomotionClass::Head_To_Coord(void)
+{
+	return(LinkedTo->PositionCoord);
+}
+
+
+/// <summary>
+/// Is the object currently in motion?
+/// The mission and display code uses this to tell a traveling object from a parked one.
+/// The base locomotor never carries its object anywhere, so it always answers no.
+/// </summary>
+/// <returns>bool; Is the object moving?</returns>
+bool LocomotionClass::Is_Moving(void)
+{
+	return(false);
+}
+
+
+/// <summary>
+/// Forces the object onto a new ground slope.
+/// This routine is called when the terrain beneath the object changes out from under it.
+/// Only locomotors that tilt their object with the ground need to act on it.
+/// </summary>
+/// <param name="ramp">The ramp type of the slope the object should now conform to.</param>
+void LocomotionClass::Force_New_Slope(int ramp)
+{
+}
+
+
+/// <summary>
+/// Fetches the drawing code the locomotor wants the object rendered with.
+/// The render code uses this to pick a presentation that suits how the object is
+/// currently traveling. The base locomotor has no preference.
+/// </summary>
+/// <returns>Returns with the drawing code, or zero for the ordinary presentation.</returns>
+int LocomotionClass::Drawing_Code(void)
+{
+	return(0);
+}
+
+
+/// <summary>
+/// Determines if the locomotor will allow the object to fire.
+/// Locomotors that must settle, land, or surface before a weapon can be brought to bear
+/// will override this routine. The base locomotor never stands in the way.
+/// </summary>
+/// <returns>Returns with the reason firing is disallowed, or FIRE_OK if it is permitted.</returns>
+FireErrorType LocomotionClass::Can_Fire(void)
+{
+	return(FIRE_OK);
+}
+
+
+/// <summary>
+/// Fetches the speed that the object appears to be traveling at.
+/// This is the plain answer -- the linked object's own current speed. Locomotors whose
+/// visible motion differs from the object's logical speed will override this routine.
+/// </summary>
+/// <returns>Returns with the apparent speed of the linked object.</returns>
+int LocomotionClass::Apparent_Speed(void)
+{
+	return(LinkedTo->Current_Speed());
+}

@@ -1,0 +1,48 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import CommandPage from '../../../components/CommandPage.astro';
+import TombstoneDetail from '../../../components/TombstoneDetail.astro';
+import { allCommands, requireCommand, type CommandRecord } from '../../../lib/commands';
+import { tombstones, type TombstoneRecord } from '../../../lib/data';
+import { requireRouteTail } from '../../../lib/paths';
+
+export async function getStaticPaths() {
+	const overlays = await getCollection('commands');
+	const byCommand = new Map<string, typeof overlays[number]>();
+	for (const overlay of overlays) {
+		const record = requireCommand(overlay.data.command_id, `Command overlay ${overlay.id}`);
+		byCommand.set(record.id, overlay);
+	}
+	const active = allCommands()
+		.filter((record) => record.kind === 'launch')
+		.map((record) => ({
+			params: { id: record.route_id },
+			props: { kind: 'active' as const, record, overlay: byCommand.get(record.id) },
+		}));
+	const removed = tombstones()
+		.filter((record) => record.type === 'command' && record.route.startsWith('/using/command-line/'))
+		.map((record) => ({
+			params: { id: requireRouteTail(record.route, `Command tombstone ${record.id}`) },
+			props: { kind: 'removed' as const, record },
+		}));
+	return [...active, ...removed];
+}
+
+type Props =
+	| { kind: 'active'; record: CommandRecord; overlay?: CollectionEntry<'commands'> }
+	| { kind: 'removed'; record: TombstoneRecord };
+const props = Astro.props as Props;
+---
+
+{props.kind === 'removed' ? (
+	<TombstoneDetail record={props.record} />
+) : (
+	<CommandPage
+		record={props.record}
+		overlay={props.overlay}
+		crumbs={[
+			{ href: '/using/', label: 'Using OpenTS' },
+			{ href: '/using/command-line/', label: 'Command line options' },
+		]}
+	/>
+)}
