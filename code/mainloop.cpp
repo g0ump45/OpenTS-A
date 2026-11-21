@@ -36,6 +36,12 @@
 #include "dsurface.h"
 #include "fog.h"
 #include "globals.h"
+#ifdef __ANDROID__
+#include "android_shortcuts.h"
+#include "android_controls.h"
+#include "init.h"
+#include "movies.h"
+#endif
 #include "goptions.h"
 #include "ipxmgr.h"
 #include "language/language.h"
@@ -279,6 +285,12 @@ bool Main_Loop(void)
 	if (!Session.Play) {
 		if (SpecialDialog == SDLG_NONE && GameInFocus) {
 			Map.Input(input, x, y);
+#ifdef __ANDROID__
+			auto shortcuts = touch_shortcuts::panel.take();
+			if (ScenarioActive && !(Scen && Scen->IsInputLocked) && !AndroidMenuActive.load() && !Movie_Is_Playing() && !Session.Messages.Is_Edit()) {
+				for (auto const & name : shortcuts) Execute_Command(name.c_str());
+			}
+#endif
 			if (input) {
 				Keyboard_Process(input);
 			}

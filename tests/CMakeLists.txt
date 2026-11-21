@@ -101,3 +101,9 @@ add_subdirectory(shapefacing)
 add_subdirectory(zbufring)
 add_subdirectory(priorityqueue)
 add_subdirectory(save)
+
+opents_add_test(android_shortcuts_test NAME android_shortcuts SOURCES android_shortcuts_test.cpp)
+
+if(ANDROID)
+    opents_add_test(android_hardware_input_test NAME android_hardware_input SOURCES android_hardware_input_test.cpp)
+endif()

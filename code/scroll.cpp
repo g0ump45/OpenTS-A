@@ -570,7 +570,8 @@ void ScrollClass::Scroll_AI(void)
                 bool android_touch_in_tactical = android_point.X >= 0 && android_point.X < TacticalRect.Width && android_point.Y >= 0 && android_point.Y < TacticalRect.Height;
                 android_point.X = std::clamp(android_point.X, 0, TacticalRect.Width - 1);
                 android_point.Y = std::clamp(android_point.Y, 0, TacticalRect.Height - 1);
-                if (AndroidControls.EdgeScrolling.load() && Keyboard->AndroidLeftMouseDown.load() && android_touch_in_tactical) {
+                if (AndroidControls.EdgeScrolling.load() && (Keyboard->AndroidLeftMouseDown.load() ||
+                    (Keyboard->AndroidMousePresent.load() && !Keyboard->AndroidHardwareKeys[VK_LBUTTON].load())) && android_touch_in_tactical) {
                         const int edge_margin = 24;
                         const int top_edge_margin = 40;
                         const int bottom_edge_margin = 40;

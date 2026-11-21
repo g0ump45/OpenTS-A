@@ -130,6 +130,7 @@ int main(void)
 
 	Check(UTF8::OEM_437_Glyph('A') == 'A', "ASCII keeps its byte in code page 437");
 	Check(UTF8::OEM_437_Glyph(0xC7) == 0x80, "C cedilla is 0x80 in code page 437");
+	Check(UTF8::OEM_437_Glyph(0xF3) == 0xA2 && UTF8::OEM_437_Glyph(0xF1) == 0xA4, "Spanish o acute and n tilde retain their glyphs");
 	Check(UTF8::OEM_437_Glyph(0xE9) == 0x82, "e acute is 0x82 in code page 437");
 	Check(UTF8::OEM_437_Glyph(0xE4) == 0x84, "a umlaut is 0x84 in code page 437");
 	Check(UTF8::OEM_437_Glyph(0xC9) == 0x90, "E acute is 0x90 in code page 437");

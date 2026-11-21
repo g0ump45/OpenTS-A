@@ -25,6 +25,7 @@ public final class GameFilePolicy {
         if (!name.matches("[A-Z0-9][A-Z0-9_. -]*")) return null;
         if (name.equals("SUN.INI") || name.equals("KEYBOARD.INI") || name.startsWith("SPAWN")
             || name.startsWith("QUEST_") || name.equals("DDRAW.INI")) return null;
+        if (name.equals("LANGUAGE.DLL")) return name;
         int dot = name.lastIndexOf('.');
         return dot > 0 && EXTENSIONS.contains(name.substring(dot + 1)) ? name : null;
     }
@@ -37,6 +38,7 @@ public final class GameFilePolicy {
             String path = normalize(original);
             if (!path.substring(path.lastIndexOf('/') + 1).equalsIgnoreCase("TIBSUN.MIX")) continue;
             String root = path.substring(0, path.lastIndexOf('/') + 1);
+            if (root.toUpperCase(Locale.ROOT).endsWith("MIX/")) root = root.substring(0, root.length() - 4);
             int candidateDepth = root.split("/", -1).length;
             if (candidateDepth < depth) { depth = candidateDepth; best = root; candidates.clear(); }
             if (candidateDepth == depth) candidates.add(root);
@@ -49,21 +51,37 @@ public final class GameFilePolicy {
     public static Map<String,String> plan(Collection<String> paths) throws IOException {
         String root = findRoot(paths);
         Map<String,String> plan = new TreeMap<>();
+        Map<String,Integer> priorities = new HashMap<>();
         for (String original : paths) {
             String path = normalize(original);
             if (!path.startsWith(root)) continue;
             String name = destinationName(path);
             if (name == null) continue;
-            String previous = plan.get(name);
-            if (previous == null) plan.put(name, original);
-            else {
-                boolean direct = path.substring(root.length()).indexOf('/') < 0;
-                boolean previousDirect = normalize(previous).substring(root.length()).indexOf('/') < 0;
-                if (direct && !previousDirect) plan.put(name, original);
-                else if (direct == previousDirect) throw new IOException("Conflicting copies of " + name + ". Choose one installation folder.");
+            int priority = priority(path.substring(root.length()));
+            Integer previous = priorities.get(name);
+            if (previous == null || priority < previous) {
+                plan.put(name, original);
+                priorities.put(name, priority);
             }
         }
+        for (String original : paths) {
+            String path = normalize(original);
+            if (!path.startsWith(root)) continue;
+            String name = destinationName(path);
+            if (name != null && priority(path.substring(root.length())) == priorities.get(name)
+                && !original.equals(plan.get(name)))
+                throw new IOException("Conflicting copies of " + name + ". Choose one installation folder.");
+        }
         return plan;
+    }
+
+    private static int priority(String relative) {
+        int slash = relative.indexOf('/');
+        if (slash < 0) return 0;
+        String directory = relative.substring(0, slash).toUpperCase(Locale.ROOT);
+        if (relative.indexOf('/', slash + 1) < 0
+            && (directory.equals("INI") || directory.equals("MIX") || directory.equals("MOVIES"))) return 1;
+        return 2;
     }
 
     public static long copyAtomic(InputStream source, File directory, String name, long remaining) throws IOException {

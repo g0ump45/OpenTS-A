@@ -47,6 +47,14 @@
 #include "gscreen.h"
 #ifdef __ANDROID__
 #include "android_video.h"
+#include "android_controls.h"
+#include "android_shortcuts.h"
+#include "textbtn.h"
+#include "globals.h"
+#include "win.h"
+#include "movies.h"
+#include "special.hh"
+#include "scenario.h"
 #endif
 
 #include "_alpha.h"
@@ -606,13 +614,28 @@ void Update_Visible_Surface(Surface *surface, Rect *rect)
 		Surface * const previous = LogicalSurface;
 		LogicalSurface = VisibleSurface;
 		Session.Messages.Draw();
+		using namespace touch_shortcuts;
+		int placement = AndroidControls.ShortcutPlacement.load();
+		bool show = placement && _dialog_count == 0 && GameInFocus && !Session.Play && !Session.Messages.Is_Edit() &&
+			SpecialDialog == SDLG_NONE && !(Scen && Scen->IsInputLocked) && !AndroidMenuActive.load() && !Movie_Is_Playing();
+		int left = Options.IsSidebarOnRight ? TacticalRect.X : SidebarRect.Width;
+		bool bottom = placement == 1;
+		auto layout = panel.frame(show, left + (TacticalRect.Width - 3 * Step) / 2,
+			bottom ? TacticalRect.Y + TacticalRect.Height - Size - 8 : TacticalRect.Y + 8,
+			bottom ? -1 : 1);
+		if (show) for (int id = layout.expanded ? 1 : Groups; id <= Base; ++id) {
+			std::string label = id == Groups ? (layout.expanded ? "[-]" : "[+]") :
+				id == Base ? "Base" : std::to_string(id);
+			TextButtonClass button(0, label.c_str(), TPF_BUTTON, layout.left(id), layout.top(id), Size, Size, false, false);
+			button.Draw_Me(true);
+		}
 		LogicalSurface = previous;
 	}
 #endif
 	Heal_Dialog_Controls();
 #ifdef __ANDROID__
 	DSurface * visible = static_cast<DSurface *>(VisibleSurface);
-	Android_Video_Present(visible->Get_Buffer(), visible->Get_Width(), visible->Get_Height(), visible->Stride());
+	Android_Video_Present(visible->Get_Buffer(), visible->Get_Width(), visible->Get_Height(), visible->Stride(), surface == CompositeSurface && ScenarioActive);
 #else
 	Video_Present_If_Dirty();
 #endif

@@ -8,6 +8,9 @@
  ******************************************************************************/
 
 #include "tutorial.h"
+#ifdef __ANDROID__
+#include "android_objectives.h"
+#endif
 
 #include "dbgprint.h"
 #include "ini.h"
@@ -119,5 +122,10 @@ char const * TutorialTextClass::Fetch(int id) const
 {
 	char const * text = Find(Overrides, id);
 
-	return(text != NULL ? text : Find(Base, id));
+    if (text == NULL) text = Find(Base, id);
+#ifdef __ANDROID__
+    extern bool Android_Spanish_Game(void);
+    if (Android_Spanish_Game()) return Android_Spanish_Objective(id, text);
+#endif
+    return text;
 }

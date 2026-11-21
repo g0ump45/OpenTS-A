@@ -205,6 +205,9 @@ struct SRecord {
  *=============================================================================================*/
 char const * Fetch_String(int id)
 {
+#ifdef __ANDROID__
+	return id == -1 || id == TXT_NONE ? "" : Android_Fetch_String(id);
+#else
 	static SRecord _buffers[128];
 	static int _time = 0;
 
@@ -252,13 +255,6 @@ char const * Fetch_String(int id)
 	_buffers[oldest].ID = id;
 	_buffers[oldest].TimeStamp = _time;
 
-#ifdef __ANDROID__
-        char const * android_text = Android_Fetch_String(id);
-        if (android_text == NULL || android_text[0] == '\0') {
-                return("");
-        }
-        UTF8::Copy(stringptr, sizeof(_buffers[oldest].String), android_text);
-#else
         if (LanguageResources == NULL) {
                 Init_Language_Resources(false);
         }
@@ -273,8 +269,8 @@ char const * Fetch_String(int id)
                 std::string text = UTF8::From_Windows_1252(stringptr);
                 UTF8::Copy(stringptr, sizeof(_buffers[oldest].String), text.c_str());
         }
-#endif
 	return(stringptr);
+#endif
 }
 
 

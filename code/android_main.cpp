@@ -9,9 +9,14 @@
 #include <algorithm>
 #include <cmath>
 #include <thread>
+#include <chrono>
 #include <string_view>
 #include "android_video.h"
 #include "android_controls.h"
+#include "android_shortcuts.h"
+#include "android_hardware_input.h"
+#include "scenario.h"
+#include "queue.h"
 #include "keyboard.h"
 #include "_xmouse.h"
 #include "wwmouse.h"
@@ -30,6 +35,8 @@
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__)
 
 extern void Main_Game(int argc, char * argv[]);
+extern void Android_Init_Language();
+extern bool Android_Options_Tab_Hit(int x, int y);
 extern WWKeyboardClass* Keyboard;
 extern bool GameInFocus;
 static android_app * AndroidApp = nullptr;
@@ -97,46 +104,89 @@ bool Android_Open_Url(char const * url)
     return success;
 }
 
+bool Android_Open_Updates() { return Android_Open_Activity("com.opents.game.UpdatesActivity"); }
 bool Android_Open_Game_Importer() { return Android_Open_Activity("com.opents.game.GameFilesActivity"); }
 bool Android_Open_Connection_Help() { return Android_Open_Activity("com.opents.game.ConnectionHelpActivity"); }
 bool Android_Open_Host_Address() { return Android_Open_Activity("com.opents.game.HostAddressActivity"); }
 
 static void Android_End_Selection(bool complete, int x, int y);
+static bool AndroidResumed = false;
+static bool AndroidFocused = false;
+static bool AndroidTouchActive = false;
+static int AndroidMouseButtons = 0;
+static bool AndroidPendingTap = false;
+static int AndroidPendingTapX = 0;
+static int AndroidPendingTapY = 0;
+static int64_t AndroidPendingTapDeadline = 0;
+
+static int64_t Android_Now()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(
+        std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
+static void Android_Flush_Tap()
+{
+    if (!AndroidPendingTap) return;
+    AndroidPendingTap = false;
+    int const x = AndroidPendingTapX;
+    int const y = AndroidPendingTapY;
+    Keyboard->Set_Mouse_Position(x, y);
+    Keyboard->AndroidTouchX = x;
+    Keyboard->AndroidTouchY = y;
+    Map.Message_Handler(MainWindow, WM_LBUTTONDOWN, 0, MAKELPARAM(x, y));
+    Keyboard->Put_Mouse_Message(VK_LBUTTON, x, y, false);
+    Map.Message_Handler(MainWindow, WM_LBUTTONUP, 0, MAKELPARAM(x, y));
+    Keyboard->Put_Mouse_Message(VK_LBUTTON, x, y, true);
+}
+
+static void Android_Update_Focus(android_app * app)
+{
+    GameInFocus = AndroidResumed && AndroidFocused && app->window != nullptr;
+    if (GameInFocus) AudioEngine.Focus_Restore();
+    else {
+        AudioEngine.Focus_Loss();
+        touch_shortcuts::panel.frame(false);
+        AndroidPendingTap = false;
+        AndroidTouchActive = false;
+        AndroidMouseButtons = 0;
+        if (Keyboard) {
+            Keyboard->AndroidLeftMouseDown = false;
+            Keyboard->AndroidMousePresent = false;
+            for (auto & key : Keyboard->AndroidHardwareKeys) key = false;
+        }
+        Android_End_Selection(false, 0, 0);
+    }
+}
+
 
 static void Handle_App_Command(struct android_app * app, int32_t cmd)
 {
     switch (cmd) {
         case APP_CMD_PAUSE:
         case APP_CMD_STOP:
-            Android_End_Selection(false, 0, 0);
-            GameInFocus = false;
-            LOGI("Android lifecycle: paused/stopped");
+            AndroidResumed = false;
             break;
-
         case APP_CMD_RESUME:
-        case APP_CMD_START:
-            GameInFocus = true;
-            LOGI("Android lifecycle: resumed/started");
+            AndroidResumed = true;
             break;
-
+        case APP_CMD_GAINED_FOCUS:
+            AndroidFocused = true;
+            break;
+        case APP_CMD_LOST_FOCUS:
+            AndroidFocused = false;
+            break;
         case APP_CMD_TERM_WINDOW:
-            Android_End_Selection(false, 0, 0);
-            GameInFocus = false;
+            AndroidFocused = false;
             Android_Video_Set_Window(nullptr);
-            LOGI("Android lifecycle: window terminated");
             break;
-
         case APP_CMD_INIT_WINDOW:
-            if (app->window != nullptr) {
-                Android_Video_Set_Window(app->window);
-                GameInFocus = true;
-                LOGI("Android lifecycle: window initialized");
-            }
+            if (app->window != nullptr) Android_Video_Set_Window(app->window);
             break;
-
         default:
-            break;
+            return;
     }
+    Android_Update_Focus(app);
 }
 static int64_t AndroidLastTapTime = 0;
 static int AndroidLastTapX = -1000;
@@ -144,6 +194,7 @@ static int AndroidLastTapY = -1000;
 static bool AndroidRightTap = false;
 static bool AndroidTouchDragging = false;
 static bool AndroidSelectionDragging = false;
+static bool AndroidSwapDragForTouch = false;
 static int AndroidTouchStartX = 0;
 static int AndroidTouchStartY = 0;
 static int AndroidTouchLastX = 0;
@@ -154,6 +205,7 @@ static constexpr int64_t AndroidLongPressMilliseconds = 500;
 static bool AndroidPinching = false;
 static float AndroidPinchLastDistance = 0.0f;
 static bool AndroidMovieTouchActive = false;
+static bool AndroidBlockedTouchActive = false;
 static bool AndroidTwoFingerTap = false;
 static constexpr int64_t AndroidTwoFingerTapMilliseconds = 250;
 static int AndroidTapPointerIds[2] = {-1, -1};
@@ -176,8 +228,98 @@ static void Android_End_Selection(bool complete, int x, int y)
     AndroidLastTapY = -1000;
 }
 
+static int32_t Android_Hardware_Input(android_app * app, AInputEvent * event)
+{
+    if (!Keyboard || !GameInFocus) return 0;
+    if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_KEY) {
+        int const code = AKeyEvent_getKeyCode(event);
+        int const key = android_hardware::virtual_key(code);
+        if (!key) return 0;
+        int const action = AKeyEvent_getAction(event);
+        if (action != AKEY_EVENT_ACTION_DOWN && action != AKEY_EVENT_ACTION_UP) return 0;
+        bool const release = action == AKEY_EVENT_ACTION_UP;
+        int const meta = AKeyEvent_getMetaState(event);
+        Keyboard->AndroidHardwareKeys[key] = !release;
+        Keyboard->AndroidCapsLock = (meta & AMETA_CAPS_LOCK_ON) != 0;
+        Keyboard->AndroidHardwareKeys[VK_SHIFT] = (meta & AMETA_SHIFT_ON) != 0;
+        Keyboard->AndroidHardwareKeys[VK_CONTROL] = (meta & AMETA_CTRL_ON) != 0;
+        Keyboard->AndroidHardwareKeys[VK_MENU] = (meta & AMETA_ALT_ON) != 0;
+        if (!AndroidMenuActive.load() && ScenarioActive && Scen && Scen->IsInputLocked) {
+            if (key == VK_ESCAPE && !release) Queue_Options();
+            return 1;
+        }
+        unsigned short value = key;
+        if (meta & AMETA_SHIFT_ON) value |= WWKEY_SHIFT_BIT;
+        if (meta & AMETA_CTRL_ON) value |= WWKEY_CTRL_BIT;
+        if (meta & AMETA_ALT_ON) value |= WWKEY_ALT_BIT;
+        if (release) value |= WWKEY_RLS_BIT;
+        Keyboard->Put(value);
+        return 1;
+    }
+    if (!app->window) return 0;
+    Keyboard->AndroidMousePresent = true;
+    int width, height;
+    Android_Video_Get_Game_Size(width, height);
+    int const ww = ANativeWindow_getWidth(app->window), wh = ANativeWindow_getHeight(app->window);
+    if (width <= 0 || height <= 0 || ww <= 0 || wh <= 0) return 0;
+    int const sw = std::min(ww, width * wh / height), sh = std::min(wh, height * ww / width);
+    if (sw <= 0 || sh <= 0) return 0;
+    int const sx = int((AMotionEvent_getX(event, 0) - (ww-sw)/2) * width / sw);
+    int const sy = int((AMotionEvent_getY(event, 0) - (wh-sh)/2) * height / sh);
+    int const action = AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK;
+    int buttons = AMotionEvent_getButtonState(event);
+    if (action == AMOTION_EVENT_ACTION_CANCEL || action == AMOTION_EVENT_ACTION_UP) buttons = 0;
+    int const changed = buttons ^ AndroidMouseButtons;
+    int x = std::clamp(sx, 0, width-1), y = std::clamp(sy, 0, height-1);
+    if (!AndroidMenuActive.load() && ScenarioActive) Android_Video_Map_Touch(x, y, x, y);
+    Keyboard->Set_Mouse_Position(x, y);
+    Keyboard->AndroidTouchX = sx;
+    Keyboard->AndroidTouchY = sy;
+    if (Movie_Is_Playing()) {
+        Keyboard->AndroidLeftMouseDown = (buttons & AMOTION_EVENT_BUTTON_PRIMARY) != 0;
+        AndroidMouseButtons = buttons;
+        return 1;
+    }
+    if (!AndroidMenuActive.load() && ScenarioActive && Scen && Scen->IsInputLocked) {
+        if ((changed & AMOTION_EVENT_BUTTON_PRIMARY) && !buttons && Android_Options_Tab_Hit(sx, sy)) Queue_Options();
+        AndroidMouseButtons = buttons;
+        return 1;
+    }
+    using touch_shortcuts::Phase;
+    Phase shortcut_phase = Phase::Move;
+    if (changed & AMOTION_EVENT_BUTTON_PRIMARY) shortcut_phase = (buttons & AMOTION_EVENT_BUTTON_PRIMARY) ? Phase::Down : Phase::Up;
+    if (action == AMOTION_EVENT_ACTION_CANCEL) shortcut_phase = Phase::Cancel;
+    if (buttons & (AMOTION_EVENT_BUTTON_SECONDARY | AMOTION_EVENT_BUTTON_TERTIARY)) shortcut_phase = Phase::Extra;
+    if (touch_shortcuts::panel.touch(shortcut_phase, sx, sy, AMotionEvent_getEventTime(event))) {
+        AndroidMouseButtons = buttons;
+        return 1;
+    }
+    if (action == AMOTION_EVENT_ACTION_SCROLL && ScenarioActive && !AndroidMenuActive.load()) {
+        Android_Video_Set_Zoom(Android_Video_Get_Zoom() + AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_VSCROLL, 0) * 0.15);
+    }
+    Map.Message_Handler(MainWindow, WM_MOUSEMOVE, 0, MAKELPARAM(x, y));
+    int const masks[] = {AMOTION_EVENT_BUTTON_PRIMARY, AMOTION_EVENT_BUTTON_SECONDARY, AMOTION_EVENT_BUTTON_TERTIARY};
+    int const keys[] = {VK_LBUTTON, VK_RBUTTON, VK_MBUTTON};
+    int const downs[] = {WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_MBUTTONDOWN};
+    int const ups[] = {WM_LBUTTONUP, WM_RBUTTONUP, WM_MBUTTONUP};
+    for (int i = 0; i < 3; ++i) {
+        if (!(changed & masks[i])) continue;
+        bool const release = (buttons & masks[i]) == 0;
+        Keyboard->AndroidHardwareKeys[keys[i]] = !release;
+        Map.Message_Handler(MainWindow, release ? ups[i] : downs[i], 0, MAKELPARAM(x, y));
+        Keyboard->Put_Mouse_Message(keys[i], x, y, release);
+    }
+    AndroidMouseButtons = buttons;
+    return 1;
+}
+
 static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
 {
+    int const type = AInputEvent_getType(event);
+    if (type == AINPUT_EVENT_TYPE_KEY || (type == AINPUT_EVENT_TYPE_MOTION &&
+        (AInputEvent_getSource(event) & AINPUT_SOURCE_MOUSE) == AINPUT_SOURCE_MOUSE))
+        return Android_Hardware_Input(app, event);
+
     __android_log_print(ANDROID_LOG_INFO, "OpenTS-InputEntry", "called type=%d keyboard=%p window=%p", AInputEvent_getType(event), Keyboard, app->window);
     if (Keyboard == nullptr || AInputEvent_getType(event) != AINPUT_EVENT_TYPE_MOTION || app->window == nullptr) {
         return 0;
@@ -189,7 +331,13 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
     }
 
 
+    if (action == AMOTION_EVENT_ACTION_DOWN) { AndroidTouchActive = true; Keyboard->AndroidMousePresent = false; }
+    if (action == AMOTION_EVENT_ACTION_UP || action == AMOTION_EVENT_ACTION_CANCEL) AndroidTouchActive = false;
+    if (action == AMOTION_EVENT_ACTION_CANCEL || action == AMOTION_EVENT_ACTION_POINTER_DOWN) AndroidPendingTap = false;
+
+    if (Movie_Is_Playing() || AndroidMenuActive.load()) touch_shortcuts::panel.frame(false);
     if (Movie_Is_Playing()) {
+        AndroidPendingTap = false;
         if (action == AMOTION_EVENT_ACTION_DOWN) {
             AndroidMovieTouchActive = true;
             Keyboard->AndroidLeftMouseDown = true;
@@ -232,8 +380,24 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
     int const offset_y = (window_height - scaled_height) / 2;
     float const raw_x = AMotionEvent_getX(event, 0);
     float const raw_y = AMotionEvent_getY(event, 0);
+    using namespace touch_shortcuts;
+    Phase phase = Phase::Extra;
+    switch (action) {
+        case AMOTION_EVENT_ACTION_DOWN: phase = Phase::Down; break;
+        case AMOTION_EVENT_ACTION_MOVE: phase = Phase::Move; break;
+        case AMOTION_EVENT_ACTION_UP: phase = Phase::Up; break;
+        case AMOTION_EVENT_ACTION_CANCEL: phase = Phase::Cancel; break;
+    }
+    if (scaled_width > 0 && scaled_height > 0 &&
+        panel.touch(phase, int((raw_x - offset_x) * game_width / scaled_width),
+                    int((raw_y - offset_y) * game_height / scaled_height), AMotionEvent_getEventTime(event))) {
+        AndroidLastTapTime = 0;
+        AndroidPendingTap = false;
+        return 1;
+    }
     if (raw_x < offset_x || raw_x >= offset_x + scaled_width || raw_y < offset_y || raw_y >= offset_y + scaled_height) {
         AndroidTwoFingerTap = false;
+        AndroidPendingTap = false;
         if (action == AMOTION_EVENT_ACTION_UP || action == AMOTION_EVENT_ACTION_CANCEL) {
             Android_End_Selection(action == AMOTION_EVENT_ACTION_UP, AndroidTouchLastX, AndroidTouchLastY);
             Keyboard->AndroidLeftMouseDown = false;
@@ -248,6 +412,21 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
     int const screen_x = x;
     int const screen_y = y;
     Android_Video_Map_Touch(screen_x, screen_y, x, y);
+
+    bool const input_locked = !AndroidMenuActive.load() && ScenarioActive && Scen && Scen->IsInputLocked;
+    if (input_locked || AndroidBlockedTouchActive) {
+        if (input_locked && !AndroidBlockedTouchActive && action == AMOTION_EVENT_ACTION_DOWN
+            && Android_Options_Tab_Hit(screen_x, screen_y)) Queue_Options();
+        Android_End_Selection(false, AndroidTouchLastX, AndroidTouchLastY);
+        AndroidPendingTap = false;
+        AndroidTwoFingerTap = false;
+        AndroidPinching = false;
+        AndroidRightTap = false;
+        AndroidLastTapTime = 0;
+        Keyboard->AndroidLeftMouseDown = false;
+        AndroidBlockedTouchActive = action != AMOTION_EVENT_ACTION_UP && action != AMOTION_EVENT_ACTION_CANCEL;
+        return 1;
+    }
 
    __android_log_print(ANDROID_LOG_INFO, "OpenTS-TouchMap", "window=%dx%d scaled=%dx%d offset=(%d,%d) game=(%d,%d)", window_width, window_height, scaled_width, scaled_height, offset_x, offset_y, x, y);
     Keyboard->Set_Mouse_Position(x, y);
@@ -360,6 +539,10 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
         return 1;
     }
     if (action == AMOTION_EVENT_ACTION_DOWN) {
+        AndroidSwapDragForTouch = AndroidControls.SwapDragGestures.load() &&
+            !AndroidMenuActive.load() && ScenarioActive && TacticalMap != nullptr &&
+            screen_x >= TacticalRect.X && screen_x < TacticalRect.X + TacticalRect.Width &&
+            screen_y >= TacticalRect.Y && screen_y < TacticalRect.Y + TacticalRect.Height;
         AndroidTouchDragging = false;
         AndroidSelectionDragging = false;
         AndroidPinching = false;
@@ -382,8 +565,12 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
             (now - AndroidLastTapTime) <= int64_t(AndroidControls.DoubleTapMilliseconds.load()) * 1000000LL;
 
         AndroidRightTap = !AndroidMenuActive.load() &&
-            AndroidControls.DoubleTapRightClick.load() &&
+            (AndroidControls.DoubleTapRightClick.load() || AndroidSwapDragForTouch) &&
             quick_enough && close_enough;
+        if (!AndroidRightTap) {
+            Android_Flush_Tap();
+            Keyboard->Set_Mouse_Position(x, y);
+        }
     }
 
     if (action == AMOTION_EVENT_ACTION_MOVE && AndroidPinching && pointer_count >= 2) {
@@ -412,7 +599,8 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
         if (!AndroidTouchDragging && !AndroidSelectionDragging &&
             (total_dx * total_dx + total_dy * total_dy) >
                 (AndroidTouchDragThreshold * AndroidTouchDragThreshold)) {
-            if (AndroidRightTap) {
+            AndroidPendingTap = false;
+            if (AndroidRightTap != AndroidSwapDragForTouch) {
                 AndroidTouchDragging = true;
                 AndroidRightTap = false;
                 AndroidLastTapTime = 0;
@@ -516,7 +704,8 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
                 AndroidLastTapTime = 0;
                 AndroidLastTapX = -1000;
                 AndroidLastTapY = -1000;
-            } else if (AndroidRightTap) {
+            } else if (AndroidRightTap && AndroidControls.DoubleTapRightClick.load()) {
+                Android_Flush_Tap();
                 Execute_Command("SelectType");
 
                 AndroidLastTapTime = 0;
@@ -541,10 +730,15 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
                     AndroidLastTapX = -1000;
                     AndroidLastTapY = -1000;
                 } else {
-                    Map.Message_Handler(MainWindow, WM_LBUTTONDOWN, 0, MAKELPARAM(x, y));
-                    Keyboard->Put_Mouse_Message(VK_LBUTTON, x, y, false);
-                    Map.Message_Handler(MainWindow, WM_LBUTTONUP, 0, MAKELPARAM(x, y));
-                    Keyboard->Put_Mouse_Message(VK_LBUTTON, x, y, true);
+                    AndroidPendingTap = true;
+                    AndroidPendingTapX = x;
+                    AndroidPendingTapY = y;
+                    AndroidPendingTapDeadline = Android_Now() +
+                        int64_t(AndroidControls.DoubleTapMilliseconds.load()) * 1000000LL;
+                    bool const battlefield = !AndroidMenuActive.load() && ScenarioActive && TacticalMap != nullptr &&
+                        screen_x >= TacticalRect.X && screen_x < TacticalRect.X + TacticalRect.Width &&
+                        screen_y >= TacticalRect.Y && screen_y < TacticalRect.Y + TacticalRect.Height;
+                    if (!battlefield) Android_Flush_Tap();
 
                     AndroidLastTapTime = AMotionEvent_getEventTime(event);
                     AndroidLastTapX = x;
@@ -598,6 +792,8 @@ void android_main(struct android_app* app) {
         chdir("/sdcard/Android/data/com.opents.game/files");
     }
 
+    Android_Init_Language();
+
     char cwd[512];
     getcwd(cwd, sizeof(cwd));
     LOGI("Current dir now: %s", cwd);
@@ -611,7 +807,7 @@ void android_main(struct android_app* app) {
         MouseCursor->Capture_Mouse();
         LOGI("Creating MouseCursor stub");
     }
-    GameInFocus = true;
+    Android_Update_Focus(app);
 
 #if !defined(OPENTS_ANDROID_ASAN)
     // --- NEW FILE LISTING THAT SHOWS IN LOGCAT ---
@@ -652,6 +848,7 @@ void android_main(struct android_app* app) {
     LOGI("Initializing audio...");
     bool audio_ok = AudioEngine.Init();
     LOGI("Audio init result: %s", audio_ok ? "success" : "failed");
+    Android_Update_Focus(app);
     LOGI("Calling Main_Game...");
     RegisterClasses();
     LOGI("Engine classes registered");
@@ -662,9 +859,16 @@ void android_main(struct android_app* app) {
     }).detach();
 
     while (!app->destroyRequested) {
+        if (!GameInFocus || AndroidMenuActive.load() || !ScenarioActive || Movie_Is_Playing() || (Scen && Scen->IsInputLocked)) AndroidPendingTap = false;
+        int timeout = -1;
+        if (AndroidPendingTap && !AndroidTouchActive) {
+            int64_t const remaining = AndroidPendingTapDeadline - Android_Now();
+            if (remaining <= 0) Android_Flush_Tap();
+            else timeout = int((remaining + 999999) / 1000000);
+        }
         int events;
         android_poll_source * source;
-        if (ALooper_pollOnce(-1, nullptr, &events, reinterpret_cast<void **>(&source)) >= 0 && source != nullptr) {
+        if (ALooper_pollOnce(timeout, nullptr, &events, reinterpret_cast<void **>(&source)) >= 0 && source != nullptr) {
             source->process(app, source);
         }
     }

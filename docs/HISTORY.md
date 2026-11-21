@@ -66,6 +66,11 @@ score does not measure byte similarity or feature completion, and it is not the
 percentage of exact matches. [Rationale](RATIONALE.md) describes the tools,
 recovered module layout, and causes of the remaining mismatches.
 
+Codex, Claude, and DeepSeek accelerated the final matching work. They proposed
+interpretations and candidate implementations from disassembly, decompiled
+pseudocode, nearby reconstructed source, compiler errors, and binary-diff
+feedback. Developers reviewed and compiled every candidate, then compared it
+against the reference executable.
 
 ## From TibSun to OpenTS
 

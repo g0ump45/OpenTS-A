@@ -58,3 +58,7 @@ if(NOT ANDROID)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+if(ANDROID)
+    add_subdirectory(android/languages)
+endif()

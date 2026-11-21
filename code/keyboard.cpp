@@ -22,6 +22,9 @@
 #include "vidscale.h"
 
 #include <cmath>
+#ifdef __ANDROID__
+#include "android_hardware_input.h"
+#endif
 
 #define ARRAY_SIZE(x) int(sizeof(x)/sizeof(x[0]))
 
@@ -144,6 +147,10 @@ Point2D WWKeyboardClass::Get_Mouse_Position(void) const
 
 int WWKeyboardClass::To_ASCII(unsigned short key)
 {
+#ifdef __ANDROID__
+    if (key & WWKEY_RLS_BIT) return 0;
+    return android_hardware::ascii(key & 0xff, (key & WWKEY_SHIFT_BIT) != 0, AndroidCapsLock.load());
+#else
 	if (key & WWKEY_RLS_BIT) {
 		return(0);
 	}
@@ -177,14 +184,15 @@ int WWKeyboardClass::To_ASCII(unsigned short key)
 		return(0);
 	}
 	return(buffer[0]);
+#endif
 }
 
 bool WWKeyboardClass::Down(unsigned short key)
 {
 #ifdef __ANDROID__
 	key &= 0xFF;
-if (key == VK_LBUTTON) return AndroidLeftMouseDown;
-return false;
+if (key == VK_LBUTTON) return AndroidLeftMouseDown || AndroidHardwareKeys[key];
+return AndroidHardwareKeys[key];
 #else
 	key &= 0xFF;
 	if ((key == VK_LBUTTON || key == VK_RBUTTON) && GetSystemMetrics(SM_SWAPBUTTON) == TRUE) {

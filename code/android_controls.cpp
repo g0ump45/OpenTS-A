@@ -14,7 +14,9 @@ void Android_Reset_Control_Settings()
         AndroidControls.ControlScheme = ANDROID_CONTROL_MODERN;
 	AndroidControls.DoubleTapRightClick = true;
 	AndroidControls.SelectionBox = true;
+	AndroidControls.SwapDragGestures = true;
 	AndroidControls.EdgeScrolling = true;
+	AndroidControls.ShortcutPlacement = 1;
 	AndroidControls.PanSpeed = 8;
 	AndroidControls.DoubleTapMilliseconds = 300;
 }
@@ -34,21 +36,28 @@ void Android_Load_Control_Settings()
         int scheme = ANDROID_CONTROL_MODERN;
         int right, box, edge, speed, delay;
         int count = 0;
+        int swap = 1;
+        int placement = 1;
 
         if (version == 1) {
                 count = std::fscanf(file, "%d %d %d %d %d", &right, &box, &edge, &speed, &delay);
+        } else if (version == 3) {
+                count = std::fscanf(file, "%d %d %d %d %d %d %d %d", &scheme, &right, &box, &edge, &speed, &delay, &swap, &placement);
         } else if (version == 2) {
                 count = std::fscanf(file, "%d %d %d %d %d %d", &scheme, &right, &box, &edge, &speed, &delay);
+                if (count == 6) std::fscanf(file, "%d", &swap);
         }
 
         std::fclose(file);
 
         if ((version == 1 && count != 5) || (version == 2 && count != 6)) return;
-        if (version != 1 && version != 2) return;
+        if ((version == 3 && count != 8) || version < 1 || version > 3) return;
+        AndroidControls.ShortcutPlacement = std::clamp(placement, 0, 2);
 
         AndroidControls.ControlScheme = ANDROID_CONTROL_MODERN;
-        AndroidControls.DoubleTapRightClick = right != 0;
-        AndroidControls.SelectionBox = box != 0;
+        AndroidControls.DoubleTapRightClick = true;
+        AndroidControls.SelectionBox = true;
+        AndroidControls.SwapDragGestures = swap != 0;
         AndroidControls.EdgeScrolling = edge != 0;
         AndroidControls.PanSpeed = std::clamp(speed, 1, 16);
         AndroidControls.DoubleTapMilliseconds = std::clamp(delay, 150, 500);
@@ -60,13 +69,14 @@ bool Android_Save_Control_Settings()
         std::string const temporary = path + ".tmp";
         FILE * file = std::fopen(temporary.c_str(), "w");
         if (!file) return false;
-        bool const written = std::fprintf(file, "2 %d %d %d %d %d %d\n",
+        bool const written = std::fprintf(file, "3 %d %d %d %d %d %d %d %d\n",
                 AndroidControls.ControlScheme.load(),
                 int(AndroidControls.DoubleTapRightClick.load()),
                 int(AndroidControls.SelectionBox.load()),
                 int(AndroidControls.EdgeScrolling.load()),
                 AndroidControls.PanSpeed.load(),
-                AndroidControls.DoubleTapMilliseconds.load()) > 0;
+                AndroidControls.DoubleTapMilliseconds.load(),
+                int(AndroidControls.SwapDragGestures.load()), AndroidControls.ShortcutPlacement.load()) > 0;
         bool const closed = std::fclose(file) == 0;
         if (!written || !closed) return false;
         return std::rename(temporary.c_str(), path.c_str()) == 0;

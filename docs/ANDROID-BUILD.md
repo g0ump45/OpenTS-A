@@ -57,8 +57,22 @@ and game files before uninstalling a debug build.
 Android native compilation enables Clang MS extensions in every configuration,
 including the RelWithDebInfo configuration used by the APK release variant.
 
-The corrected V1 APK uses versionName 1.0.1 and versionCode 4 with the original
-release signing key. All Android configurations package the engine as
-libGameD.so, matching the NativeActivity manifest. The original release APK
-used a different native library filename and could not start. The hotfix also
-checks for a missing source object before updating smoke effects.
+The local V1.1 preview uses versionName 1.1.0 and versionCode 3, with the same
+release key as V1. Its game-data ZIP is prepared separately from the APK and
+source repository. Publication is pending device testing and owner approval.
+
+Every Android native configuration names the engine libGameD.so to match
+the NativeActivity library name in AndroidManifest.xml. Windows output names
+remain unchanged. Verify this match when checking a packaged APK.
+
+The unpublished V1.2 controls preview uses versionName 1.2.0-preview1 and
+versionCode 5. It adds the optional Modern Touch drag swap and uses the same
+release signing key. Installation and publication require owner approval.
+
+The local game-download test APK uses versionName 1.3.0-preview1 and
+versionCode 7 with the existing release key. Gradle resolves XZ for Java 1.10
+from Maven Central on the first build. It is not published or device-tested.
+
+V1.3 Easy Install Update uses versionName 1.3.0 and versionCode 8 with the
+existing release key. The owner confirmed the download setup worked on the
+Samsung test phone. The release APK is prepared locally for owner publication.

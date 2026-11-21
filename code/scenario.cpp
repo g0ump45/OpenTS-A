@@ -376,9 +376,17 @@ bool Start_Scenario(char const * name, bool briefing, CampaignType campaign)
 
 	Theme.Stop();
 
+#ifndef __ANDROID__
 	if ((briefing == true) && (campaign != CAMPAIGN_NONE) && (Scen->Scenario == 1) && (Campaigns[Scen->Campaign]->CDNumber < 2)) {
 		Choose_Side(Campaigns[Scen->Campaign]->CDNumber);
 	}
+#endif
+
+#ifdef __ANDROID__
+	bool const first_base_mission = campaign != CAMPAIGN_NONE
+		&& Campaigns[campaign]->RequiredAddon == ADDON_BASE_GAME
+		&& strcmpi(name, Campaigns[campaign]->ScenarioName) == 0;
+#endif
 
 	DebugString("Reading scenario: %s\n", name);
 
@@ -389,7 +397,18 @@ bool Start_Scenario(char const * name, bool briefing, CampaignType campaign)
 	Theme.Stop();
 
 	if (briefing) {
+#ifdef __ANDROID__
+		bool const missing_opening = first_base_mission && Scen->IntroMovie == VQ_NONE && Scen->BriefMovie == VQ_NONE;
+		if ((campaign != CAMPAIGN_NONE && Scen->IntroMovie == VQ_INTRO) || missing_opening) {
+			int const faction = Scen->PlayerSide == SIDE_FIRST ? 1 : 2;
+			DebugString("Campaign intro: player side=%d, faction alias=INTR%d.VQA\n", (int)Scen->PlayerSide, faction);
+			Choose_Side(faction);
+		} else {
+			Play_Movie(Scen->IntroMovie);
+		}
+#else
 		Play_Movie(Scen->IntroMovie);
+#endif
 		Play_Movie(Scen->BriefMovie);
 	}
 
@@ -2180,7 +2199,13 @@ ScenarioState Read_Scenario_INI(CCINIClass const & ini, bool is_mapgen)
 				mini.Get_String(Scen->ScenarioName, "Name", "", Scen->Description, sizeof(Scen->Description));
 			}
 
-			if (mini.Is_Present(Scen->ScenarioName, "Briefing")) {
+#ifdef __ANDROID__
+            extern bool Android_Spanish_Game(void);
+            bool const keep_map_briefing = Android_Spanish_Game() && Scen->BriefingText[0];
+#else
+            bool const keep_map_briefing = false;
+#endif
+			if (!keep_map_briefing && mini.Is_Present(Scen->ScenarioName, "Briefing")) {
 				mini.Get_String(Scen->ScenarioName, "Briefing", "", buffer, sizeof(buffer));
 
 				if (strlen(buffer) > 0) {
@@ -3816,6 +3841,12 @@ bool ScenarioClass::Read_INI(CCINIClass const & ini)
 	ini.Get_String(BASIC, "NextScenario", NextScenarioName, NextScenarioName, sizeof(NextScenarioName));
 	ini.Get_String(BASIC, "AltNextScenario", AltNextScenarioName, AltNextScenarioName, sizeof(AltNextScenarioName));
 	IntroMovie = ini.Get_VQType(BASIC, "Intro", IntroMovie);
+#ifdef __ANDROID__
+	extern bool Android_Spanish_Game(void);
+	char intro_name[32];
+	if (Android_Spanish_Game() && ini.Get_String(BASIC, "Intro", "", intro_name, sizeof(intro_name))
+		&& strcmpi(intro_name, "INTRON") == 0) IntroMovie = VQ_INTRO;
+#endif
 	BriefMovie = ini.Get_VQType(BASIC, "Brief", BriefMovie);
 	WinMovie = ini.Get_VQType(BASIC, "Win", WinMovie);
 	LoseMovie = ini.Get_VQType(BASIC, "Lose", LoseMovie);

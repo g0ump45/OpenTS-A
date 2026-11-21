@@ -7,6 +7,7 @@
 #ifdef __ANDROID__
 
 #include "android_video.h"
+#include "android_shortcuts.h"
 
 #include <android/native_window.h>
 
@@ -176,8 +177,9 @@ void Android_Video_Zoom_Battlefield(Surface * surface)
 }
 
 
-void Android_Video_Present(void const * pixels, int width, int height, int pitch)
+void Android_Video_Present(void const * pixels, int width, int height, int pitch, bool battlefield)
 {
+	if (!battlefield) touch_shortcuts::panel.frame(false);
 	if (pixels == nullptr || width <= 0 || height <= 0 || pitch < width * 2) {
         return;
 }

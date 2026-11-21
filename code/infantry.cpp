@@ -3568,7 +3568,8 @@ void InfantryClass::Firing_AI(void)
 			}
 
 			const WeaponDataStruct * wdata = Get_Class_Weapon_Data(0);
-			if (wdata->Weapon->MaxSpeed < Rule->Incoming) {
+			if (TarCom != NULL && wdata != NULL && wdata->Weapon != NULL
+				&& wdata->Weapon->MaxSpeed < Rule->Incoming) {
 				Map[TarCom->Center_Coord()].Incoming(PositionCoord, true);
 			}
 		}

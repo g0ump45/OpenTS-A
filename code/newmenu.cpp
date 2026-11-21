@@ -12,6 +12,7 @@
 #include "newmenu.h"
 #ifdef __ANDROID__
 #include "android_options.h"
+#include "theme.h"
 #endif
 
 #include "_pk.h"
@@ -231,6 +232,13 @@ int NewMenuClass::Display_Menu(char const * section, DynamicVectorClass<int> & o
 	menu->AndroidImportButton = false;
 	if (strcmp(section, "MainMenu") == 0 && !Addon_Installed(ADDON_FIRESTORM)) menu->Set_Item_Enabled(GMENU_FIRESTORM, false);
 	#endif
+#ifdef __ANDROID__
+	if (Android_Localized_Menu() && strcmp(section, "MainMenu") != 0) {
+		Theme.Play_Song(Theme.From_Name(menu->ThemeName.Peek()));
+		delete menu;
+		return Android_Shell_Menu(section, options);
+	}
+#endif
 	int result = menu->Presentation();
 	delete menu;
 	return((int)result);

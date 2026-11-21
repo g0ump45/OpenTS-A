@@ -2,11 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.opents.game">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <application android:label="OpenTS-A" android:icon="@drawable/opents_a_icon" android:hasCode="true" android:extractNativeLibs="true">
-        <activity android:name="android.app.NativeActivity"
+        <activity android:name=".GameActivity"
             android:screenOrientation="sensorLandscape"
             android:exported="true"
-            android:configChanges="orientation|keyboardHidden|screenSize">
+            android:configChanges="orientation|keyboard|keyboardHidden|navigation|screenSize">
             <meta-data android:name="android.app.lib_name" android:value="GameD" />
 
         </activity>
@@ -18,6 +19,10 @@
         <activity android:name=".HostAddressActivity" android:exported="false"
             android:screenOrientation="sensorLandscape"
             android:configChanges="orientation|keyboardHidden|screenSize" />
+        <activity android:name=".UpdatesActivity" android:exported="false"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+        <provider android:name=".UpdateApkProvider" android:authorities="com.opents.game.updates"
+            android:exported="false" android:grantUriPermissions="true" />
         <activity android:name=".LauncherActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

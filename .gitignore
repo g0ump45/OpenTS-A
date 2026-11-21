@@ -55,6 +55,8 @@ __pycache__/
 manual/data/.manual-check-*/
 manual/data/.manual-generate-*/
 
+# Agent worktrees, which are checkouts of this repository placed inside it
+/.claude/worktrees/
 
 # Android build output
 build-android/
@@ -88,3 +90,14 @@ android/local.properties
 android/fullcrash.txt
 
 android/Install
+
+# Local signing material and release backups
+*.jks
+*.keystore
+*.dpapi
+*.idsig
+/*.zip
+/OpenTSA-beta1-package/
+/pinch-current.patch
+*.pinch-backup
+.controls-docs-venv/

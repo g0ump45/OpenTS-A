@@ -346,7 +346,9 @@ void TagClass::Delete_All(void)
 /// <param name="global">The global flag that just changed.</param>
 void TagClass::Timer_Global_Reset(int global)
 {
-	Trigger->Reset_Global_Linked_Timed_Events(global);
+	if (Trigger != NULL) {
+		Trigger->Reset_Global_Linked_Timed_Events(global);
+	}
 }
 
 
@@ -356,7 +358,9 @@ void TagClass::Timer_Global_Reset(int global)
 /// <param name="local">The local variable that just changed.</param>
 void TagClass::Timer_Local_Reset(int local)
 {
-	Trigger->Reset_Local_Linked_Timed_Events(local);
+	if (Trigger != NULL) {
+		Trigger->Reset_Local_Linked_Timed_Events(local);
+	}
 }
 
 

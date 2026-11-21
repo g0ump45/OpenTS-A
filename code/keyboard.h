@@ -79,6 +79,9 @@ class WWKeyboardClass
 		Point2D MousePos;
 #ifdef __ANDROID__
             std::atomic<bool> AndroidLeftMouseDown;
+            std::atomic<bool> AndroidHardwareKeys[256]{};
+            std::atomic<bool> AndroidCapsLock{false};
+            std::atomic<bool> AndroidMousePresent{false};
             std::atomic<int> AndroidTouchX;
             std::atomic<int> AndroidTouchY;
 #endif

@@ -1,0 +1,82 @@
+package com.opents.game;
+
+final class SpanishManifest {
+    static final String PAGE = "https://www.mediafire.com/file/5fro3j0hjjw9x4a/traduccion_ts-client.rar/file";
+    static final String CREDIT = "Spanish community translation adapted by nacho-arg for TS Client 6.05.";
+    static final long BYTES = 1535671541L;
+    static final String SHA256 = "b7d7ce979073739ef24b6e1c934a00b9d382638d287c72c2c5d43c4151cd95a3";
+    static final class Entry {
+        final String path, name;
+        final long bytes;
+        Entry(String path, String name, long bytes) { this.path = path; this.name = name; this.bytes = bytes; }
+    }
+    static final Entry[] ENTRIES = {
+        new Entry("Maps/Missions/fsgdi01.map", "FSGDI01.MAP", 110335L),
+        new Entry("Maps/Missions/fsgdi02.map", "FSGDI02.MAP", 248116L),
+        new Entry("Maps/Missions/fsgdi03.map", "FSGDI03.MAP", 157294L),
+        new Entry("Maps/Missions/fsgdi04.map", "FSGDI04.MAP", 166114L),
+        new Entry("Maps/Missions/fsgdi05.map", "FSGDI05.MAP", 215941L),
+        new Entry("Maps/Missions/fsgdi06.map", "FSGDI06.MAP", 138273L),
+        new Entry("Maps/Missions/fsgdi07.map", "FSGDI07.MAP", 258241L),
+        new Entry("Maps/Missions/fsgdi08.map", "FSGDI08.MAP", 257644L),
+        new Entry("Maps/Missions/fsgdi09.map", "FSGDI09.MAP", 328202L),
+        new Entry("Maps/Missions/fsnod01.map", "FSNOD01.MAP", 188201L),
+        new Entry("Maps/Missions/fsnod02.map", "FSNOD02.MAP", 246603L),
+        new Entry("Maps/Missions/fsnod03.map", "FSNOD03.MAP", 186102L),
+        new Entry("Maps/Missions/fsnod04.map", "FSNOD04.MAP", 135280L),
+        new Entry("Maps/Missions/fsnod05.map", "FSNOD05.MAP", 154815L),
+        new Entry("Maps/Missions/fsnod06.map", "FSNOD06.MAP", 225999L),
+        new Entry("Maps/Missions/fsnod07.map", "FSNOD07.MAP", 156567L),
+        new Entry("Maps/Missions/fsnod08.map", "FSNOD08.MAP", 209683L),
+        new Entry("Maps/Missions/fsnod09.map", "FSNOD09.MAP", 342603L),
+        new Entry("Maps/Missions/gdi10a.map", "GDI10A.MAP", 246062L),
+        new Entry("Maps/Missions/gdi10b.map", "GDI10B.MAP", 245793L),
+        new Entry("Maps/Missions/gdi11a.map", "GDI11A.MAP", 130944L),
+        new Entry("Maps/Missions/gdi12a.map", "GDI12A.MAP", 209292L),
+        new Entry("Maps/Missions/gdi1a.map", "GDI1A.MAP", 87453L),
+        new Entry("Maps/Missions/gdi1adshp.map", "GDI1ADSHP.MAP", 87517L),
+        new Entry("Maps/Missions/gdi2a.map", "GDI2A.MAP", 133326L),
+        new Entry("Maps/Missions/gdi3a.map", "GDI3A.MAP", 148763L),
+        new Entry("Maps/Missions/gdi3b.map", "GDI3B.MAP", 151953L),
+        new Entry("Maps/Missions/gdi4a.map", "GDI4A.MAP", 133264L),
+        new Entry("Maps/Missions/gdi5a.map", "GDI5A.MAP", 170451L),
+        new Entry("Maps/Missions/gdi5b.map", "GDI5B.MAP", 202655L),
+        new Entry("Maps/Missions/gdi5c.map", "GDI5C.MAP", 213614L),
+        new Entry("Maps/Missions/gdi6a.map", "GDI6A.MAP", 151273L),
+        new Entry("Maps/Missions/gdi6b.map", "GDI6B.MAP", 257054L),
+        new Entry("Maps/Missions/gdi7a.map", "GDI7A.MAP", 218438L),
+        new Entry("Maps/Missions/gdi8a.map", "GDI8A.MAP", 173521L),
+        new Entry("Maps/Missions/gdi9a.map", "GDI9A.MAP", 236869L),
+        new Entry("Maps/Missions/gdi9b.map", "GDI9B.MAP", 204008L),
+        new Entry("Maps/Missions/gdi9c.map", "GDI9C.MAP", 126368L),
+        new Entry("Maps/Missions/gdi9d.map", "GDI9D.MAP", 226824L),
+        new Entry("Maps/Missions/nod10a.map", "NOD10A.MAP", 224691L),
+        new Entry("Maps/Missions/nod11a.map", "NOD11A.MAP", 299113L),
+        new Entry("Maps/Missions/nod12a.map", "NOD12A.MAP", 384512L),
+        new Entry("Maps/Missions/nod12b.map", "NOD12B.MAP", 104603L),
+        new Entry("Maps/Missions/nod1a.map", "NOD1A.MAP", 83984L),
+        new Entry("Maps/Missions/nod2a.map", "NOD2A.MAP", 130157L),
+        new Entry("Maps/Missions/nod3a.map", "NOD3A.MAP", 154839L),
+        new Entry("Maps/Missions/nod3b.map", "NOD3B.MAP", 103783L),
+        new Entry("Maps/Missions/nod4a.map", "NOD4A.MAP", 192913L),
+        new Entry("Maps/Missions/nod4b.map", "NOD4B.MAP", 189291L),
+        new Entry("Maps/Missions/nod5a.map", "NOD5A.MAP", 170300L),
+        new Entry("Maps/Missions/nod6a.map", "NOD6A.MAP", 161132L),
+        new Entry("Maps/Missions/nod6b.map", "NOD6B.MAP", 149643L),
+        new Entry("Maps/Missions/nod6c.map", "NOD6C.MAP", 224748L),
+        new Entry("Maps/Missions/nod7a.map", "NOD7A.MAP", 217814L),
+        new Entry("Maps/Missions/nod7b.map", "NOD7B.MAP", 137612L),
+        new Entry("Maps/Missions/nod8a.map", "NOD8A.MAP", 179442L),
+        new Entry("Maps/Missions/nod9a.map", "NOD9A.MAP", 231518L),
+        new Entry("Maps/Missions/nod9b.map", "NOD9B.MAP", 164286L),
+        new Entry("MIX/MOVIES01.MIX", "MOVIES01.MIX", 1030965077L),
+        new Entry("MIX/MOVIES02.MIX", "MOVIES02.MIX", 673418974L),
+        new Entry("MIX/SideCD01.mix", "SIDECD01.MIX", 12094436L),
+        new Entry("MIX/SideCD02.mix", "SIDECD02.MIX", 11924164L),
+        new Entry("MIX/sounds.mix", "SOUNDS.MIX", 3101080L),
+        new Entry("MIX/speech01.mix", "SPEECH01.MIX", 6219020L),
+        new Entry("MIX/speech02.mix", "SPEECH02.MIX", 7067460L),
+        new Entry("Resources/language_640x480.dll", "LANGUAGE.DLL", 135168L),
+        new Entry("INI/LANGRULE.INI", "LANGRULE.INI", 8321L),
+    };
+}

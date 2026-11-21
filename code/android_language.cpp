@@ -1,8 +1,11 @@
 #include "always.h"
 #include "language/language.h"
+#include "language_resources.h"
+#include <fstream>
+#include <vector>
 
 #ifdef __ANDROID__
-char const * Android_Fetch_String(int id)
+static char const * Android_English_String(int id)
 {
     switch (id) {
         case TXT_NONE: return " ";
@@ -756,5 +759,89 @@ char const * Android_Fetch_String(int id)
         case TXT_CONNECTION_QUALITY_RUNG: return "%s (rung %u)";
         default: return "";
     }
+}
+
+static std::map<unsigned, std::string> & Android_Language_Strings()
+{
+    static std::map<unsigned, std::string> strings;
+    return strings;
+}
+
+static unsigned AndroidLanguageCode;
+
+void Android_Init_Language()
+{
+    std::ifstream choice(".opents-game-language");
+    std::string language;
+    choice >> language;
+    unsigned code = language == "es" ? 10 : language == "fr" ? 12 : language == "de" ? 7 : 0;
+    AndroidLanguageCode = code;
+    if (!code) return;
+    std::ifstream file("LANGUAGE.DLL", std::ios::binary | std::ios::ate);
+    auto size = file.tellg();
+    if (!file || size <= 0 || size > 4 * 1024 * 1024) return;
+    file.seekg(0);
+    std::vector<unsigned char> bytes(static_cast<size_t>(size));
+    if (file.read(reinterpret_cast<char *>(bytes.data()), bytes.size()))
+        Read_Language_Strings(bytes, code, Android_Language_Strings());
+}
+
+char const * Android_Fetch_String(int id)
+{
+    char const * english = Android_English_String(id);
+    auto const & strings = Android_Language_Strings();
+    auto found = strings.find(id);
+    if (found != strings.end() && Compatible_Language_Format(english, found->second)) return found->second.c_str();
+    return english;
+}
+
+bool Android_Spanish_Game(void)
+{
+    return AndroidLanguageCode == 10;
+}
+
+
+bool Android_Localized_Menu(void)
+{
+    return AndroidLanguageCode == 10 || AndroidLanguageCode == 12 || AndroidLanguageCode == 7;
+}
+
+
+char const * Android_Menu_String(char const * text)
+{
+    struct Label { char const * English; char const * Spanish; char const * French; char const * German; };
+    static Label const labels[] = {
+        {"Main Menu", "Men\303\272 principal", "Menu principal", "Hauptmen\303\274"},
+        {"New Campaign", "Nueva campa\303\261a", "Nouvelle campagne", "Neue Kampagne"},
+        {"New Game", "Nueva partida", "Nouvelle partie", "Neues Spiel"},
+        {"Local Wi-Fi", "Wi-Fi local", "Wi-Fi local", "Lokales WLAN"},
+        {"Internet", "Internet", "Internet", "Internet"},
+        {"Intro / Sneak Peek", "Introducci\303\263n / Avance", "Introduction / Aper\303\247u", "Intro / Vorschau"},
+        {"Exit", "Salir", "Quitter", "Beenden"},
+        {"Load Game", "Cargar partida", "Charger une partie", "Spiel laden"},
+        {"Save Game", "Guardar partida", "Sauvegarder", "Spiel speichern"},
+        {"Delete Game", "Borrar partida", "Supprimer une partie", "Spiel l\303\266schen"},
+        {"Abort Mission", "Abortar misi\303\263n", "Abandonner la mission", "Mission abbrechen"},
+        {"Game Controls", "Controles del juego", "Commandes du jeu", "Spielsteuerung"},
+        {"Restate Briefing", "Repetir objetivos", "Rappeler les objectifs", "Einsatzbesprechung"},
+        {"Sound", "Sonido", "Son", "Sound"},
+        {"Keyboard", "Teclado", "Clavier", "Tastatur"},
+        {"Campaign", "Campa\303\261a", "Campagne", "Kampagne"},
+        {"Skirmish", "Escaramuza", "Escarmouche", "Gefechtsmodus"},
+        {"Back", "Volver", "Retour", "Zur\303\274ck"},
+        {"Next", "Siguiente", "Suivant", "Weiter"},
+        {"Previous", "Anterior", "Pr\303\251c\303\251dent", "Zur\303\274ck"},
+        {"Start", "Comenzar", "Commencer", "Starten"},
+        {"Difficulty", "Dificultad", "Difficult\303\251", "Schwierigkeitsgrad"},
+        {"Music Tracks", "Pistas de m\303\272sica", "Pistes musicales", "Musiktitel"},
+        {"Mission Objectives", "Objetivos de la misi\303\263n", "Objectifs de mission", "Missionsziele"},
+    };
+    for (auto const & label : labels) {
+        if (strcmp(text, label.English) != 0) continue;
+        if (AndroidLanguageCode == 10) return label.Spanish;
+        if (AndroidLanguageCode == 12) return label.French;
+        if (AndroidLanguageCode == 7) return label.German;
+    }
+    return text;
 }
 #endif

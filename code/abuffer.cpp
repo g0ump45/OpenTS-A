@@ -13,6 +13,7 @@
 
 #include "bsurface.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 
@@ -103,37 +104,7 @@ void ABuffer::Release_Surface(void)
 /// run off the end of the buffer.</remarks>
 void ABuffer::Set(unsigned short * dst, int size, unsigned short value)
 {
-	/// Write a single pixel to bring the address up to an int boundary.
-	if ((uintptr_t)dst & 2) {
-		if (size != 0) {
-			*dst = value;
-			++dst;
-			size--;
-		}
-	}
-
-	int size_half = size >> 1;
-	unsigned int *dst_ptr = NULL;
-
-	/// Duplicate the value into both halves of an int and write the bulk of the run two
-	/// pixels at a time. This loop becomes a memset32.
-	if (size_half) {
-		int val = (value * (2 * ABUFFER_MAX)) + value;
-		dst_ptr = (unsigned int *)dst;
-		while (size_half) {
-			*dst_ptr = val;
-			dst_ptr++;
-			size_half--;
-		}
-	}
-
-	/// Write the odd pixel left over at the end. A run of a single pixel that began
-	/// aligned never sets dst_ptr, so it writes nothing.
-	if (size & 1) {
-		if (dst_ptr != NULL) {
-			*(unsigned short *)dst_ptr = value;
-		}
-	}
+	if (size > 0) std::fill_n(dst, size, value);
 }
 
 

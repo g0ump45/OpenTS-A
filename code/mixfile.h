@@ -51,6 +51,7 @@ class MixFileClass : public Node<MixFileClass *>
 		static_assert(sizeof(SubBlock) == 12, "a MIX directory entry is 12 bytes on disk");
 
 	private:
+		static bool Offset_In_Archive(char const * filename, char const * archive, void ** realptr, MixFileClass ** mixfile, int * offset, int * size);
 		static MixFileClass * Finder(char const * filename);
 		int Offset(int crc, int * size = 0) const;
 

@@ -64,5 +64,8 @@ void Choose_Side(int side)
 		return;
 	}
 
+#ifdef __ANDROID__
+	if (side == 1 || side == 2) return;
+#endif
 	Play_Movie("INTRO.VQA");
 }

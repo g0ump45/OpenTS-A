@@ -1210,6 +1210,10 @@ void Tactical::Render(Surface & surface, bool fullredraw, int drawpass)
 			}
 		} else {
 			if (fullredraw && (drawpass == DRAW_PASS_PAN || drawpass == DRAW_PASS_FULL)) {
+#ifdef __ANDROID__
+				// A cleared background must invalidate bridge draws from the same simulation frame.
+				Map.Increment_Redraw_Counter();
+#endif
 				DepthBuffer->Fill(0xFFFFu);
 				AlphaBuffer->Fill(127u);
 			}

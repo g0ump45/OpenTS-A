@@ -1,7 +1,7 @@
 package com.opents.game;
 
 import android.app.Activity;
-import android.app.NativeActivity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -16,7 +16,11 @@ import java.util.zip.*;
 public class GameFilesActivity extends Activity {
     private static final int FOLDER = 1, ZIP = 2;
     private TextView status;
-    private Button folderButton, zipButton, doneButton;
+    private Button folderButton, zipButton, downloadButton, doneButton, languageButton;
+    private String gameLanguage = "en";
+    private volatile boolean cancelDownload;
+    private boolean downloading;
+    private long lastProgress;
     private boolean busy, imported;
     private File destination;
 
@@ -26,23 +30,66 @@ public class GameFilesActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         LinearLayout layout = new LinearLayout(this);
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setPadding(32, 24, 32, 24);
+        layout.setPadding(dp(16), dp(12), dp(16), dp(12));
         layout.setBackgroundColor(0xff101a12);
+        TextView heading = new TextView(this);
+        heading.setText("Install game files");
+        heading.setTextColor(0xffa8e89a); heading.setTextSize(22);
+        heading.setPadding(0, 0, 0, dp(8));
+        layout.addView(heading);
+        ScrollView scroll = new ScrollView(this);
+        layout.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        LinearLayout content = new LinearLayout(this);
+        boolean landscape = getResources().getConfiguration().orientation
+            == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
+        content.setOrientation(landscape ? LinearLayout.HORIZONTAL : LinearLayout.VERTICAL);
+        scroll.addView(content);
         status = new TextView(this);
-        status.setTextColor(0xffa8e89a); status.setTextSize(19);
-        status.setText("Import Game Files\n\nChoose the root folder of your installed Tiberian Sun copy, or a ZIP containing it. Game files are found automatically. Phone settings and saves are kept.\n\nFiles must be accessible on this phone, a connected USB drive, or through its file picker.");
-        layout.addView(status, new LinearLayout.LayoutParams(-1, 0, 1));
-        folderButton = button(layout, "Choose installation folder", () -> choose(FOLDER));
-        zipButton = button(layout, "Choose installation ZIP", () -> choose(ZIP));
-        doneButton = button(layout, "Back", () -> leave());
+        status.setTextColor(0xffa8e89a); status.setTextSize(16);
+        status.setPadding(0, 0, landscape ? dp(20) : 0, dp(12));
+        status.setText("Choose your game language, then download the freeware files or import an installation folder or ZIP.\n\nPhone settings and saves are kept. Use Wi-Fi for downloads and keep this screen open.");
+        content.addView(status, landscape ? new LinearLayout.LayoutParams(0, -2, 1)
+            : new LinearLayout.LayoutParams(-1, -2));
+        LinearLayout actions = new LinearLayout(this);
+        actions.setOrientation(LinearLayout.VERTICAL);
+        content.addView(actions, landscape ? new LinearLayout.LayoutParams(0, -2, 1)
+            : new LinearLayout.LayoutParams(-1, -2));
+        gameLanguage = getPreferences(MODE_PRIVATE).getString("game-language", "en");
+        if (!Arrays.asList(GameLanguage.CODES).contains(gameLanguage)) gameLanguage = "en";
+        languageButton = button(actions, "Game language: " + GameLanguage.label(gameLanguage), () -> chooseLanguage());
+        downloadButton = button(actions, "Download freeware game files", () -> confirmDownload());
+        LinearLayout imports = new LinearLayout(this);
+        imports.setOrientation(LinearLayout.HORIZONTAL);
+        actions.addView(imports, new LinearLayout.LayoutParams(-1, -2));
+        folderButton = button(imports, "Choose folder", () -> choose(FOLDER));
+        folderButton.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1));
+        zipButton = button(imports, "Choose ZIP", () -> choose(ZIP));
+        zipButton.setLayoutParams(new LinearLayout.LayoutParams(0, -2, 1));
+        doneButton = button(actions, "Back", () -> { if (downloading) cancelDownload = true; else leave(); });
         setContentView(layout);
-        if (destination == null) { status.setText("Phone game storage is unavailable."); folderButton.setEnabled(false); zipButton.setEnabled(false); }
+        if (destination == null) { status.setText("Phone game storage is unavailable."); downloadButton.setEnabled(false); folderButton.setEnabled(false); zipButton.setEnabled(false); }
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
     private Button button(LinearLayout layout, String title, Runnable action) {
         Button button = new Button(this); button.setText(title);
-        button.setOnClickListener(v -> action.run()); layout.addView(button);
+        button.setOnClickListener(v -> action.run()); layout.addView(button, new LinearLayout.LayoutParams(-1, -2));
         return button;
+    }
+
+    private void chooseLanguage() {
+        if (busy) return;
+        new AlertDialog.Builder(this).setTitle("Choose game language")
+            .setSingleChoiceItems(GameLanguage.LABELS, Arrays.asList(GameLanguage.CODES).indexOf(gameLanguage), (dialog, which) -> {
+                gameLanguage = GameLanguage.CODES[which];
+                getPreferences(MODE_PRIVATE).edit().putString("game-language", gameLanguage).apply();
+                languageButton.setText("Game language: " + GameLanguage.label(gameLanguage));
+                status.setText(GameLanguage.summary(gameLanguage) + "\n\nOnly the selected language and shared game files are downloaded. Folder and ZIP imports keep the language files supplied in your installation.");
+                dialog.dismiss();
+            }).setNegativeButton("Cancel", null).show();
     }
 
     private void choose(int mode) {
@@ -56,7 +103,8 @@ public class GameFilesActivity extends Activity {
         super.onActivityResult(request, result, data);
         if (result != RESULT_OK || data == null || data.getData() == null || busy) return;
         busy = true;
-        folderButton.setEnabled(false); zipButton.setEnabled(false); doneButton.setEnabled(false);
+        languageButton.setEnabled(false);
+        downloadButton.setEnabled(false); folderButton.setEnabled(false); zipButton.setEnabled(false); doneButton.setEnabled(false);
         Uri uri = data.getData();
         status.setText("Finding game files...");
         new Thread(() -> {
@@ -64,6 +112,8 @@ public class GameFilesActivity extends Activity {
             try {
                 destination.mkdirs();
                 int count = request == FOLDER ? importFolder(uri) : importZip(uri);
+                GameLanguage.recordImported(destination, gameLanguage);
+                new File(destination, FreewareSetup.PENDING).delete();
                 imported = true;
                 message = "Imported " + count + " game files.\n\nLocation: " + destination + "\n\nClose and reopen OpenTS to load the imported files.";
             } catch (Exception e) {
@@ -72,10 +122,55 @@ public class GameFilesActivity extends Activity {
             String finalMessage = message;
             runOnUiThread(() -> {
                 busy = false; status.setText(finalMessage);
-                folderButton.setEnabled(true); zipButton.setEnabled(true); doneButton.setEnabled(true);
+                languageButton.setEnabled(true);
+                downloadButton.setEnabled(true); folderButton.setEnabled(true); zipButton.setEnabled(true); doneButton.setEnabled(true);
                 doneButton.setText(imported ? "Close game" : "Back");
             });
         }, "OpenTS-import").start();
+    }
+
+    private void confirmDownload() {
+        if (busy || destination == null) return;
+        new AlertDialog.Builder(this).setTitle("Install " + GameLanguage.label(gameLanguage) + "?")
+            .setMessage(GameLanguage.summary(gameLanguage) + "\n\nShared files come from C&C Communications Center and Tore. Spanish uses nacho-arg's translation; German and French use verified game-data downloads. Use Wi-Fi and keep this screen open. Interrupted downloads can be resumed.")
+            .setNegativeButton("Cancel", null)
+            .setPositiveButton("Download", (dialog, which) -> downloadFiles()).show();
+    }
+
+    private void downloadFiles() {
+        busy = true; downloading = true; cancelDownload = false; lastProgress = 0;
+        languageButton.setEnabled(false);
+        downloadButton.setEnabled(false); folderButton.setEnabled(false); zipButton.setEnabled(false);
+        doneButton.setText("Cancel download");
+        status.setText("Preparing game-file download...");
+        new Thread(() -> {
+            String message;
+            try {
+                int count = FreewareSetup.install(destination, gameLanguage, text -> {
+                    if (cancelDownload) throw new java.io.InterruptedIOException("Download cancelled.");
+                    long now = android.os.SystemClock.elapsedRealtime();
+                    if (now - lastProgress >= 500) { progress(text); lastProgress = now; }
+                });
+                imported = true;
+                message = "Installed " + count + " game files.\n\nTap Close game, then reopen OpenTS-A to play.";
+            } catch (Exception e) {
+                message = "Setup stopped: " + e.getMessage() + "\n\nTap Download freeware game files to retry. Completed packages and partial downloads are kept.";
+            } catch (OutOfMemoryError e) {
+                message = "Not enough memory to unpack game files. Close other apps and retry.";
+            }
+            String finalMessage = message;
+            runOnUiThread(() -> {
+                busy = false; downloading = false; status.setText(finalMessage);
+                languageButton.setEnabled(true);
+                downloadButton.setEnabled(true); folderButton.setEnabled(true); zipButton.setEnabled(true);
+                doneButton.setText(imported ? "Close game" : "Back");
+            });
+        }, "OpenTS-freeware-setup").start();
+    }
+
+    @Override protected void onDestroy() {
+        cancelDownload = true;
+        super.onDestroy();
     }
 
     private void progress(String text) { runOnUiThread(() -> status.setText(text)); }
@@ -158,7 +253,7 @@ public class GameFilesActivity extends Activity {
         } finally { archive.delete(); }
     }
 
-    @Override public void onBackPressed() { if (!busy) leave(); }
+    @Override public void onBackPressed() { if (downloading) cancelDownload = true; else if (!busy) leave(); }
 
     private void leave() {
         if (imported) { finishAffinity(); android.os.Process.killProcess(android.os.Process.myPid()); }

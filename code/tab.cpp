@@ -122,6 +122,15 @@ void TabClass::Serialize(SaveStreamClass & stream)
  *=============================================================================================*/
 #define	EVA_WIDTH		80
 #define	TAB_HEIGHT		8
+#ifdef __ANDROID__
+bool Android_Options_Tab_Hit(int x, int y)
+{
+	if (y <= 0 || y >= 32 || x <= 0 || x >= VisibleSurface->Get_Width() - 1) return false;
+	return Options.IsSidebarOnRight ? x < 160 : x > VisibleRect.Width - 160 && x < VisibleRect.Width;
+}
+#endif
+
+
 void TabClass::Draw_It(bool complete)
 {
 	if (!Debug_Map) {

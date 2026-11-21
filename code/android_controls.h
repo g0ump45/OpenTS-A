@@ -12,7 +12,9 @@ struct AndroidControlSettings {
         std::atomic<int> ControlScheme{ANDROID_CONTROL_MODERN};
 	std::atomic<bool> DoubleTapRightClick{true};
 	std::atomic<bool> SelectionBox{true};
+	std::atomic<bool> SwapDragGestures{true};
 	std::atomic<bool> EdgeScrolling{true};
+	std::atomic<int> ShortcutPlacement{1};
 	std::atomic<int> PanSpeed{8};
 	std::atomic<int> DoubleTapMilliseconds{300};
 };

@@ -59,7 +59,24 @@
 #include <string>
 #include <vector>
 
+extern char const * Android_Fetch_String(int id);
+extern char const * Android_Menu_String(char const * text);
+
 namespace {
+
+char const * Menu_Label(char const * text)
+{
+    struct Label { char const * Text; int ID; };
+    static Label const labels[] = {
+        {"Options", TXT_TAB_BUTTON_CONTROLS}, {"Options Menu", TXT_OPTIONS_MENU},
+        {"Resume Mission", TXT_RESUME_MISSION}, {"Cancel", TXT_CANCEL},
+        {"Yes", TXT_YES}, {"No", TXT_NO}, {"OK", TXT_OK},
+        {"Easy", TXT_EASY}, {"Normal", TXT_NORMAL}, {"Hard", TXT_HARD}
+    };
+    for (auto const & label : labels)
+        if (strcmp(text, label.Text) == 0) return Android_Fetch_String(label.ID);
+    return Android_Menu_String(text);
+}
 
 struct Choice {
 	int ID;
@@ -154,9 +171,11 @@ public:
 		Keyboard->Clear();
 		LogicalSurface = HiddenSurface;
 		HiddenSurface->Blit_From(Background);
-		Draw_Menu_Panel(compact ? Rect(180 + ox, 110, 280, 240) : Rect(90 + ox, 28, 460, 424));
+		int compact_height = 240;
+		for (auto const & item : choices) compact_height = std::max(compact_height, item.Y + 24 + 20 - 110);
+		Draw_Menu_Panel(compact ? Rect(180 + ox, 110, 280, compact_height) : Rect(90 + ox, 28, 460, 424));
 		if (!compact) {
-			TextButtonClass heading(0, title, TPF_BUTTON, 110 + ox, 42, 420, 26, false, true);
+			TextButtonClass heading(0, Menu_Label(title), TPF_BUTTON, 110 + ox, 42, 420, 26, false, true);
 			heading.Draw_Me(true);
 		}
 		for (size_t i = 0; i < lines.size(); ++i) {
@@ -166,7 +185,7 @@ public:
 		std::vector<std::unique_ptr<TextButtonClass>> buttons;
 		GadgetClass * list = nullptr;
 		for (Choice const & item : choices) {
-			auto button = std::make_unique<MenuButton>(item.ID, item.Text.c_str(), TPF_BUTTON,
+			auto button = std::make_unique<MenuButton>(item.ID, Menu_Label(item.Text.c_str()), TPF_BUTTON,
 				item.X + ox, item.Y, item.Width, compact ? 24 : 30);
 			if (list) button->Add(*list);
 			else list = button.get();
@@ -659,18 +678,19 @@ void Touch_Controls_Guide(Menu & menu)
                 int const result = menu.Show("Controls Guide", {
                         {1, "Modern Touch", 110, 150, 420},
                         {2, "Original Touch (disabled)", 110, 205, 420, false},
+                        {4, "Mouse + Keyboard", 110, 260, 420},
                         {3, "Back", 220, 390, 200}},
                         {"Choose a control scheme to see how it works."});
 
                 if (result == 1) {
                         menu.Show("Modern Touch", {
-                                {1, "Back", 220, 390, 200}},
+                                {1, "Back", 220, 414, 200}},
                                 {"Tap unit: Select",
-                                 "Tap ground: Move selected units",
+                                 "Tap ground: Move (after tap interval)",
                                  "Tap enemy: Attack",
-                                 "Drag, then release: Box-select units",
+                                 AndroidControls.SwapDragGestures.load() ? "Hold + drag: Pan camera" : "Drag, then release: Box-select units",
                                  "Double-tap unit: Select same type",
-                                 "Second tap + drag: Pan camera",
+                                 AndroidControls.SwapDragGestures.load() ? "Second tap + drag: Box-select units" : "Second tap + drag: Pan camera",
                                  "Pinch: Zoom battlefield",
                                  "Two-finger tap: Right click",
                                  "Keep still; lift both within 0.25 sec",
@@ -678,7 +698,23 @@ void Touch_Controls_Guide(Menu & menu)
                                  "Hold production icon 0.5 sec, release:",
                                  "Pause build; repeat to cancel",
                                  "Hold ground 0.5 sec, release:",
-                                 "Attack-move (without dragging)"});
+                                 "Attack-move (without dragging)",
+                                 "[+] groups: tap to recall, hold to assign",
+                                 "Base: centre the camera on your base"});
+                } else if (result == 4) {
+                        menu.Show("Mouse + Keyboard", {
+                                {1, "Back", 220, 390, 200}},
+                                {"USB or Bluetooth mouse and keyboard",
+                                 "Left click: Select or give orders",
+                                 "Left drag: Select units in a box",
+                                 "Right click: Cancel / deselect",
+                                 "Mouse wheel: Zoom battlefield",
+                                 "Move cursor to edge: Scroll, if enabled",
+                                 "Keyboard: Standard game shortcuts",
+                                 "Shift / Ctrl / Alt combinations work",
+                                 "View or change bindings in Keyboard",
+                                 "Text entry uses the US keyboard layout",
+                                 "Touch controls remain available"});
                 } else if (result == 2) {
                         menu.Show("Original Touch", {
                                 {1, "Back", 220, 390, 200}},
@@ -694,21 +730,22 @@ void Touch_Controls_Guide(Menu & menu)
 
 void Touch_Controls(Menu & menu)
 {
+	static char const * const placementNames[] = {"Hidden", "Bottom", "Top"};
 	for (;;) {
 		int const speed = AndroidControls.PanSpeed.load();
 		int const delay = AndroidControls.DoubleTapMilliseconds.load();
 		int const result = menu.Show("Touch Controls", {
 			{1, AndroidControls.ControlScheme.load() == ANDROID_CONTROL_MODERN ? "Scheme: Modern Touch" : "Scheme: Original Touch", 110, 86, 420},
-			{2, Toggle("Double-tap gestures", AndroidControls.DoubleTapRightClick.load()), 110, 130, 420},
-			{3, Toggle("Selection box", AndroidControls.SelectionBox.load()), 110, 174, 205},
-			{4, Toggle("Touch edge scroll", AndroidControls.EdgeScrolling.load()), 325, 174, 205},
+			{11, Toggle("Swap pan / box drag", AndroidControls.SwapDragGestures.load()), 110, 130, 420},
+			{4, Toggle("Touch edge scroll", AndroidControls.EdgeScrolling.load()), 110, 174, 420},
 			{5, "-", 110, 218, 42, speed > 1},
 			{30, "Camera speed: " + std::to_string(speed), 160, 218, 320, false},
 			{6, "+", 488, 218, 42, speed < 16},
 			{7, "-", 110, 262, 42, delay > 150},
 			{31, "Double-tap: " + std::to_string(delay) + " ms", 160, 262, 320, false},
 			{8, "+", 488, 262, 42, delay < 500},
-			{9, "Reset Controls", 110, 330, 205}, {10, "Back", 325, 330, 205}});
+			{12, std::string("Tactical shortcuts: ") + placementNames[AndroidControls.ShortcutPlacement.load()], 110, 306, 420},
+			{9, "Reset Controls", 110, 350, 205}, {10, "Back", 325, 350, 205}});
 		if (result == 1) {
 int const scheme = menu.Show("Control Schemes", {
 {2, AndroidControls.ControlScheme.load() == ANDROID_CONTROL_MODERN ? "Modern Touch (active)" : "Modern Touch", 110, 150, 420},
@@ -732,9 +769,9 @@ if (!Android_Save_Control_Settings())
 menu.Message("Touch Controls", "Settings active, but could not save to storage.");
 continue;
 }
-if (result == 2) AndroidControls.DoubleTapRightClick = !AndroidControls.DoubleTapRightClick.load();
-		else if (result == 3) AndroidControls.SelectionBox = !AndroidControls.SelectionBox.load();
-		else if (result == 4) AndroidControls.EdgeScrolling = !AndroidControls.EdgeScrolling.load();
+if (result == 4) AndroidControls.EdgeScrolling = !AndroidControls.EdgeScrolling.load();
+		else if (result == 12) AndroidControls.ShortcutPlacement = (AndroidControls.ShortcutPlacement.load() + 1) % 3;
+		else if (result == 11) AndroidControls.SwapDragGestures = !AndroidControls.SwapDragGestures.load();
 		else if (result == 5 || result == 6) AndroidControls.PanSpeed = std::clamp(speed + (result == 6 ? 1 : -1), 1, 16);
 		else if (result == 7 || result == 8) AndroidControls.DoubleTapMilliseconds = std::clamp(delay + (result == 8 ? 50 : -50), 150, 500);
 		else if (result == 9) {
@@ -797,7 +834,8 @@ void Controls(Menu & menu)
 		choices.insert(choices.end(), {{1, Toggle("Sidebar Text", Options.SidebarCameoText), 110, 230, 205},
 			{2, Toggle("Target Lines", Options.ActionLines), 325, 230, 205}, {3, Toggle("Tooltips", Options.ToolTips), 110, 273, 205},
 			{4, Toggle("Scroll Coasting", Options.ScrollMethod == 0), 325, 273, 205}, {5, "Touch Controls", 210, 316, 220},
-			{9, "About OpenTS-A", 210, 354, 220},
+			{9, "About OpenTS-A", 110, 354, 205},
+			{40, "Check for updates", 325, 354, 205, !ScenarioActive},
 			{6, "Sound", 110, 395, 125, AudioEngine.Is_Available()}, {7, "Keyboard", 255, 395, 125}, {8, "Options Menu", 400, 395, 130}});
 		int const result = menu.Show("Game Controls", choices);
 		if (result == 1) { Options.SidebarCameoText = !Options.SidebarCameoText; Map.Toggle_Cameo_Text(Options.SidebarCameoText); }
@@ -808,6 +846,7 @@ void Controls(Menu & menu)
 		else if (result == 6) Sound(menu);
 		else if (result == 7) Keyboard_Menu(menu);
 		else if (result == 9) About(menu);
+		else if (result == 40) { if (!Android_Open_Updates()) menu.Message("Updates", "Could not open update settings."); }
 		else if (result >= 10 && result <= 15) {
 			int const delta = (result & 1) ? 1 : -1;
 			if (result < 12) {
@@ -979,6 +1018,34 @@ bool Android_Has_Saved_Games(void)
 	auto const saves = Saves();
 	return std::any_of(saves.begin(), saves.end(), [](SaveEntry const & entry) { return entry.Valid; });
 }
+
+int Android_Shell_Menu(char const * section, DynamicVectorClass<int> const & disabled)
+{
+	bool const game_select = strcmp(section, "MainMenu") == 0;
+	Draw_Menu_Background();
+	Menu menu;
+	std::vector<Choice> choices;
+	if (game_select) {
+		choices = {{GMENU_TIBSUN, "Tiberian Sun", 150, 130, 340},
+			{GMENU_FIRESTORM, "Firestorm", 150, 175, 340, Addon_Installed(ADDON_FIRESTORM)},
+			{NSEL_EXIT, "Exit", 150, 360, 340}};
+	} else {
+		choices = {{NSEL_START_NEW_GAME, "New Game", 150, 100, 340},
+			{NSEL_LOAD_MISSION, "Load Game", 150, 140, 340},
+			{NSEL_SKIRMISH, "Skirmish", 150, 180, 340},
+			{NSEL_LAN, "Local Wi-Fi", 150, 220, 340},
+			{NSEL_INTERNET, "Internet", 150, 260, 340},
+			{NSEL_OPTIONS, "Options", 150, 300, 340},
+			{NSEL_INTRO, "Intro / Sneak Peek", 150, 340, 340},
+			{GMENU_BACK, "Back", 150, 390, 340}};
+	}
+	for (auto & choice : choices) {
+		for (int id : disabled) if (choice.ID == id) choice.Enabled = false;
+	}
+	int const result = menu.Show(game_select ? "Main Menu" : section[0] == 'F' ? "Firestorm" : "Tiberian Sun", choices);
+	return result == 0 && !game_select ? GMENU_BACK : result;
+}
+
 
 int Android_Main_Menu(void)
 {

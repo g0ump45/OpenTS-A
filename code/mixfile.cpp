@@ -556,6 +556,21 @@ void MixFileClass::Free(void)
  *=============================================================================================*/
 bool MixFileClass::Offset(char const * filename, void ** realptr, MixFileClass ** mixfile, int * offset, int * size)
 {
+#ifdef __ANDROID__
+	char const * archive = filename && strcmpi(filename, "INTR1.VQA") == 0 ? "MOVIES01.MIX"
+		: filename && strcmpi(filename, "INTR2.VQA") == 0 ? "MOVIES02.MIX" : nullptr;
+	// Combined installations can contain misleading embedded faction aliases.
+	if (archive) return Offset_In_Archive("INTRO.VQA", archive, realptr, mixfile, offset, size);
+	if (Offset_In_Archive(filename, nullptr, realptr, mixfile, offset, size)) return true;
+	return false;
+#else
+	return Offset_In_Archive(filename, nullptr, realptr, mixfile, offset, size);
+#endif
+}
+
+
+bool MixFileClass::Offset_In_Archive(char const * filename, char const * archive, void ** realptr, MixFileClass ** mixfile, int * offset, int * size)
+{
 	MixFileClass * ptr;
 
 	if (filename == NULL) {
@@ -583,6 +598,14 @@ bool MixFileClass::Offset(char const * filename, void ** realptr, MixFileClass *
 	*/
 	ptr = List.First();
 	while (ptr->Is_Valid()) {
+		if (archive) {
+			char const * basename = ptr->Filename;
+			for (char const * scan = basename; *scan; ++scan) {
+				if (*scan == '/' || *scan == '\\') basename = scan + 1;
+			}
+			if (strcmpi(basename, archive) != 0) { ptr = ptr->Next(); continue; }
+		}
+
 		SubBlock * block;
 
 		/*

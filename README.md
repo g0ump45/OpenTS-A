@@ -4,16 +4,11 @@ An Android port of [OpenTS](https://github.com/OpenTS-Developers/OpenTS), mainta
 
 This port adds Modern Touch controls, phone menus, game-file importing, pinch zoom, campaign audio support and Android LAN multiplayer work. Development continues: sidebar video playback and minimap alignment need further device testing and refinement. More updates will follow, and more projects by GEARS0FUMP45 may come soon.
 
-The V1 download has been corrected to **1.0.1 (code 4)** for the startup
-library mismatch and post-cutscene smoke crash. Re-download the APK if the
-original V1 installation closes. The corrected build has been confirmed working on the phone.
-
 ## Install
 
-1. Use **Android 8.0 or newer on a 64-bit ARM device**. Install the OpenTS-A APK and allow installation from your file manager when Android asks. Download [V1 - Welcome Back Commander](https://github.com/g0ump45/OpenTS-A/releases/tag/v1.0.0).
-2. Download **OpenTS-A-GameFiles.zip** from the [Releases page](https://github.com/g0ump45/OpenTS-A/releases/tag/v1.0.0). It includes the game files, movies and restored mission audio.
-3. Keep the ZIP compressed and leave at least 5 GiB free during import. Open the app: when game files are missing, the importer opens automatically. Tap **Choose installation ZIP**, select **OpenTS-A-GameFiles.zip**, wait for completion, tap **Close game**, then reopen OpenTS-A.
-4. Open **Options > Game Controls > Touch Controls > Controls Guide** for help. Back up saves before replacing test builds.
+1. Use **Android 8.0 or newer on a 64-bit ARM device**. Download the APK from [Releases](https://github.com/g0ump45/OpenTS-A/releases/latest) and allow installation when Android asks.
+2. On first launch, choose your game language and tap **Download freeware game files**. Keep the setup screen open until installation finishes. You can also import the game-files ZIP from [Releases](https://github.com/g0ump45/OpenTS-A/releases), or choose an existing game folder or ZIP.
+3. Open **Options > Game Controls > Touch Controls > Controls Guide** for instructions. Mouse and keyboard instructions are included there too.
 
 See [game-file requirements](docs/ANDROID-GAME-FILES.md) and [Android build instructions](docs/ANDROID-BUILD.md).
 
@@ -29,14 +24,20 @@ Modern Touch is the enabled default; saved control adjustments remain compatible
 | --- | --- |
 | Tap a unit | Select |
 | Tap ground / enemy | Move / attack with selected units |
-| Drag | Selection box; release to finish |
+| Hold and drag | Pan the camera by default |
 | Double-tap a unit | Select the same type |
-| Drag on the second tap | Pan the camera |
+| Drag on the second tap | Selection box by default |
 | Pinch | Zoom the battlefield |
 | Long-press ground | Attack-move |
 | Stationary two-finger tap, lifting both within 250 ms | Right-click at the first finger's position |
 | Hold a production icon for 0.5 seconds, then release | Pause production; repeat to cancel |
 | Touch near a battlefield edge | Scroll, when enabled |
+
+Tap **[+]** on the battlefield for groups 1-9. Tap a number to recall it or hold it for half a second and release to assign selected units. **Base** centres the camera. Set the panel to Bottom, Top or Hidden in Touch Controls.
+
+USB and Bluetooth mice/keyboards use physical clicks, drag selection and standard game shortcuts. The mouse wheel zooms the battlefield. Shift/Ctrl/Alt combinations and US-layout text entry are supported; touch controls remain available.
+
+Turn **Swap pan / box drag** off to use single-drag selection and second-tap camera panning.
 
 See the [touch-control guide](manual/content/systems/android-touch-controls.md) for settings.
 
