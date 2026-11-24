@@ -57,6 +57,9 @@
 #include "always.h"
 
 #include "wwmouse.h"
+#ifdef __ANDROID__
+#include "android_cursor.h"
+#endif
 
 #include "keyboard.h"
 
@@ -164,7 +167,11 @@ int WWMouseClass::Get_Mouse_State(void) const
 void WWMouseClass::Set_Cursor(Point2D const & hotspot, ShapeSet const * cursor, int shape)
 {
 	if (cursor != NULL) {
-		Win_Cursor_Set(cursor, shape, hotspot.X, hotspot.Y, Is_Captured());
+#ifdef __ANDROID__
+        Android_Cursor_Set(cursor, shape, hotspot.X, hotspot.Y);
+#else
+        Win_Cursor_Set(cursor, shape, hotspot.X, hotspot.Y, Is_Captured());
+#endif
 	}
 }
 

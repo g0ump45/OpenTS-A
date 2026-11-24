@@ -107,3 +107,5 @@ opents_add_test(android_shortcuts_test NAME android_shortcuts SOURCES android_sh
 if(ANDROID)
     opents_add_test(android_hardware_input_test NAME android_hardware_input SOURCES android_hardware_input_test.cpp)
 endif()
+
+opents_add_test(android_pointer_layout_test NAME android_pointer_layout SOURCES android_pointer_layout_test.cpp)

@@ -8,6 +8,9 @@ int main() {
     assert(virtual_key(AKEYCODE_CTRL_RIGHT)==0x11);
     assert(virtual_key(AKEYCODE_F12)==0x7b);
     assert(virtual_key(AKEYCODE_DPAD_LEFT)==0x25);
+    assert(virtual_key(AKEYCODE_DPAD_UP)==0x26);
+    assert(virtual_key(AKEYCODE_DPAD_RIGHT)==0x27);
+    assert(virtual_key(AKEYCODE_DPAD_DOWN)==0x28);
     assert(virtual_key(AKEYCODE_ESCAPE)==0x1b);
     assert(virtual_key(AKEYCODE_VOLUME_UP)==0);
     assert(ascii('A',false,false)=='a');

@@ -8,6 +8,14 @@
 
 #include "android_video.h"
 #include "android_shortcuts.h"
+#include "android_cursor.h"
+#include "android_controls.h"
+#include "_keyboar.h"
+#include "movies.h"
+#include "android_pointer_layout.h"
+#include <fstream>
+#include <string>
+#include <cstdio>
 
 #include <android/native_window.h>
 
@@ -32,12 +40,93 @@
 static ANativeWindow * AndroidWindow = nullptr;
 static std::mutex AndroidWindowMutex;
 static double AndroidVideoZoom = 1.0;
+static std::mutex AndroidViewMutex;
+static android_pointer::View AndroidInputView{0,0,0,0};
+static bool AndroidInputBattlefield = false;
+static void Android_Remap_Mouse(android_pointer::View view, int width, int height, bool battlefield)
+{
+    if (!Keyboard || !Keyboard->AndroidMousePresent.load()) return;
+    auto const point = android_pointer::map_window(view, width, height,
+        Keyboard->AndroidPointerWindowX.load(), Keyboard->AndroidPointerWindowY.load());
+    Keyboard->AndroidTouchX = point.width; Keyboard->AndroidTouchY = point.height;
+    int x = point.width, y = point.height;
+    if (battlefield) Android_Video_Map_Touch(x, y, x, y);
+    Keyboard->Set_Mouse_Position(x, y);
+}
+void Android_Video_Reset_Input_View()
+{
+    android_pointer::View const view{0,0,VideoModeWidth,VideoModeHeight};
+    { std::lock_guard<std::mutex> lock(AndroidViewMutex); AndroidInputView = view; AndroidInputBattlefield = true; }
+    int width = 0, height = 0;
+    if (Android_Video_Window_Size(width, height)) Android_Remap_Mouse(view, width, height, true);
+}
+void Android_Video_Get_Input_View(int & x, int & y, int & width, int & height)
+{
+    std::lock_guard<std::mutex> lock(AndroidViewMutex);
+    auto const view = AndroidInputView.width > 0 ? AndroidInputView : android_pointer::View{0,0,VideoModeWidth,VideoModeHeight};
+    x = view.x; y = view.y; width = view.width; height = view.height;
+}
 
+
+
+static std::string AndroidDisplayPath;
+static int AndroidDisplayPreset = 0;
+static int AndroidCustomWidth = 1280, AndroidCustomHeight = 720;
+void Android_Video_Init_Display(char const * data_path)
+{
+    AndroidDisplayPath = std::string(data_path ? data_path : "/sdcard/Android/data/com.opents.game/files") + "/ANDROID-DISPLAY.cfg";
+    AndroidDisplayPreset = 0;
+    std::ifstream file(AndroidDisplayPath);
+    int value = 0, width = 0, height = 0;
+    if (!(file >> value)) return;
+    if (value >= 0 && value <= 3) AndroidDisplayPreset = value;
+    else if (value == 4 && (file >> width >> height) && android_pointer::valid_custom_resolution(width, height)) {
+        AndroidDisplayPreset = 4; AndroidCustomWidth = width; AndroidCustomHeight = height;
+    }
+}
+int Android_Video_Resolution_Preset() { return AndroidDisplayPreset; }
+bool Android_Video_Window_Size(int & width, int & height)
+{
+    std::lock_guard<std::mutex> lock(AndroidWindowMutex);
+    if (!AndroidWindow) return false;
+    width = ANativeWindow_getWidth(AndroidWindow); height = ANativeWindow_getHeight(AndroidWindow);
+    return width > 0 && height > 0;
+}
+void Android_Video_Pending_Resolution(int & width, int & height)
+{
+    if (AndroidDisplayPreset == 4) { width = AndroidCustomWidth; height = AndroidCustomHeight; return; }
+    int window_width = 0, window_height = 0;
+    Android_Video_Window_Size(window_width, window_height);
+    auto const size = android_pointer::resolution(AndroidDisplayPreset, window_width, window_height);
+    width = size.width; height = size.height;
+}
+static bool Android_Save_Display(int preset, int width, int height)
+{
+    if (AndroidDisplayPath.empty()) return false;
+    std::string const temporary = AndroidDisplayPath + ".tmp";
+    std::ofstream file(temporary, std::ios::trunc);
+    file << preset;
+    if (preset == 4) file << ' ' << width << ' ' << height;
+    file << '\n'; file.close();
+    if (!file || std::rename(temporary.c_str(), AndroidDisplayPath.c_str()) != 0) return false;
+    AndroidDisplayPreset = preset;
+    if (preset == 4) { AndroidCustomWidth = width; AndroidCustomHeight = height; }
+    return true;
+}
+bool Android_Video_Save_Resolution(int preset)
+{
+    return preset >= 0 && preset <= 3 && Android_Save_Display(preset, 0, 0);
+}
+bool Android_Video_Save_Custom_Resolution(int width, int height)
+{
+    return android_pointer::valid_custom_resolution(width, height) && Android_Save_Display(4, width, height);
+}
 
 void Android_Video_Map_Touch(int screen_x, int screen_y, int & x, int & y)
 {
     x = screen_x;
     y = screen_y;
+    if (AndroidMenuActive.load() || !ScenarioActive) return;
 
     double const zoom = AndroidVideoZoom;
     if (zoom <= 1.0) {
@@ -104,15 +193,19 @@ bool Android_Initialize_Engine_Surfaces(void)
 		return true;
 	}
 
-	int width = 640, height = 480;
+	int width = 640, height = AndroidDisplayPreset == 2 ? 600 : AndroidDisplayPreset == 3 ? 720 : 480;
 	{
 		std::lock_guard<std::mutex> lock(AndroidWindowMutex);
 		if (AndroidWindow) {
 			int const w = ANativeWindow_getWidth(AndroidWindow);
 			int const h = ANativeWindow_getHeight(AndroidWindow);
-			if (w > 0 && h > 0) width = std::max(640, int((480LL * w + h / 2) / h));
+			if (AndroidDisplayPreset != 4 && w > 0 && h > 0) {
+                auto const size = android_pointer::resolution(AndroidDisplayPreset, w, h);
+                width = size.width; height = size.height;
+            }
 		}
 	}
+    if (AndroidDisplayPreset == 4) { width = AndroidCustomWidth; height = AndroidCustomHeight; }
 	Options.ScreenWidth = width;
 	Options.ScreenHeight = height;
 	DebugString("Android battlefield resolution: %dx%d\n", width, height);
@@ -177,7 +270,7 @@ void Android_Video_Zoom_Battlefield(Surface * surface)
 }
 
 
-void Android_Video_Present(void const * pixels, int width, int height, int pitch, bool battlefield)
+void Android_Video_Present(void const * pixels, int width, int height, int pitch, bool battlefield, bool menu)
 {
 	if (!battlefield) touch_shortcuts::panel.frame(false);
 	if (pixels == nullptr || width <= 0 || height <= 0 || pitch < width * 2) {
@@ -204,10 +297,20 @@ if (ANativeWindow_lock(window, &buffer, nullptr) != 0 || buffer.bits == nullptr)
         return;
 }
 
+    bool const menu_frame = !Movie_Is_Playing() && (menu || !ScenarioActive);
+    auto const view = android_pointer::presentation_view(width, height, menu_frame, menu);
+    bool changed;
+    {
+        std::lock_guard<std::mutex> lock(AndroidViewMutex);
+        changed = AndroidInputView.x != view.x || AndroidInputView.y != view.y ||
+            AndroidInputView.width != view.width || AndroidInputView.height != view.height || AndroidInputBattlefield != battlefield;
+        AndroidInputView = view; AndroidInputBattlefield = battlefield;
+    }
+    if (changed) Android_Remap_Mouse(view, buffer.width, buffer.height, battlefield);
 	int const dest_width = buffer.width;
 	int const dest_height = buffer.height;
-	int const scaled_width = std::min(dest_width, width * dest_height / height);
-	int const scaled_height = std::min(dest_height, height * dest_width / width);
+	int const scaled_width = std::min(dest_width, view.width * dest_height / view.height);
+	int const scaled_height = std::min(dest_height, view.height * dest_width / view.width);
 	int const offset_x = (dest_width - scaled_width) / 2;
 	int const offset_y = (dest_height - scaled_height) / 2;
 
@@ -224,19 +327,21 @@ if (ANativeWindow_lock(window, &buffer, nullptr) != 0 || buffer.bits == nullptr)
 			std::fill_n(destination + y * buffer.stride, dest_width, 0);
 		}
 
-		auto const * source = static_cast<std::uint8_t const *>(pixels);
+		auto const * source = static_cast<std::uint8_t const *>(pixels) + view.y * pitch + view.x * 2;
 		for (int y = 0; y < scaled_height; ++y) {
-			auto const * source_row = reinterpret_cast<std::uint16_t const *>(source + (y * height / scaled_height) * pitch);
+			auto const * source_row = reinterpret_cast<std::uint16_t const *>(source + (y * view.height / scaled_height) * pitch);
 			auto * destination_row = destination + (y + offset_y) * buffer.stride + offset_x;
 			for (int x = 0; x < scaled_width; ++x) {
-				destination_row[x] = source_row[x * width / scaled_width];
+				destination_row[x] = source_row[x * view.width / scaled_width];
 			}
 		}
 
 
-	}
+        Android_Cursor_Draw(destination, buffer.stride, dest_width, dest_height,
+            view.width, view.height, scaled_width, scaled_height, offset_x, offset_y, battlefield);
+    }
 
-	ANativeWindow_unlockAndPost(window);
+    ANativeWindow_unlockAndPost(window);
         ANativeWindow_release(window);
 }
 

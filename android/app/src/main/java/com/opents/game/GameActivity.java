@@ -4,10 +4,27 @@ import android.app.NativeActivity;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.PointerIcon;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
 public class GameActivity extends NativeActivity {
+    private boolean systemPointerHidden;
+    public void setSystemPointerHidden(boolean hidden) {
+        runOnUiThread(() -> {
+            systemPointerHidden = hidden;
+            if (!isFinishing() && !isDestroyed()) applyPointer(getWindow().getDecorView(),
+                PointerIcon.getSystemIcon(this, hidden ? PointerIcon.TYPE_NULL : PointerIcon.TYPE_DEFAULT));
+        });
+    }
+    private void applyPointer(View view, PointerIcon icon) {
+        view.setPointerIcon(icon);
+        if (view instanceof ViewGroup) {
+            ViewGroup group = (ViewGroup)view;
+            for (int i = 0; i < group.getChildCount(); ++i) applyPointer(group.getChildAt(i), icon);
+        }
+    }
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
         hideSystemBars();
@@ -20,7 +37,7 @@ public class GameActivity extends NativeActivity {
 
     @Override public void onWindowFocusChanged(boolean focused) {
         super.onWindowFocusChanged(focused);
-        if (focused) hideSystemBars();
+        if (focused) { hideSystemBars(); setSystemPointerHidden(systemPointerHidden); }
     }
 
     private void hideSystemBars() {

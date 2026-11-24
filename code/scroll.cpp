@@ -33,6 +33,9 @@
  *   ScrollClass::Set_Autoscroll -- Turns autoscrolling on or off.                             *
  * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - */
 
+#ifdef __ANDROID__
+#include "android_pointer_layout.h"
+#endif
 #include "always.h"
 
 #ifdef __ANDROID__
@@ -570,17 +573,22 @@ void ScrollClass::Scroll_AI(void)
                 bool android_touch_in_tactical = android_point.X >= 0 && android_point.X < TacticalRect.Width && android_point.Y >= 0 && android_point.Y < TacticalRect.Height;
                 android_point.X = std::clamp(android_point.X, 0, TacticalRect.Width - 1);
                 android_point.Y = std::clamp(android_point.Y, 0, TacticalRect.Height - 1);
-                if (AndroidControls.EdgeScrolling.load() && (Keyboard->AndroidLeftMouseDown.load() ||
-                    (Keyboard->AndroidMousePresent.load() && !Keyboard->AndroidHardwareKeys[VK_LBUTTON].load())) && android_touch_in_tactical) {
-                        const int edge_margin = 24;
-                        const int top_edge_margin = 40;
-                        const int bottom_edge_margin = 40;
-                        int edge_speed = AndroidControls.PanSpeed.load();
-                        if (android_point.X <= edge_margin) { Map.Scroll_Map(FACING_W, edge_speed, true); android_edge_scroll = true; }
-                        else if (android_point.X >= TacticalRect.Width - edge_margin) { Map.Scroll_Map(FACING_E, edge_speed, true); android_edge_scroll = true; }
-                        if (android_point.Y <= top_edge_margin) { Map.Scroll_Map(FACING_N, edge_speed, true); android_edge_scroll = true; }
-                        else if (android_point.Y >= TacticalRect.Height - bottom_edge_margin) { Map.Scroll_Map(FACING_S, edge_speed, true); android_edge_scroll = true; }
-                        if (android_edge_scroll) Map.Abort_Drag_Select();
+                if (AndroidControls.EdgeScrolling.load() && Keyboard->AndroidMousePresent.load() &&
+                    !Keyboard->AndroidHardwareKeys[VK_LBUTTON].load()) {
+                    int const left = Options.IsSidebarOnRight ? TacticalRect.X : SidebarRect.Width;
+                    unsigned const edges = android_pointer::edges(android_touch.X, android_touch.Y,
+                        left, TacticalRect.Y, TacticalRect.Width, TacticalRect.Height);
+                    int speed = AndroidControls.PanSpeed.load();
+                    FacingType const facing = edges & 4 ? (edges & 1 ? FACING_NW : edges & 2 ? FACING_NE : FACING_N) :
+                        edges & 8 ? (edges & 1 ? FACING_SW : edges & 2 ? FACING_SE : FACING_S) : edges & 1 ? FACING_W : FACING_E;
+                    if (edges) Map.Scroll_Map(facing, speed, true);
+                } else if (AndroidControls.EdgeScrolling.load() && Keyboard->AndroidLeftMouseDown.load() && android_touch_in_tactical) {
+                    int speed = AndroidControls.PanSpeed.load();
+                    if (android_point.X <= 24) { Map.Scroll_Map(FACING_W, speed, true); android_edge_scroll = true; }
+                    else if (android_point.X >= TacticalRect.Width - 24) { Map.Scroll_Map(FACING_E, speed, true); android_edge_scroll = true; }
+                    if (android_point.Y <= 40) { Map.Scroll_Map(FACING_N, speed, true); android_edge_scroll = true; }
+                    else if (android_point.Y >= TacticalRect.Height - 40) { Map.Scroll_Map(FACING_S, speed, true); android_edge_scroll = true; }
+                    if (android_edge_scroll) Map.Abort_Drag_Select();
                 }
 #endif
 

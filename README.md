@@ -39,6 +39,8 @@ USB and Bluetooth mice/keyboards use physical clicks, drag selection and standar
 
 Turn **Swap pan / box drag** off to use single-drag selection and second-tap camera panning.
 
+Physical mice use game targeting cursors and scroll only at the battlefield boundary. Arrow keys can be assigned in Keyboard. **Game Controls > Display** offers native, common phone/tablet and custom resolutions that apply after fully restarting.
+
 See the [touch-control guide](manual/content/systems/android-touch-controls.md) for settings.
 
 ## Support

@@ -82,6 +82,7 @@ class WWKeyboardClass
             std::atomic<bool> AndroidHardwareKeys[256]{};
             std::atomic<bool> AndroidCapsLock{false};
             std::atomic<bool> AndroidMousePresent{false};
+            std::atomic<int> AndroidPointerWindowX{0}, AndroidPointerWindowY{0};
             std::atomic<int> AndroidTouchX;
             std::atomic<int> AndroidTouchY;
 #endif

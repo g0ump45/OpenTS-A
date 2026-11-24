@@ -48,8 +48,7 @@ void MouseClass::Set_Default_Mouse(MouseType mouse, bool size)
 #ifdef __ANDROID__
     if ((unsigned)mouse >= MOUSE_COUNT) return;
     NormalMouseShape = mouse;
-    CurrentMouseShape = mouse;
-    IsSmall = size;
+    Override_Mouse_Shape(mouse, size);
     return;
 #else
     assert((unsigned)mouse < MOUSE_COUNT);
@@ -61,7 +60,7 @@ void MouseClass::Set_Default_Mouse(MouseType mouse, bool size)
 void MouseClass::Revert_Mouse_Shape(void)
 {
 #ifdef __ANDROID__
-    return;
+    Override_Mouse_Shape(NormalMouseShape, false);
 #else
     Override_Mouse_Shape(NormalMouseShape, false);
 #endif
@@ -70,8 +69,7 @@ void MouseClass::Revert_Mouse_Shape(void)
 void MouseClass::Mouse_Small(bool wsmall)
 {
 #ifdef __ANDROID__
-    if (!MouseCursor) return;
-    IsSmall = wsmall;
+    Override_Mouse_Shape(CurrentMouseShape, wsmall);
     return;
 #else
     MouseStruct const * control = &MouseControl[CurrentMouseShape];
@@ -132,6 +130,7 @@ bool MouseClass::Override_Mouse_Shape(MouseType mouse, bool wsmall)
 {
 #ifdef __ANDROID__
     if ((unsigned)mouse >= MOUSE_COUNT) return false;
+    if (CurrentMouseShape != mouse || IsSmall != wsmall) { Frame = 0; Timer = MouseControl[mouse].FrameRate; }
     CurrentMouseShape = mouse;
     IsSmall = wsmall;
     if (!MouseCursor || !MouseShapes) {
@@ -158,6 +157,8 @@ void MouseClass::One_Time(void)
 {
     BASECLASS::One_Time();
 #ifdef __ANDROID__
+    MouseShapes = (ShapeSet const *)MFCD::Retrieve("MOUSE.SHP");
+    Override_Mouse_Shape(MOUSE_NORMAL, false);
     return;
 #else
     // Original One_Time loads mouse.shp - skip on Android
@@ -177,6 +178,11 @@ void MouseClass::AI(KeyNumType &input, Point2D const & xy)
 {
 #ifdef __ANDROID__
     BASECLASS::AI(input, xy);
+    if (MouseShapes && MouseControl[CurrentMouseShape].FrameCount > 1 && !Timer) {
+        Frame = (Frame + 1) % MouseControl[CurrentMouseShape].FrameCount;
+        Timer = MouseControl[CurrentMouseShape].FrameRate;
+        Override_Mouse_Shape(CurrentMouseShape, IsSmall);
+    }
     return;
 #else
     // Original AI animates mouse - skip if needed

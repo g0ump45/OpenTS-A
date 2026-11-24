@@ -12,6 +12,7 @@
 #include <chrono>
 #include <string_view>
 #include "android_video.h"
+#include "android_cursor.h"
 #include "android_controls.h"
 #include "android_shortcuts.h"
 #include "android_hardware_input.h"
@@ -40,6 +41,28 @@ extern bool Android_Options_Tab_Hit(int x, int y);
 extern WWKeyboardClass* Keyboard;
 extern bool GameInFocus;
 static android_app * AndroidApp = nullptr;
+
+bool Android_System_Pointer(bool hidden)
+{
+    static int last = -1;
+    if (last == int(hidden)) return true;
+    if (!AndroidApp || !AndroidApp->activity) return false;
+    ANativeActivity * activity = AndroidApp->activity;
+    JNIEnv * env = nullptr;
+    bool const attached = activity->vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6) != JNI_OK;
+    if (attached && activity->vm->AttachCurrentThread(&env, nullptr) != JNI_OK) return false;
+    bool success = false;
+    if (env->PushLocalFrame(8) == JNI_OK) {
+        jclass type = env->GetObjectClass(activity->clazz);
+        jmethodID method = type ? env->GetMethodID(type, "setSystemPointerHidden", "(Z)V") : nullptr;
+        if (method && !env->ExceptionCheck()) { env->CallVoidMethod(activity->clazz, method, jboolean(hidden)); success = !env->ExceptionCheck(); }
+        if (env->ExceptionCheck()) env->ExceptionClear();
+        env->PopLocalFrame(nullptr);
+    } else if (env->ExceptionCheck()) env->ExceptionClear();
+    if (attached) activity->vm->DetachCurrentThread();
+    if (success) last = int(hidden);
+    return success;
+}
 
 static bool Android_Open_Activity(char const * activityName)
 {
@@ -258,19 +281,21 @@ static int32_t Android_Hardware_Input(android_app * app, AInputEvent * event)
     }
     if (!app->window) return 0;
     Keyboard->AndroidMousePresent = true;
-    int width, height;
-    Android_Video_Get_Game_Size(width, height);
+    Keyboard->AndroidPointerWindowX = int(AMotionEvent_getX(event, 0));
+    Keyboard->AndroidPointerWindowY = int(AMotionEvent_getY(event, 0));
+    int width, height, view_x, view_y;
+    Android_Video_Get_Input_View(view_x, view_y, width, height);
     int const ww = ANativeWindow_getWidth(app->window), wh = ANativeWindow_getHeight(app->window);
     if (width <= 0 || height <= 0 || ww <= 0 || wh <= 0) return 0;
     int const sw = std::min(ww, width * wh / height), sh = std::min(wh, height * ww / width);
     if (sw <= 0 || sh <= 0) return 0;
-    int const sx = int((AMotionEvent_getX(event, 0) - (ww-sw)/2) * width / sw);
-    int const sy = int((AMotionEvent_getY(event, 0) - (wh-sh)/2) * height / sh);
+    int const sx = view_x + int((AMotionEvent_getX(event, 0) - (ww-sw)/2) * width / sw);
+    int const sy = view_y + int((AMotionEvent_getY(event, 0) - (wh-sh)/2) * height / sh);
     int const action = AMotionEvent_getAction(event) & AMOTION_EVENT_ACTION_MASK;
     int buttons = AMotionEvent_getButtonState(event);
     if (action == AMOTION_EVENT_ACTION_CANCEL || action == AMOTION_EVENT_ACTION_UP) buttons = 0;
     int const changed = buttons ^ AndroidMouseButtons;
-    int x = std::clamp(sx, 0, width-1), y = std::clamp(sy, 0, height-1);
+    int x = std::clamp(sx, view_x, view_x+width-1), y = std::clamp(sy, view_y, view_y+height-1);
     if (!AndroidMenuActive.load() && ScenarioActive) Android_Video_Map_Touch(x, y, x, y);
     Keyboard->Set_Mouse_Position(x, y);
     Keyboard->AndroidTouchX = sx;
@@ -297,7 +322,7 @@ static int32_t Android_Hardware_Input(android_app * app, AInputEvent * event)
     if (action == AMOTION_EVENT_ACTION_SCROLL && ScenarioActive && !AndroidMenuActive.load()) {
         Android_Video_Set_Zoom(Android_Video_Get_Zoom() + AMotionEvent_getAxisValue(event, AMOTION_EVENT_AXIS_VSCROLL, 0) * 0.15);
     }
-    Map.Message_Handler(MainWindow, WM_MOUSEMOVE, 0, MAKELPARAM(x, y));
+    if (!AndroidMenuActive.load()) Map.Message_Handler(MainWindow, WM_MOUSEMOVE, 0, MAKELPARAM(x, y));
     int const masks[] = {AMOTION_EVENT_BUTTON_PRIMARY, AMOTION_EVENT_BUTTON_SECONDARY, AMOTION_EVENT_BUTTON_TERTIARY};
     int const keys[] = {VK_LBUTTON, VK_RBUTTON, VK_MBUTTON};
     int const downs[] = {WM_LBUTTONDOWN, WM_RBUTTONDOWN, WM_MBUTTONDOWN};
@@ -306,7 +331,7 @@ static int32_t Android_Hardware_Input(android_app * app, AInputEvent * event)
         if (!(changed & masks[i])) continue;
         bool const release = (buttons & masks[i]) == 0;
         Keyboard->AndroidHardwareKeys[keys[i]] = !release;
-        Map.Message_Handler(MainWindow, release ? ups[i] : downs[i], 0, MAKELPARAM(x, y));
+        if (!AndroidMenuActive.load()) Map.Message_Handler(MainWindow, release ? ups[i] : downs[i], 0, MAKELPARAM(x, y));
         Keyboard->Put_Mouse_Message(keys[i], x, y, release);
     }
     AndroidMouseButtons = buttons;
@@ -372,8 +397,8 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
         return 0;
     }
 
-    int game_width, game_height;
-    Android_Video_Get_Game_Size(game_width, game_height);
+    int game_width, game_height, view_x, view_y;
+    Android_Video_Get_Input_View(view_x, view_y, game_width, game_height);
     int const scaled_width = std::min(window_width, game_width * window_height / game_height);
     int const scaled_height = std::min(window_height, game_height * window_width / game_width);
     int const offset_x = (window_width - scaled_width) / 2;
@@ -389,8 +414,8 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
         case AMOTION_EVENT_ACTION_CANCEL: phase = Phase::Cancel; break;
     }
     if (scaled_width > 0 && scaled_height > 0 &&
-        panel.touch(phase, int((raw_x - offset_x) * game_width / scaled_width),
-                    int((raw_y - offset_y) * game_height / scaled_height), AMotionEvent_getEventTime(event))) {
+        panel.touch(phase, view_x + int((raw_x - offset_x) * game_width / scaled_width),
+                    view_y + int((raw_y - offset_y) * game_height / scaled_height), AMotionEvent_getEventTime(event))) {
         AndroidLastTapTime = 0;
         AndroidPendingTap = false;
         return 1;
@@ -407,8 +432,8 @@ static int32_t Handle_Input(struct android_app * app, AInputEvent * event)
         return 0;
     }
 
-    int x = std::clamp(static_cast<int>((raw_x - offset_x) * game_width / scaled_width), 0, game_width - 1);
-    int y = std::clamp(static_cast<int>((raw_y - offset_y) * game_height / scaled_height), 0, game_height - 1);
+    int x = view_x + std::clamp(static_cast<int>((raw_x - offset_x) * game_width / scaled_width), 0, game_width - 1);
+    int y = view_y + std::clamp(static_cast<int>((raw_y - offset_y) * game_height / scaled_height), 0, game_height - 1);
     int const screen_x = x;
     int const screen_y = y;
     Android_Video_Map_Touch(screen_x, screen_y, x, y);
@@ -773,6 +798,7 @@ void android_main(struct android_app* app) {
         return;
     }
     Android_Video_Set_Window(app->window);
+    Android_Video_Init_Display(app->activity->externalDataPath);
     if (!Android_Initialize_Engine_Surfaces()) {
         LOGE("Unable to initialize engine drawing surfaces");
         return;

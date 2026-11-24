@@ -74,3 +74,19 @@ languages, source downloads and storage requirements.
 ## Mouse and keyboard
 
 USB and Bluetooth hardware input uses mouse movement, left/right/middle buttons, left-drag selection and keyboard commands. The wheel zooms the battlefield. Letter, number, function, navigation and modifier keys use the engine shortcuts. Text fields support US-layout letters and punctuation. Device system buttons remain with Android. Touch controls remain available. Held keys and buttons clear when the app loses focus.
+
+## Hardware pointer and display
+
+Physical mice use the game cursor artwork in menus and on the battlefield, including targeting and animated action cursors. Android's pointer remains available if the artwork cannot be loaded. The cursor is drawn after battlefield zoom and does not leave marks in the cached map image.
+
+Mouse edge scrolling uses the outermost pixels of the visible battlefield. The production sidebar and letterbox space never count as battlefield edges. Touch scrolling keeps its wider drag zones.
+
+The keyboard shortcut picker includes Up, Down, Left and Right on the function-key page. Arrow bindings support Shift, Ctrl and Alt and use the existing KEYBOARD.INI format.
+
+Open **Game Controls > Display** to choose Auto, the current native display size, a common phone/tablet resolution, or a custom width and height. The screen shows active and saved dimensions separately and marks pending changes as requiring an app restart. Returning to the main menu does not apply them.
+
+The custom editor accepts on-screen digits, keyboard digits and number-pad digits. Select Width or Height, or use Tab/Left/Right to switch fields; Backspace deletes and Enter saves. The first digit replaces the selected value. Valid sizes are landscape or square, at least 640x480, no greater than 3840x2400, and at most 8,294,400 pixels. High resolutions use more memory and can reduce performance.
+
+Exact sizes retain their aspect ratio; black bars fill unused screen space. Higher sizes show more battlefield. Menus use a separate 640x480 presentation canvas scaled to the window, so text and buttons stay readable at native and custom resolutions. Mouse and touch positions follow the same menu transform. Pinch zoom remains independent. ANDROID-DISPLAY.cfg stores either an old preset number (0-3), or `4 width height` for an exact size. Old preset files remain readable; invalid exact sizes fall back to Auto. Changes apply after fully stopping and restarting the app.
+
+Menu headings, labels and enabled options use white text with a black font shadow. Disabled actions remain grey. Menu scaling and pointer hit positions are independent of the selected battlefield resolution.

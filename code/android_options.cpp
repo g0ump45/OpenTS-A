@@ -1,4 +1,5 @@
 #include "always.h"
+#include <cstdlib>
 
 #ifdef __ANDROID__
 #include "android_options.h"
@@ -49,6 +50,9 @@
 #include "ownrdraw.h"
 #include "font.h"
 #include "scheme.h"
+#include "convert.h"
+#include "palette.h"
+#include "rgb.h"
 #include "techno.h"
 #include "theme.h"
 #include "audio/audioengine.h"
@@ -118,10 +122,12 @@ void Draw_Menu_Panel(Rect const & rect)
 class MenuButton : public TextButtonClass {
 public:
 	using TextButtonClass::TextButtonClass;
+    bool Informational = false;
 
 protected:
 	void Draw_Background(void) override
 	{
+        if (IsNoBackground) return;
 		char name[32];
 		Surface * pieces[3];
 		char const * positions[] = {"li", "mi", "ri"};
@@ -139,17 +145,25 @@ protected:
 		SurfaceCache.Draw(Rect(X + Width - right, Y, right, Height), *LogicalSurface, *pieces[2]);
 	}
 
-	void Draw_Text(char const * text) override
-	{
-		ColorScheme * scheme = Fetch_Scheme_By_Name("Green");
-		if (scheme == nullptr) scheme = ColorSchemes[Get_Color_Scheme()];
-		TextPrintType flags = TextPrintType(TPF_BUTTON | TPF_USE_GRAD_PAL |
-			(IsDisabled ? 0 : IsPressed ? TPF_BRIGHT_COLOR : TPF_MEDIUM_COLOR));
-		int const offset = IsPressed ? 1 : 0;
-		Simple_Text_Print(text, *LogicalSurface, Rect(X, Y, Width, Height),
-			Point2D(Width / 2 + offset, (Height - Font_From_TPF(flags)->Get_Height()) / 2 + offset),
-			scheme, TBLACK, flags, true);
-	}
+    void Draw_Text(char const * text) override
+    {
+        if (!text || !*text) return;
+        static std::unique_ptr<ConvertClass> converter;
+        if (!converter) {
+            PaletteClass palette(RGBClass(0,0,0));
+            palette[1] = RGBClass(255,255,255);
+            palette[2] = RGBClass(160,160,160);
+            converter = std::make_unique<ConvertClass>(palette, palette, *LogicalSurface);
+        }
+        unsigned char remap[16];
+        std::fill_n(remap,16,IsDisabled && !Informational ? 2 : 1);
+        remap[0] = 0; remap[2] = remap[3] = 3;
+        FontClass const * font = Font_From_TPF(TPF_BUTTON);
+        int const offset = IsPressed ? 1 : 0;
+        font->Print(text, *LogicalSurface, Rect(X,Y,Width,Height),
+            Point2D((Width-font->String_Pixel_Width(text))/2+offset, (Height-font->Get_Height())/2+offset),
+            *converter,remap);
+    }
 };
 
 class Menu {
@@ -158,28 +172,29 @@ public:
 	DSurface Background;
 	Menu() : PreviousMenuState(AndroidMenuActive.exchange(true)), Background(VisibleSurface->Get_Width(), VisibleSurface->Get_Height())
 	{
+        if (ScenarioActive) Map.Abort_Drag_Select();
 		Background.Blit_From(*VisibleSurface);
 	}
-	~Menu() { AndroidMenuActive = PreviousMenuState; }
+	~Menu() { AndroidMenuActive = PreviousMenuState; if (!PreviousMenuState && ScenarioActive) Android_Video_Reset_Input_View(); }
 	Menu(Menu const &) = delete;
 	Menu & operator=(Menu const &) = delete;
 
 	int Show(char const * title, std::vector<Choice> const & choices,
-		std::vector<std::string> const & lines = {}, bool compact = false, std::function<bool()> poll = {})
+		std::vector<std::string> const & lines = {}, bool compact = false, std::function<bool()> poll = {}, bool numeric_input = false)
 	{
 		int const ox = (HiddenSurface->Get_Width() - 640) / 2;
-		Keyboard->Clear();
+		if (!numeric_input) Keyboard->Clear();
 		LogicalSurface = HiddenSurface;
 		HiddenSurface->Blit_From(Background);
 		int compact_height = 240;
 		for (auto const & item : choices) compact_height = std::max(compact_height, item.Y + 24 + 20 - 110);
 		Draw_Menu_Panel(compact ? Rect(180 + ox, 110, 280, compact_height) : Rect(90 + ox, 28, 460, 424));
 		if (!compact) {
-			TextButtonClass heading(0, Menu_Label(title), TPF_BUTTON, 110 + ox, 42, 420, 26, false, true);
+			MenuButton heading(0, Menu_Label(title), TPF_BUTTON, 110 + ox, 42, 420, 26, false, true);
 			heading.Draw_Me(true);
 		}
 		for (size_t i = 0; i < lines.size(); ++i) {
-			TextButtonClass line(0, lines[i].c_str(), TPF_BUTTON, 108 + ox, 78 + int(i) * 20, 424, 20, false, true);
+			MenuButton line(0, lines[i].c_str(), TPF_BUTTON, 108 + ox, 78 + int(i) * 20, 424, 20, false, true);
 			line.Draw_Me(true);
 		}
 		std::vector<std::unique_ptr<TextButtonClass>> buttons;
@@ -190,8 +205,13 @@ public:
 			if (list) button->Add(*list);
 			else list = button.get();
 			if (!item.Enabled) button->Disable();
+            button->Informational = item.ID >= 30 && item.ID <= 32;
 			buttons.push_back(std::move(button));
 		}
+        list->Draw_All();
+        VisibleSurface->Blit_From(*HiddenSurface);
+        auto * initial = static_cast<DSurface *>(VisibleSurface);
+        Android_Video_Present(initial->Get_Buffer(), initial->Get_Width(), initial->Get_Height(), initial->Stride(), false, true);
 		for (;;) {
 			Call_Back();
 			if (poll && poll()) return -1;
@@ -200,7 +220,15 @@ public:
 			VisibleSurface->Blit_From(*HiddenSurface);
 			auto * visible = static_cast<DSurface *>(VisibleSurface);
 			// The snapshot is already transformed into display coordinates.
-			Android_Video_Present(visible->Get_Buffer(), visible->Get_Width(), visible->Get_Height(), visible->Stride());
+			Android_Video_Present(visible->Get_Buffer(), visible->Get_Width(), visible->Get_Height(), visible->Stride(), false, true);
+            if (numeric_input && !(input & (KN_BUTTON | KN_RLSE_BIT))) {
+                int const key = input & 0xff;
+                if (key >= '0' && key <= '9') return 100 + key - '0';
+                if (key >= VK_NUMPAD0 && key <= VK_NUMPAD9) return 100 + key - VK_NUMPAD0;
+                if (key == VK_BACK) return 12;
+                if (key == VK_RETURN) return 13;
+                if (key == VK_TAB || key == VK_LEFT || key == VK_RIGHT) return 15;
+            }
 			if (input == KN_ESC) return 0;
 			for (Choice const & item : choices) {
 				if (item.Enabled && input == (unsigned(item.ID) | KN_BUTTON)) {
@@ -590,9 +618,9 @@ int Pick_Key(Menu & menu)
 		std::vector<Choice> choices;
 		std::string const keys = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		for (int i = 0; i < 18; ++i) {
-			int const key = page == 0 ? keys[i] : page == 1 ? keys[18 + i] : i < 12 ? VK_F1 + i : 0;
+			int const key = page == 0 ? keys[i] : page == 1 ? keys[18 + i] : i < 12 ? VK_F1 + i : i < 16 ? (i == 12 ? VK_UP : i == 13 ? VK_DOWN : i == 14 ? VK_LEFT : VK_RIGHT) : 0;
 			if (!key) continue;
-			std::string label = page == 2 ? "F" + std::to_string(i + 1) : std::string(1, char(key));
+			std::string label = page != 2 ? std::string(1, char(key)) : i < 12 ? "F" + std::to_string(i + 1) : i == 12 ? "Up" : i == 13 ? "Down" : i == 14 ? "Left" : "Right";
 			choices.push_back({key + 100, label, 115 + (i % 6) * 69, 125 + (i / 6) * 45, 62});
 		}
 		choices.insert(choices.end(), {{1, Toggle("Shift", modifiers & KN_SHIFT_BIT), 115, 80, 130},
@@ -623,7 +651,11 @@ std::string Android_Key_Name(int key)
                 text += char(base);
         } else if (base >= VK_F1 && base <= VK_F12) {
                 text += "F" + std::to_string(base - VK_F1 + 1);
-        } else {
+        } else if (base == VK_UP) text += "Up";
+        else if (base == VK_DOWN) text += "Down";
+        else if (base == VK_LEFT) text += "Left";
+        else if (base == VK_RIGHT) text += "Right";
+        else {
                 text += "?";
         }
 
@@ -728,6 +760,79 @@ void Touch_Controls_Guide(Menu & menu)
         }
 }
 
+void Custom_Resolution(Menu & menu)
+{
+    Keyboard->Clear();
+    int w, h; Android_Video_Pending_Resolution(w, h);
+    std::string values[] = {std::to_string(w), std::to_string(h)};
+    int field = 0; bool replace = true;
+    for (;;) {
+        std::vector<Choice> choices = {
+            {10, std::string(field == 0 ? "Width: [" : "Width: ") + values[0] + (field == 0 ? "]" : ""), 110, 126, 205},
+            {11, std::string(field == 1 ? "Height: [" : "Height: ") + values[1] + (field == 1 ? "]" : ""), 325, 126, 205}};
+        std::string const digits = "1234567890";
+        for (int i = 0; i < int(digits.size()); ++i)
+            choices.push_back({100 + digits[i] - '0', std::string(1, digits[i]), 160 + (i % 3) * 110, 170 + (i / 3) * 44, 100});
+        choices.insert(choices.end(), {{12, "Delete", 110, 350, 125}, {13, "Save", 255, 350, 125}, {14, "Cancel", 400, 350, 130}});
+        int const result = menu.Show("Custom Resolution", choices,
+            {"Choose a field; tap digits or type on your keyboard.", "Landscape, minimum 640 x 480. Restart to apply."}, false, {}, true);
+        if (result >= 100 && result <= 109) {
+            if (replace) { values[field].clear(); replace = false; }
+            if (values[field].size() < 4) values[field] += char('0' + result - 100);
+        } else if (result == 10 || result == 11 || result == 15) { field = result == 15 ? 1 - field : result - 10; replace = true; }
+        else if (result == 12) { if (!values[field].empty()) values[field].pop_back(); replace = false; }
+        else if (result == 13) {
+            if (Android_Video_Save_Custom_Resolution(std::atoi(values[0].c_str()), std::atoi(values[1].c_str()))) return;
+            menu.Message("Display", "Use landscape 640x480 to 3840x2400, up to 8.3M pixels. Storage must be writable.");
+        } else return;
+    }
+}
+
+void Common_Resolutions(Menu & menu)
+{
+    static int const sizes[][2] = {{800,480},{800,600},{960,540},{1024,576},{1024,600},{1024,768},{1280,720},{1280,800},
+        {1600,720},{1600,900},{1920,1080},{1920,1200},{2048,1536},{2400,1080},{2560,1440},{2560,1600},{3840,2160}};
+    int page = 0;
+    for (;;) {
+        std::vector<Choice> choices;
+        int const count = int(sizeof(sizes) / sizeof(sizes[0]));
+        for (int i = page; i < std::min(page + 6, count); ++i)
+            choices.push_back({100 + i, std::to_string(sizes[i][0]) + " x " + std::to_string(sizes[i][1]), 110, 90 + (i - page) * 44, 420});
+        choices.insert(choices.end(), {{1, "Previous", 110, 390, 125, page > 0}, {2, "Next", 255, 390, 125, page + 6 < count}, {3, "Back", 400, 390, 130}});
+        int const result = menu.Show("Phone / Tablet Resolutions", choices);
+        if (result == 1) page = std::max(0, page - 6);
+        else if (result == 2) page = std::min(page + 6, (count - 1) / 6 * 6);
+        else if (result >= 100 && result < 100 + count) {
+            if (!Android_Video_Save_Custom_Resolution(sizes[result-100][0], sizes[result-100][1])) menu.Message("Display", "Could not save the resolution.");
+            else return;
+        } else return;
+    }
+}
+
+void Display_Settings(Menu & menu)
+{
+    for (;;) {
+        int active_w, active_h, saved_w, saved_h;
+        Android_Video_Get_Game_Size(active_w, active_h); Android_Video_Pending_Resolution(saved_w, saved_h);
+        int const result = menu.Show("Display Resolution", {
+            {1, "Auto", 110, 166, 205}, {2, "Native display", 325, 166, 205},
+            {3, "Phone / Tablet Sizes", 110, 210, 420}, {4, "Custom Width / Height", 110, 254, 420},
+            {5, "Back", 220, 390, 200}},
+            {"Active: " + std::to_string(active_w) + " x " + std::to_string(active_h),
+             "Saved: " + std::to_string(saved_w) + " x " + std::to_string(saved_h),
+             active_w == saved_w && active_h == saved_h ? "Saved resolution is active." : "Force stop and reopen to apply the saved size.",
+             "Menus stay readable; black bars keep the aspect ratio."});
+        if (result == 1) { if (!Android_Video_Save_Resolution(0)) menu.Message("Display", "Could not save the setting."); }
+        else if (result == 2) {
+            int w = 0, h = 0;
+            if (!Android_Video_Window_Size(w,h) || !Android_Video_Save_Custom_Resolution(w,h))
+                menu.Message("Display", "Native size is unsupported or the setting could not be saved.");
+        } else if (result == 3) Common_Resolutions(menu);
+        else if (result == 4) Custom_Resolution(menu);
+        else return;
+    }
+}
+
 void Touch_Controls(Menu & menu)
 {
 	static char const * const placementNames[] = {"Hidden", "Bottom", "Top"};
@@ -737,7 +842,7 @@ void Touch_Controls(Menu & menu)
 		int const result = menu.Show("Touch Controls", {
 			{1, AndroidControls.ControlScheme.load() == ANDROID_CONTROL_MODERN ? "Scheme: Modern Touch" : "Scheme: Original Touch", 110, 86, 420},
 			{11, Toggle("Swap pan / box drag", AndroidControls.SwapDragGestures.load()), 110, 130, 420},
-			{4, Toggle("Touch edge scroll", AndroidControls.EdgeScrolling.load()), 110, 174, 420},
+			{4, Toggle("Edge scrolling", AndroidControls.EdgeScrolling.load()), 110, 174, 420},
 			{5, "-", 110, 218, 42, speed > 1},
 			{30, "Camera speed: " + std::to_string(speed), 160, 218, 320, false},
 			{6, "+", 488, 218, 42, speed < 16},
@@ -833,7 +938,7 @@ void Controls(Menu & menu)
 		}
 		choices.insert(choices.end(), {{1, Toggle("Sidebar Text", Options.SidebarCameoText), 110, 230, 205},
 			{2, Toggle("Target Lines", Options.ActionLines), 325, 230, 205}, {3, Toggle("Tooltips", Options.ToolTips), 110, 273, 205},
-			{4, Toggle("Scroll Coasting", Options.ScrollMethod == 0), 325, 273, 205}, {5, "Touch Controls", 210, 316, 220},
+			{4, Toggle("Scroll Coasting", Options.ScrollMethod == 0), 325, 273, 205}, {5, "Touch Controls", 110, 316, 205}, {41, "Display", 325, 316, 205},
 			{9, "About OpenTS-A", 110, 354, 205},
 			{40, "Check for updates", 325, 354, 205, !ScenarioActive},
 			{6, "Sound", 110, 395, 125, AudioEngine.Is_Available()}, {7, "Keyboard", 255, 395, 125}, {8, "Options Menu", 400, 395, 130}});
@@ -846,6 +951,7 @@ void Controls(Menu & menu)
 		else if (result == 6) Sound(menu);
 		else if (result == 7) Keyboard_Menu(menu);
 		else if (result == 9) About(menu);
+		else if (result == 41) Display_Settings(menu);
 		else if (result == 40) { if (!Android_Open_Updates()) menu.Message("Updates", "Could not open update settings."); }
 		else if (result >= 10 && result <= 15) {
 			int const delta = (result & 1) ? 1 : -1;

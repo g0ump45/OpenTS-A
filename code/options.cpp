@@ -59,6 +59,9 @@
 #include "always.h"
 
 #include "options.h"
+#ifdef __ANDROID__
+#include "android_video.h"
+#endif
 
 #include "_command.h"
 #include "_deploymentconfig.h"
@@ -410,8 +413,12 @@ void OptionsClass::Load_Settings(void)
 	AutoSaveInterval = ConfigINI.Get_Int("Options", "AutoSaveInterval", AutoSaveInterval);
 	DebugString("AutoSaveInterval = %d\n", AutoSaveInterval);
 
-	ScreenWidth = ConfigINI.Get_Int("Video", "ScreenWidth", ScreenWidth);
-	ScreenHeight = ConfigINI.Get_Int("Video", "ScreenHeight", ScreenHeight);
+#ifdef __ANDROID__
+    Android_Video_Get_Game_Size(ScreenWidth, ScreenHeight);
+#else
+    ScreenWidth = ConfigINI.Get_Int("Video", "ScreenWidth", ScreenWidth);
+    ScreenHeight = ConfigINI.Get_Int("Video", "ScreenHeight", ScreenHeight);
+#endif
 	DebugString("Resolution = %d X %d\n", ScreenWidth, ScreenHeight);
 
 	StretchMovies = ConfigINI.Get_Bool("Video", "StretchMovies", StretchMovies);
